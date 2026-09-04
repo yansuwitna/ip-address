@@ -10,6 +10,7 @@ import {
   Plus,
   Layers,
   ArrowRight,
+  ArrowLeft,
   Trash2
 } from 'lucide-react';
 import { IPGroup, IPAllocation } from './types/ipam';
@@ -43,6 +44,7 @@ export const App: React.FC = () => {
 
   // Navigation & UI State
   const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
+  const [isViewingGroupAllocations, setIsViewingGroupAllocations] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Data State
@@ -199,9 +201,15 @@ export const App: React.FC = () => {
     switch (tab) {
       case 'dashboard': return 'Dashboard';
       case 'groups': return 'Grup IP (Subnet)';
-      case 'allocations': return 'Alokasi IP Host';
       case 'backup': return 'Cadangan & Data';
     }
+  };
+
+  const handleSelectTab = (tab: NavTab) => {
+    if (tab === 'groups') {
+      setIsViewingGroupAllocations(false);
+    }
+    setCurrentTab(tab);
   };
 
   return (
@@ -210,7 +218,7 @@ export const App: React.FC = () => {
       {/* 1. Left STATIC Dedicated Sidebar (Permanently anchored & pinned) */}
       <Sidebar
         currentTab={currentTab}
-        onSelectTab={setCurrentTab}
+        onSelectTab={handleSelectTab}
         isOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
         currentUser={currentUser}
@@ -248,10 +256,14 @@ export const App: React.FC = () => {
             <DashboardView
               groups={groups}
               allocations={allocations}
-              onNavigateToGroups={() => setCurrentTab('groups')}
+              onNavigateToGroups={() => {
+                setIsViewingGroupAllocations(false);
+                setCurrentTab('groups');
+              }}
               onNavigateToAllocations={(groupId) => {
                 if (groupId) setSelectedGroupId(groupId);
-                setCurrentTab('allocations');
+                setIsViewingGroupAllocations(true);
+                setCurrentTab('groups');
               }}
               onAddGroup={() => {
                 setEditingGroup(null);
@@ -265,311 +277,337 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* TAB 2: GRUP IP (SUBNET & VLAN MANAGEMENT) */}
+          {/* TAB 2: GRUP IP (SUBNET & VLAN MANAGEMENT DENGAN KELOLA ALOKASI HOST) */}
           {currentTab === 'groups' && (
             <div className="space-y-6 animate-in fade-in duration-200">
-              {/* Top Banner */}
-              <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
-                    Manajemen Grup IP & Subnet
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Kelola segmen subnet CIDR, VLAN ID, Gateway, dan lokasi infrastruktur jaringan.
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    setEditingGroup(null);
-                    setIsGroupModalOpen(true);
-                  }}
-                  className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Tambah Grup IP Baru</span>
-                </button>
-              </div>
-
-              {/* Grid of Groups */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {groups.map(grp => {
-                  const grpAllocs = allocations.filter(a => a.groupId === grp.id);
-                  const used = grpAllocs.filter(a => a.status === 'used').length;
-                  const resv = grpAllocs.filter(a => a.status === 'reserved' || a.status === 'dhcp').length;
-                  const subnet = parseCidr(grp.cidr);
-                  const usable = subnet ? subnet.usableHosts : 254;
-                  const pct = usable > 0 ? Math.round(((used + resv) / usable) * 100) : 0;
-
-                  return (
-                    <div
-                      key={grp.id}
-                      className="bg-white border border-slate-200/90 hover:border-blue-300 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
+              {isViewingGroupAllocations && activeGroup ? (
+                /* Sub-tampilan: Kelola Alokasi IP Host untuk Subnet Terpilih */
+                <div className="space-y-4">
+                  {/* Top Bar: Tombol Kembali & Tambah Alokasi */}
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <button
+                      onClick={() => setIsViewingGroupAllocations(false)}
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer w-fit"
                     >
-                      <div 
-                        className="absolute top-0 left-0 right-0 h-1.5"
-                        style={{ backgroundColor: grp.color || '#3b82f6' }}
-                      />
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Kembali ke Daftar Subnet</span>
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingAlloc(null);
+                          setPresetIp(undefined);
+                          setIsAllocModalOpen(true);
+                        }}
+                        className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Alokasikan IP Host</span>
+                      </button>
+                    </div>
+                  </div>
 
-                      <div>
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="font-extrabold text-slate-900 text-base">
-                            {grp.name}
-                          </h3>
-                          {grp.vlanId && (
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 flex-shrink-0">
-                              VLAN {grp.vlanId}
+                  {/* Subnet Selector Pills Bar */}
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xs flex items-center gap-2 overflow-x-auto">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2 flex-shrink-0 flex items-center gap-1.5">
+                      <Layers className="w-4 h-4 text-blue-600" />
+                      <span>Pilih Subnet:</span>
+                    </span>
+                    {groups.map(g => {
+                      const isSel = g.id === activeGroup.id;
+                      const gUsed = allocations.filter(a => a.groupId === g.id && a.status === 'used').length;
+                      return (
+                        <button
+                          key={g.id}
+                          onClick={() => setSelectedGroupId(g.id)}
+                          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                            isSel
+                              ? 'bg-blue-600 text-white shadow-xs font-bold'
+                              : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                          }`}
+                        >
+                          <span 
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: isSel ? '#ffffff' : g.color || '#3b82f6' }}
+                          />
+                          <span>{g.name}</span>
+                          <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                            isSel ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-600'
+                          }`}>
+                            {gUsed}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Active Group Header Card */}
+                  <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-2.5">
+                          <span 
+                            className="w-3.5 h-3.5 rounded-full flex-shrink-0 shadow-xs"
+                            style={{ backgroundColor: activeGroup.color || '#3b82f6' }}
+                          />
+                          <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                            {activeGroup.name}
+                          </h2>
+                          {activeGroup.vlanId && (
+                            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
+                              VLAN {activeGroup.vlanId}
                             </span>
                           )}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 font-mono mb-3">
-                          <span className="bg-slate-100 px-2 py-0.5 rounded-lg text-blue-700 font-bold border border-slate-200">
-                            {grp.cidr}
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-medium">
+                          <span className="font-mono bg-slate-100 px-2 py-0.5 rounded-lg text-blue-700 font-bold border border-slate-200">
+                            {activeGroup.cidr}
                           </span>
-                          <span>GW: {grp.gateway}</span>
-                        </div>
-
-                        <p className="text-xs text-slate-500 line-clamp-2 mb-4">
-                          {grp.description || 'Tidak ada catatan deskripsi.'}
-                        </p>
-
-                        {(grp.location || grp.pic) && (
-                          <div className="flex items-center gap-3 text-xs text-slate-500 mb-4 pt-2 border-t border-slate-100">
-                            {grp.location && (
+                          <span>•</span>
+                          <span>Gateway: <strong className="text-slate-800 font-mono">{activeGroup.gateway}</strong></span>
+                          {activeGroup.location && (
+                            <>
+                              <span>•</span>
                               <span className="flex items-center gap-1">
                                 <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                                <span>{grp.location}</span>
+                                {activeGroup.location}
                               </span>
-                            )}
-                            {grp.pic && (
+                            </>
+                          )}
+                          {activeGroup.pic && (
+                            <>
+                              <span>•</span>
                               <span className="flex items-center gap-1">
                                 <UserCheck className="w-3.5 h-3.5 text-slate-400" />
-                                <span>{grp.pic}</span>
+                                {activeGroup.pic}
                               </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* View Mode Toggle & CSV Export */}
+                      <div className="flex items-center gap-2 self-start sm:self-center">
+                        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                          <button
+                            onClick={() => setViewMode('matrix')}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              viewMode === 'matrix'
+                                ? 'bg-white text-blue-700 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                            title="Peta Grid Visual Seluruh Host"
+                          >
+                            <Grid className="w-3.5 h-3.5" />
+                            <span>Visual Grid</span>
+                          </button>
+                          <button
+                            onClick={() => setViewMode('table')}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              viewMode === 'table'
+                                ? 'bg-white text-blue-700 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                            title="Daftar Tabel Rinci"
+                          >
+                            <List className="w-3.5 h-3.5" />
+                            <span>Tabel Rinci</span>
+                          </button>
+                        </div>
+
+                        <button
+                          onClick={() => exportToCsv(activeGroup, allocations.filter(a => a.groupId === activeGroup.id))}
+                          title="Ekspor CSV Grup Ini"
+                          className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-colors cursor-pointer"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* View Content (Matrix vs Table) */}
+                  {viewMode === 'matrix' ? (
+                    <IPMatrixGrid
+                      group={activeGroup}
+                      allocations={allocations.filter(a => a.groupId === activeGroup.id)}
+                      onSelectIp={(ip, existingAlloc) => {
+                        if (existingAlloc) {
+                          setEditingAlloc(existingAlloc);
+                          setPresetIp(undefined);
+                        } else {
+                          setEditingAlloc(null);
+                          setPresetIp(ip);
+                        }
+                        setIsAllocModalOpen(true);
+                      }}
+                      onPingIp={(alloc) => {
+                        setPingAlloc(alloc);
+                        setIsPingModalOpen(true);
+                      }}
+                    />
+                  ) : (
+                    <IPTable
+                      group={activeGroup}
+                      allocations={allocations}
+                      onAddAllocation={(initialIp) => {
+                        setEditingAlloc(null);
+                        setPresetIp(initialIp);
+                        setIsAllocModalOpen(true);
+                      }}
+                      onEditAllocation={(alloc) => {
+                        setEditingAlloc(alloc);
+                        setPresetIp(undefined);
+                        setIsAllocModalOpen(true);
+                      }}
+                      onDeleteAllocation={handleDeleteAllocation}
+                      onBatchReserve={() => setIsBatchModalOpen(true)}
+                      onPingAllocation={(alloc) => {
+                        setPingAlloc(alloc);
+                        setIsPingModalOpen(true);
+                      }}
+                    />
+                  )}
+                </div>
+              ) : (
+                /* Sub-tampilan: Daftar Kartu Grup IP */
+                <div className="space-y-6">
+                  {/* Top Banner */}
+                  <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                        Manajemen Grup IP & Subnet
+                      </h2>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Kelola segmen subnet CIDR, VLAN ID, Gateway, dan lokasi infrastruktur jaringan.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setEditingGroup(null);
+                        setIsGroupModalOpen(true);
+                      }}
+                      className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Tambah Grup IP Baru</span>
+                    </button>
+                  </div>
+
+                  {/* Grid of Groups */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {groups.map(grp => {
+                      const grpAllocs = allocations.filter(a => a.groupId === grp.id);
+                      const used = grpAllocs.filter(a => a.status === 'used').length;
+                      const resv = grpAllocs.filter(a => a.status === 'reserved' || a.status === 'dhcp').length;
+                      const subnet = parseCidr(grp.cidr);
+                      const usable = subnet ? subnet.usableHosts : 254;
+                      const pct = usable > 0 ? Math.round(((used + resv) / usable) * 100) : 0;
+
+                      return (
+                        <div
+                          key={grp.id}
+                          className="bg-white border border-slate-200/90 hover:border-blue-300 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
+                        >
+                          <div 
+                            className="absolute top-0 left-0 right-0 h-1.5"
+                            style={{ backgroundColor: grp.color || '#3b82f6' }}
+                          />
+
+                          <div>
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <h3 className="font-extrabold text-slate-900 text-base">
+                                {grp.name}
+                              </h3>
+                              {grp.vlanId && (
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 flex-shrink-0">
+                                  VLAN {grp.vlanId}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 font-mono mb-3">
+                              <span className="bg-slate-100 px-2 py-0.5 rounded-lg text-blue-700 font-bold border border-slate-200">
+                                {grp.cidr}
+                              </span>
+                              <span>GW: {grp.gateway}</span>
+                            </div>
+
+                            <p className="text-xs text-slate-500 line-clamp-2 mb-4">
+                              {grp.description || 'Tidak ada catatan deskripsi.'}
+                            </p>
+
+                            {(grp.location || grp.pic) && (
+                              <div className="flex items-center gap-3 text-xs text-slate-500 mb-4 pt-2 border-t border-slate-100">
+                                {grp.location && (
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                                    <span>{grp.location}</span>
+                                  </span>
+                                )}
+                                {grp.pic && (
+                                  <span className="flex items-center gap-1">
+                                    <UserCheck className="w-3.5 h-3.5 text-slate-400" />
+                                    <span>{grp.pic}</span>
+                                  </span>
+                                )}
+                              </div>
                             )}
                           </div>
-                        )}
-                      </div>
 
-                      {/* Footer Actions */}
-                      <div className="pt-3 border-t border-slate-100 space-y-2.5">
-                        <div className="flex items-center justify-between text-xs font-semibold">
-                          <span className="text-slate-500">Host Terpakai:</span>
-                          <span className="text-slate-900">
-                            <strong className="text-blue-600 font-black">{used}</strong> / {usable} IP ({pct}%)
-                          </span>
+                          {/* Footer Actions */}
+                          <div className="pt-3 border-t border-slate-100 space-y-2.5">
+                            <div className="flex items-center justify-between text-xs font-semibold">
+                              <span className="text-slate-500">Host Terpakai:</span>
+                              <span className="text-slate-900">
+                                <strong className="text-blue-600 font-black">{used}</strong> / {usable} IP ({pct}%)
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => {
+                                  setSelectedGroupId(grp.id);
+                                  setIsViewingGroupAllocations(true);
+                                }}
+                                className="flex-1 py-2 px-3 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                              >
+                                <span>Kelola IP Host</span>
+                                <ArrowRight className="w-3.5 h-3.5" />
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  setEditingGroup(grp);
+                                  setIsGroupModalOpen(true);
+                                }}
+                                title="Edit Grup"
+                                className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-colors cursor-pointer"
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  if (window.confirm(`Hapus grup "${grp.name}" (${grp.cidr}) beserta seluruh data IP di dalamnya?`)) {
+                                    handleDeleteGroup(grp.id);
+                                  }
+                                }}
+                                title="Hapus Grup IP"
+                                className="p-2 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-xl transition-all cursor-pointer"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
                         </div>
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => {
-                              setSelectedGroupId(grp.id);
-                              setCurrentTab('allocations');
-                            }}
-                            className="flex-1 py-2 px-3 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                          >
-                            <span>Kelola IP Host</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              setEditingGroup(grp);
-                              setIsGroupModalOpen(true);
-                            }}
-                            title="Edit Grup"
-                            className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-colors cursor-pointer"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              if (window.confirm(`Hapus grup "${grp.name}" (${grp.cidr}) beserta seluruh data IP di dalamnya?`)) {
-                                handleDeleteGroup(grp.id);
-                              }
-                            }}
-                            title="Hapus Grup IP"
-                            className="p-2 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-xl transition-all cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: ALOKASI IP HOST (VISUAL GRID & TABLE) */}
-          {currentTab === 'allocations' && activeGroup && (
-            <div className="space-y-4 animate-in fade-in duration-200">
-              
-              {/* Subnet Selector Pills Bar */}
-              <div className="bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xs flex items-center gap-2 overflow-x-auto">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2 flex-shrink-0 flex items-center gap-1.5">
-                  <Layers className="w-4 h-4 text-blue-600" />
-                  <span>Pilih Subnet:</span>
-                </span>
-                {groups.map(g => {
-                  const isSel = g.id === activeGroup.id;
-                  const gUsed = allocations.filter(a => a.groupId === g.id && a.status === 'used').length;
-                  return (
-                    <button
-                      key={g.id}
-                      onClick={() => setSelectedGroupId(g.id)}
-                      className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                        isSel
-                          ? 'bg-blue-600 text-white shadow-xs font-bold'
-                          : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
-                      }`}
-                    >
-                      <span 
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: isSel ? '#ffffff' : g.color || '#3b82f6' }}
-                      />
-                      <span>{g.name}</span>
-                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                        isSel ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-600'
-                      }`}>
-                        {gUsed}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Active Group Header Card */}
-              <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2.5">
-                      <span 
-                        className="w-3.5 h-3.5 rounded-full flex-shrink-0 shadow-xs"
-                        style={{ backgroundColor: activeGroup.color || '#3b82f6' }}
-                      />
-                      <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
-                        {activeGroup.name}
-                      </h2>
-                      {activeGroup.vlanId && (
-                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
-                          VLAN {activeGroup.vlanId}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-medium">
-                      <span className="font-mono bg-slate-100 px-2 py-0.5 rounded-lg text-blue-700 font-bold border border-slate-200">
-                        {activeGroup.cidr}
-                      </span>
-                      <span>•</span>
-                      <span>Gateway: <strong className="text-slate-800 font-mono">{activeGroup.gateway}</strong></span>
-                      {activeGroup.location && (
-                        <>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-slate-400" />
-                            {activeGroup.location}
-                          </span>
-                        </>
-                      )}
-                      {activeGroup.pic && (
-                        <>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <UserCheck className="w-3 h-3 text-slate-400" />
-                            {activeGroup.pic}
-                          </span>
-                        </>
-                      )}
-                    </div>
+                      );
+                    })}
                   </div>
-
-                  {/* View Mode Toggle & CSV Export */}
-                  <div className="flex items-center gap-2 self-start sm:self-center">
-                    <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-                      <button
-                        onClick={() => setViewMode('matrix')}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          viewMode === 'matrix'
-                            ? 'bg-white text-blue-700 shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                        title="Peta Grid Visual Seluruh Host"
-                      >
-                        <Grid className="w-3.5 h-3.5" />
-                        <span>Visual Grid</span>
-                      </button>
-                      <button
-                        onClick={() => setViewMode('table')}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          viewMode === 'table'
-                            ? 'bg-white text-blue-700 shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                        title="Daftar Tabel Rinci"
-                      >
-                        <List className="w-3.5 h-3.5" />
-                        <span>Tabel Rinci</span>
-                      </button>
-                    </div>
-
-                    <button
-                      onClick={() => exportToCsv(activeGroup, allocations.filter(a => a.groupId === activeGroup.id))}
-                      title="Ekspor CSV Grup Ini"
-                      className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-colors cursor-pointer"
-                    >
-                      <Download className="w-4 h-4" />
-                    </button>
-                  </div>
-
                 </div>
-              </div>
-
-              {/* View Content (Matrix vs Table) */}
-              {viewMode === 'matrix' ? (
-                <IPMatrixGrid
-                  group={activeGroup}
-                  allocations={allocations.filter(a => a.groupId === activeGroup.id)}
-                  onSelectIp={(ip, existingAlloc) => {
-                    if (existingAlloc) {
-                      setEditingAlloc(existingAlloc);
-                      setPresetIp(undefined);
-                    } else {
-                      setEditingAlloc(null);
-                      setPresetIp(ip);
-                    }
-                    setIsAllocModalOpen(true);
-                  }}
-                  onPingIp={(alloc) => {
-                    setPingAlloc(alloc);
-                    setIsPingModalOpen(true);
-                  }}
-                />
-              ) : (
-                <IPTable
-                  group={activeGroup}
-                  allocations={allocations}
-                  onAddAllocation={(initialIp) => {
-                    setEditingAlloc(null);
-                    setPresetIp(initialIp);
-                    setIsAllocModalOpen(true);
-                  }}
-                  onEditAllocation={(alloc) => {
-                    setEditingAlloc(alloc);
-                    setPresetIp(undefined);
-                    setIsAllocModalOpen(true);
-                  }}
-                  onDeleteAllocation={handleDeleteAllocation}
-                  onBatchReserve={() => setIsBatchModalOpen(true)}
-                  onPingAllocation={(alloc) => {
-                    setPingAlloc(alloc);
-                    setIsPingModalOpen(true);
-                  }}
-                />
               )}
             </div>
           )}

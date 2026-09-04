@@ -3,7 +3,6 @@ import {
   Network, 
   LayoutDashboard, 
   Layers, 
-  Server, 
   Database, 
   LogOut, 
   ShieldCheck, 
@@ -12,7 +11,7 @@ import {
 } from 'lucide-react';
 import { User } from '../types/auth';
 
-export type NavTab = 'dashboard' | 'groups' | 'allocations' | 'backup';
+export type NavTab = 'dashboard' | 'groups' | 'backup';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -35,30 +34,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
   totalGroups,
   totalUsedIps
 }) => {
-  const navItems = [
+  interface NavItem {
+    id: NavTab;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    description: string;
+    badge?: string;
+    badgeColor?: string;
+  }
+
+  const navItems: NavItem[] = [
     {
-      id: 'dashboard' as NavTab,
+      id: 'dashboard',
       label: 'Dashboard',
       icon: LayoutDashboard,
       description: 'Ringkasan Utama'
     },
     {
-      id: 'groups' as NavTab,
+      id: 'groups',
       label: 'Grup IP (Subnet)',
       icon: Layers,
       description: 'Kelola Subnet & VLAN',
       badge: totalGroups.toString()
     },
     {
-      id: 'allocations' as NavTab,
-      label: 'Alokasi IP Host',
-      icon: Server,
-      description: 'Peta & Daftar IP Terpakai',
-      badge: `${totalUsedIps} Aktif`,
-      badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200'
-    },
-    {
-      id: 'backup' as NavTab,
+      id: 'backup',
       label: 'Cadangan & Data',
       icon: Database,
       description: 'Ekspor & Impor JSON'
