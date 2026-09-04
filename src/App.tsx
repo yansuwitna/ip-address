@@ -9,7 +9,8 @@ import {
   UserCheck,
   Plus,
   Layers,
-  ArrowRight
+  ArrowRight,
+  Trash2
 } from 'lucide-react';
 import { IPGroup, IPAllocation } from './types/ipam';
 import { User } from './types/auth';
@@ -377,9 +378,21 @@ export const App: React.FC = () => {
                               setIsGroupModalOpen(true);
                             }}
                             title="Edit Grup"
-                            className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-colors cursor-pointer"
+                            className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-colors cursor-pointer"
                           >
                             <Edit3 className="w-4 h-4" />
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              if (window.confirm(`Hapus grup "${grp.name}" (${grp.cidr}) beserta seluruh data IP di dalamnya?`)) {
+                                handleDeleteGroup(grp.id);
+                              }
+                            }}
+                            title="Hapus Grup IP"
+                            className="p-2 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-xl transition-all cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
