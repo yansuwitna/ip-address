@@ -143,6 +143,16 @@ export const DnsView: React.FC<DnsViewProps> = ({
     }
   };
 
+  
+  if (selectedDomainForSub) {
+    return (
+      <SubDomainView 
+        parentDomain={selectedDomainForSub} 
+        onBack={() => setSelectedDomainForSub(null)} 
+      />
+    );
+  }
+
   return (
     <div className="space-y-6 font-poppins animate-in fade-in duration-200">
       
@@ -526,8 +536,8 @@ export const DnsView: React.FC<DnsViewProps> = ({
                       <td className="py-3.5 px-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end space-x-1">
                           <button
-                            onClick={() => setSearch('.' + item.domain)}
-                            title="Tampilkan Data Sub-Domain"
+                            onClick={() => setSelectedDomainForSub(item)}
+                            title="Kelola Pemetaan Sub-Domain"
                             className="p-1.5 hover:bg-indigo-50 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors cursor-pointer"
                           >
                             <Layers className="w-3.5 h-3.5" />
