@@ -3,7 +3,6 @@ import {
   Layers, 
   CheckCircle2, 
   ArrowRight, 
-  Plus, 
   Server, 
   Router, 
   Monitor, 
@@ -22,17 +21,15 @@ interface DashboardViewProps {
   allocations: IPAllocation[];
   onNavigateToGroups: () => void;
   onNavigateToAllocations: (groupId?: string) => void;
-  onAddGroup: () => void;
-  onAddAllocation: () => void;
+  onAddGroup?: () => void;
+  onAddAllocation?: () => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   groups,
   allocations,
   onNavigateToGroups,
-  onNavigateToAllocations,
-  onAddGroup,
-  onAddAllocation
+  onNavigateToAllocations
 }) => {
   // 1. Total Grup IP
   const totalGroups = groups.length;
@@ -69,31 +66,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="space-y-6 font-poppins animate-in fade-in duration-200">
       
-      {/* Dashboard Top Row (Compact & Proportional) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
-        <div>
-          <p className="text-xs text-slate-500 font-medium">
-            Pemantauan data jumlah grup subnet dan seluruh IP address yang sudah digunakan.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onAddGroup}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold rounded-xl shadow-2xs transition-all cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5 text-blue-600" />
-            <span>Tambah Grup IP</span>
-          </button>
-          <button
-            onClick={onAddAllocation}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm shadow-blue-600/20 transition-all cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Alokasikan IP</span>
-          </button>
-        </div>
-      </div>
 
       {/* 2 MAIN KPI CARDS (Hanya Fokus pada Jumlah Grup IP & IP yang Sudah Digunakan) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
