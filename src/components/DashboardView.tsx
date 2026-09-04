@@ -69,34 +69,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="space-y-6 font-poppins animate-in fade-in duration-200">
       
-      {/* Dashboard Top Greeting */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 sm:p-8 text-white shadow-lg shadow-blue-500/15">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-xs font-semibold text-blue-100 mb-1">
-            <Activity className="w-3.5 h-3.5 text-cyan-300" />
-            <span>NetIPAM Overview</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Dashboard Jaringan
-          </h1>
-          <p className="text-xs sm:text-sm text-blue-100 max-w-xl">
-            Menampilkan data jumlah grup IP terdaftar serta pelacakan seluruh IP address yang sudah digunakan.
+      {/* Dashboard Top Row (Compact & Proportional) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
+        <div>
+          <p className="text-xs text-slate-500 font-medium">
+            Pemantauan data jumlah grup subnet dan seluruh IP address yang sudah digunakan.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 pt-2 sm:pt-0">
+        <div className="flex items-center gap-2">
           <button
             onClick={onAddGroup}
-            className="flex items-center gap-1.5 px-4 py-2 bg-white text-blue-700 hover:bg-blue-50 text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold rounded-xl shadow-2xs transition-all cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5 text-blue-600" />
             <span>Tambah Grup IP</span>
           </button>
           <button
             onClick={onAddAllocation}
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-700/80 hover:bg-blue-700 text-white border border-blue-400/40 text-xs font-bold rounded-xl transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm shadow-blue-600/20 transition-all cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5" />
             <span>Alokasikan IP</span>
           </button>
         </div>

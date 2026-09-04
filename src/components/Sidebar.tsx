@@ -93,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }`}>
         
         {/* Brand Header (Static Top) */}
-        <div className="h-16 px-5 border-b border-slate-200/80 flex items-center justify-between flex-shrink-0 bg-white">
+        <div className="h-14 px-5 border-b border-slate-200/80 flex items-center justify-between flex-shrink-0 bg-white">
           <div className="flex items-center space-x-3">
             <div className="p-2.5 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
               <Network className="w-5 h-5" />
@@ -167,16 +167,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
 
-        {/* Quick System Status Card */}
-        <div className="p-3 mx-3 mb-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex-shrink-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-[11px] font-bold text-slate-800">Sistem Online</span>
-          </div>
-          <p className="text-[11px] text-slate-500 leading-snug">
-            Memantau <strong>{totalGroups}</strong> grup subnet & <strong>{totalUsedIps}</strong> IP aktif.
-          </p>
-        </div>
 
         {/* User Profile & Logout (Static Bottom) */}
         <div className="p-3 border-t border-slate-200/80 bg-slate-50/70 flex-shrink-0">
