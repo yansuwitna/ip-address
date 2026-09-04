@@ -122,7 +122,7 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({ parentDomain, onBa
       
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-start sm:items-center gap-3">
           <button 
             onClick={onBack}
             className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl transition-all"
@@ -134,7 +134,7 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({ parentDomain, onBa
             <Globe className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight flex flex-wrap items-center gap-1.5 sm:gap-2 leading-snug">
               Sub Domain
               <span className="text-sm font-normal text-slate-500">untuk</span>
               <span className="text-blue-600 dark:text-blue-400 font-mono bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-lg border border-blue-100 dark:border-blue-800/60">
@@ -195,11 +195,11 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({ parentDomain, onBa
               ) : (
                 filteredSubs.map(item => (
                   <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-slate-900 dark:text-slate-100">
+                    <td className="py-3.5 px-4 whitespace-nowrap font-mono font-bold text-slate-900 dark:text-slate-100">
                       <span className="text-blue-600 dark:text-blue-400">{item.subName}</span>
                       <span className="text-slate-400 dark:text-slate-500">.{parentDomain.domain}</span>
                     </td>
-                    <td className="py-3.5 px-4">
+                    <td className="py-3.5 px-4 whitespace-nowrap">
                       <div className="flex flex-col gap-1">
                         {item.ipAddress && (
                           <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
@@ -216,7 +216,7 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({ parentDomain, onBa
                         {!item.ipAddress && !item.port && <span className="text-slate-400">-</span>}
                       </div>
                     </td>
-                    <td className="py-3.5 px-4">
+                    <td className="py-3.5 px-4 whitespace-nowrap">
                       {item.folder ? (
                         <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
                           <Folder className="w-3 h-3 text-emerald-500 flex-shrink-0" />
@@ -224,7 +224,7 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({ parentDomain, onBa
                         </div>
                       ) : <span className="text-slate-400">-</span>}
                     </td>
-                    <td className="py-3.5 px-4">
+                    <td className="py-3.5 px-4 whitespace-nowrap">
                       {item.database ? (
                         <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
                           <Database className="w-3 h-3 text-purple-500 flex-shrink-0" />

@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { DnsRecord, DnsRecordType, DnsRecordStatus, IPGroup, IPAllocation } from '../types/ipam';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
+import { loadSubDomains } from '../utils/storage';
 
 interface DnsViewProps {
   dnsRecords: DnsRecord[];
@@ -45,6 +46,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
   onOpenPrintModal
 }) => {
   const [search, setSearch] = useState('');
+  const subDomains = loadSubDomains();
   const [selectedDomainForSub, setSelectedDomainForSub] = useState<DnsRecord | null>(null);
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -453,6 +455,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
                 </tr>
               ) : (
                 filteredRecords.map(item => {
+                  const hasSubDomains = subDomains.some(s => s.parentDomainId === item.id);
                   const linkedGroup = groups.find(g => g.id === item.groupId);
                   const linkedAlloc = allocations.find(a => a.ip === item.value || a.ip === item.ip);
 
@@ -552,9 +555,17 @@ export const DnsView: React.FC<DnsViewProps> = ({
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
-                            onClick={() => handleDelete(item)}
-                            title="Hapus Catatan DNS"
-                            className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-900/40 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
+                            onClick={() => {
+                              if (hasSubDomains) return;
+                              handleDelete(item);
+                            }}
+                            title={hasSubDomains ? "Tidak dapat dihapus (memiliki Sub Domain)" : "Hapus Catatan DNS"}
+                            disabled={hasSubDomains}
+                            className={`p-1.5 rounded-lg transition-colors ${
+                              hasSubDomains 
+                                ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed' 
+                                : 'hover:bg-rose-50 dark:hover:bg-rose-900/40 text-slate-400 hover:text-rose-600 cursor-pointer'
+                            }`}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
