@@ -1,6 +1,8 @@
 import React from 'react';
 import { 
-  Network, 
+  Network,
+  Sun,
+  Moon, 
   LogIn, 
   ArrowRight, 
   Layers, 
@@ -8,28 +10,37 @@ import {
   Cpu, 
   Activity, 
   Sparkles, 
-  HardDrive
+  HardDrive,
+  Globe
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceCategory } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, DnsRecord } from '../types/ipam';
+import { loadSubDomains } from '../utils/storage';
 import { User } from '../types/auth';
 
 interface HomeViewProps {
   groups: IPGroup[];
   allocations: IPAllocation[];
   categories: DeviceCategory[];
+  dnsRecords?: DnsRecord[];
   currentUser: User | null;
   onNavigateToLogin: () => void;
   onNavigateToDashboard?: () => void;
+  theme?: 'light' | 'dark';
+  onToggleTheme?: () => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
   groups,
   allocations,
   categories,
+  dnsRecords = [],
   currentUser,
   onNavigateToLogin,
-  onNavigateToDashboard
+  onNavigateToDashboard,
+  theme = 'light',
+  onToggleTheme
 }) => {
+  const subDomains = loadSubDomains();
   // Global statistics
   const totalUsedAll = allocations.filter(a => a.status === 'used').length;
   const totalReservedAll = allocations.filter(a => a.status === 'reserved' || a.status === 'dhcp').length;
@@ -60,20 +71,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          {/* Center Badges (Desktop) */}
-          <div className="hidden md:flex items-center gap-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Sistem Aktif</span>
-            </span>
-            <span className="text-slate-400">•</span>
-            <span>{groups.length} Subnet Terdaftar</span>
-            <span className="text-slate-400">•</span>
-            <span>{allocations.length} Alokasi Host</span>
-          </div>
+
 
           {/* Right Action: Login or Dashboard Button */}
           <div className="flex items-center gap-3">
+            {onToggleTheme && (
+              <button
+                onClick={onToggleTheme}
+                className="p-2 sm:p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 shadow-xs transition-colors cursor-pointer"
+                title={theme === 'dark' ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
+              </button>
+            )}
             {currentUser ? (
               <button
                 onClick={onNavigateToDashboard}
@@ -135,7 +145,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         {/* Highlight KPI Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-5xl mx-auto pt-6">
           <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs text-left">
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Subnet IP</span>
@@ -170,6 +180,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
             <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{categories.length}</div>
             <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Hardware Tervalidasi</div>
+          </div>
+
+          {/* New Cards */}
+          <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs text-left">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Domain Utama</span>
+              <Globe className="w-4 h-4 text-indigo-600" />
+            </div>
+            <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{dnsRecords?.length || 0}</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Record DNS Server</div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs text-left">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Sub Domain</span>
+              <Layers className="w-4 h-4 text-pink-600" />
+            </div>
+            <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{subDomains.length}</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Virtual Host / Reverse Proxy</div>
           </div>
         </div>
 

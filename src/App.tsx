@@ -321,8 +321,11 @@ export const App: React.FC = () => {
         groups={groups}
         allocations={allocations}
         categories={categories}
+        dnsRecords={dnsRecords}
         currentUser={null}
         onNavigateToLogin={() => setAuthView('login')}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
     );
   }
@@ -334,9 +337,12 @@ export const App: React.FC = () => {
         groups={groups}
         allocations={allocations}
         categories={categories}
+        dnsRecords={dnsRecords}
         currentUser={currentUser}
         onNavigateToLogin={() => setIsViewingPublicHome(false)}
         onNavigateToDashboard={() => setIsViewingPublicHome(false)}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
     );
   }
