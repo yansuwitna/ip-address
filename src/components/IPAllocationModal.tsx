@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { X, Server, Sparkles, AlertTriangle } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceType, IPStatus } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceType, IPStatus, DeviceCategory } from '../types/ipam';
 import { isValidIpv4, isIpInCidr, isValidMac, findNextAvailableIp } from '../utils/ipCalculator';
+import { DEFAULT_DEVICE_CATEGORIES } from '../utils/storage';
 
 interface IPAllocationModalProps {
   isOpen: boolean;
@@ -11,20 +12,8 @@ interface IPAllocationModalProps {
   allocations: IPAllocation[];
   editAllocation?: IPAllocation | null;
   presetIp?: string;
+  categories?: DeviceCategory[];
 }
-
-const DEVICE_TYPES: { id: DeviceType; label: string }[] = [
-  { id: 'server', label: 'Server' },
-  { id: 'router', label: 'Router / Gateway' },
-  { id: 'switch', label: 'Network Switch' },
-  { id: 'access_point', label: 'Access Point (WiFi)' },
-  { id: 'pc_workstation', label: 'PC / Laptop Workstation' },
-  { id: 'cctv', label: 'IP Camera / CCTV' },
-  { id: 'printer', label: 'Printer Jaringan' },
-  { id: 'smartphone', label: 'Smartphone / Tablet' },
-  { id: 'iot', label: 'IoT / Smart Device' },
-  { id: 'other', label: 'Perangkat Lainnya' }
-];
 
 export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
   isOpen,
@@ -33,7 +22,8 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
   group,
   allocations,
   editAllocation,
-  presetIp
+  presetIp,
+  categories = DEFAULT_DEVICE_CATEGORIES
 }) => {
   const [ip, setIp] = useState('');
   const [hostname, setHostname] = useState('');
@@ -270,8 +260,8 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
                 onChange={(e) => setDeviceType(e.target.value as DeviceType)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
               >
-                {DEVICE_TYPES.map(dt => (
-                  <option key={dt.id} value={dt.id}>{dt.label}</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
             </div>

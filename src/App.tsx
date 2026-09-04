@@ -13,7 +13,7 @@ import {
   ArrowLeft,
   Trash2
 } from 'lucide-react';
-import { IPGroup, IPAllocation } from './types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory } from './types/ipam';
 import { User } from './types/auth';
 import { getCurrentUser, logoutUser } from './utils/auth';
 import { 
@@ -21,6 +21,8 @@ import {
   saveGroups, 
   loadAllocations, 
   saveAllocations, 
+  loadDeviceCategories,
+  saveDeviceCategories,
   resetDemoData 
 } from './utils/storage';
 import { exportToXlsx } from './utils/exportImport';
@@ -30,6 +32,7 @@ import { Login } from './components/Login';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { DashboardView } from './components/DashboardView';
+import { CategoriesView } from './components/CategoriesView';
 import { IPMatrixGrid } from './components/IPMatrixGrid';
 import { IPTable } from './components/IPTable';
 import { BackupView } from './components/BackupView';
@@ -50,6 +53,7 @@ export const App: React.FC = () => {
   // Data State
   const [groups, setGroups] = useState<IPGroup[]>(loadGroups);
   const [allocations, setAllocations] = useState<IPAllocation[]>(loadAllocations);
+  const [categories, setCategories] = useState<DeviceCategory[]>(loadDeviceCategories);
   const [selectedGroupId, setSelectedGroupId] = useState<string>(groups[0]?.id || '');
   const [viewMode, setViewMode] = useState<'matrix' | 'table'>('matrix');
   const [globalSearch, setGlobalSearch] = useState('');
@@ -75,6 +79,24 @@ export const App: React.FC = () => {
   useEffect(() => {
     saveAllocations(allocations);
   }, [allocations]);
+
+  useEffect(() => {
+    saveDeviceCategories(categories);
+  }, [categories]);
+
+  const handleSaveCategory = (cat: DeviceCategory) => {
+    setCategories(prev => {
+      const exists = prev.some(c => c.id === cat.id);
+      if (exists) {
+        return prev.map(c => c.id === cat.id ? cat : c);
+      }
+      return [...prev, cat];
+    });
+  };
+
+  const handleDeleteCategory = (catId: string) => {
+    setCategories(prev => prev.filter(c => c.id !== catId));
+  };
 
   // Keep selectedGroupId valid
   useEffect(() => {
@@ -201,6 +223,7 @@ export const App: React.FC = () => {
     switch (tab) {
       case 'dashboard': return 'Dashboard';
       case 'groups': return 'Grup IP (Subnet)';
+      case 'categories': return 'Kategori Perangkat';
       case 'backup': return 'Cadangan & Data';
     }
   };
@@ -225,6 +248,7 @@ export const App: React.FC = () => {
         onLogout={handleLogout}
         totalGroups={groups.length}
         totalUsedIps={totalUsedIps}
+        totalCategories={categories.length}
       />
 
       {/* 2. Main Work Area with Independent Smooth Scroll */}
@@ -472,6 +496,7 @@ export const App: React.FC = () => {
                       const subnet = parseCidr(grp.cidr);
                       const usable = subnet ? subnet.usableHosts : 254;
                       const pct = usable > 0 ? Math.round(((used + resv) / usable) * 100) : 0;
+                      const hasUsedIps = used > 0 || grpAllocs.length > 0;
 
                       return (
                         <div
@@ -557,13 +582,23 @@ export const App: React.FC = () => {
                               </button>
 
                               <button
+                                disabled={hasUsedIps}
                                 onClick={() => {
-                                  if (window.confirm(`Hapus grup "${grp.name}" (${grp.cidr}) beserta seluruh data IP di dalamnya?`)) {
+                                  if (hasUsedIps) return;
+                                  if (window.confirm(`Hapus grup "${grp.name}" (${grp.cidr})?`)) {
                                     handleDeleteGroup(grp.id);
                                   }
                                 }}
-                                title="Hapus Grup IP"
-                                className="p-2 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-xl transition-all cursor-pointer"
+                                title={
+                                  hasUsedIps
+                                    ? `Tidak dapat dihapus: masih ada ${used > 0 ? `${used} IP terpakai` : `${grpAllocs.length} data IP`} pada grup ini`
+                                    : "Hapus Grup IP"
+                                }
+                                className={`p-2 rounded-xl transition-all ${
+                                  hasUsedIps
+                                    ? 'bg-slate-100 text-slate-300 cursor-not-allowed border border-slate-200/70'
+                                    : 'bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white cursor-pointer'
+                                }`}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -580,7 +615,17 @@ export const App: React.FC = () => {
 
 
 
-          {/* TAB 5: CADANGAN & DATA */}
+          {/* TAB 3: KATEGORI PERANGKAT */}
+          {currentTab === 'categories' && (
+            <CategoriesView
+              categories={categories}
+              allocations={allocations}
+              onSaveCategory={handleSaveCategory}
+              onDeleteCategory={handleDeleteCategory}
+            />
+          )}
+
+          {/* TAB 4: CADANGAN & DATA */}
           {currentTab === 'backup' && (
             <BackupView
               groups={groups}
@@ -594,6 +639,7 @@ export const App: React.FC = () => {
                 const demo = resetDemoData();
                 setGroups(demo.groups);
                 setAllocations(demo.allocations);
+                setCategories(demo.categories);
                 setSelectedGroupId(demo.groups[0]?.id || '');
               }}
             />
@@ -626,6 +672,7 @@ export const App: React.FC = () => {
           onSave={handleSaveAllocation}
           group={activeGroup}
           allocations={allocations}
+          categories={categories}
           editAllocation={editingAlloc}
           presetIp={presetIp}
         />

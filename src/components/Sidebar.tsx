@@ -3,6 +3,7 @@ import {
   Network, 
   LayoutDashboard, 
   Layers, 
+  Cpu,
   Database, 
   LogOut, 
   ShieldCheck, 
@@ -11,7 +12,7 @@ import {
 } from 'lucide-react';
 import { User } from '../types/auth';
 
-export type NavTab = 'dashboard' | 'groups' | 'backup';
+export type NavTab = 'dashboard' | 'groups' | 'categories' | 'backup';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -22,6 +23,7 @@ interface SidebarProps {
   onLogout: () => void;
   totalGroups: number;
   totalUsedIps: number;
+  totalCategories?: number;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -32,7 +34,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentUser,
   onLogout,
   totalGroups,
-  totalUsedIps
+  totalUsedIps,
+  totalCategories
 }) => {
   interface NavItem {
     id: NavTab;
@@ -56,6 +59,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Layers,
       description: 'Kelola Subnet & VLAN',
       badge: totalGroups.toString()
+    },
+    {
+      id: 'categories',
+      label: 'Kategori Perangkat',
+      icon: Cpu,
+      description: 'Kelola Tipe Hardware',
+      badge: totalCategories !== undefined ? totalCategories.toString() : undefined
     },
     {
       id: 'backup',

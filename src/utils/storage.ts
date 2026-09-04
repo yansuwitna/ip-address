@@ -1,8 +1,9 @@
-import { IPGroup, IPAllocation } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory } from '../types/ipam';
 
 const STORAGE_KEYS = {
   GROUPS: 'netipam_groups_v1',
-  ALLOCATIONS: 'netipam_allocations_v1'
+  ALLOCATIONS: 'netipam_allocations_v1',
+  DEVICE_CATEGORIES: 'netipam_device_categories_v1'
 };
 
 export const INITIAL_GROUPS: IPGroup[] = [
@@ -393,8 +394,44 @@ export function saveAllocations(allocations: IPAllocation[]): void {
   }
 }
 
-export function resetDemoData(): { groups: IPGroup[]; allocations: IPAllocation[] } {
+export const DEFAULT_DEVICE_CATEGORIES: DeviceCategory[] = [
+  { id: 'server', name: 'Server / Host VM', icon: 'Server', description: 'Server fisik, virtual machine, datacenter' },
+  { id: 'router', name: 'Router & Gateway', icon: 'Router', description: 'Router core, edge router, mikrotik, cisco' },
+  { id: 'switch', name: 'Switch Jaringan', icon: 'Network', description: 'Manageable switch L2/L3, distribusi' },
+  { id: 'access_point', name: 'Access Point (Wi-Fi)', icon: 'Wifi', description: 'Wireless AP indoor / outdoor' },
+  { id: 'pc_workstation', name: 'PC Workstation & Laptop', icon: 'Monitor', description: 'Komputer kerja karyawan & staf' },
+  { id: 'cctv', name: 'Kamera CCTV & NVR', icon: 'Video', description: 'IP camera keamanan dan perekam NVR' },
+  { id: 'printer', name: 'Printer & Scanner', icon: 'Printer', description: 'Printer jaringan & multifungsi' },
+  { id: 'smartphone', name: 'Smartphone & Tablet', icon: 'Smartphone', description: 'Perangkat mobile pengguna' },
+  { id: 'iot', name: 'Perangkat IoT & Sensor', icon: 'Cpu', description: 'Mesin absensi, smart display, sensor' },
+  { id: 'other', name: 'Perangkat Lainnya', icon: 'HardDrive', description: 'Perangkat pendukung lainnya' }
+];
+
+export function loadDeviceCategories(): DeviceCategory[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.DEVICE_CATEGORIES);
+    if (!raw) {
+      saveDeviceCategories(DEFAULT_DEVICE_CATEGORIES);
+      return DEFAULT_DEVICE_CATEGORIES;
+    }
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error('Error loading device categories:', err);
+    return DEFAULT_DEVICE_CATEGORIES;
+  }
+}
+
+export function saveDeviceCategories(categories: DeviceCategory[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.DEVICE_CATEGORIES, JSON.stringify(categories));
+  } catch (err) {
+    console.error('Error saving device categories:', err);
+  }
+}
+
+export function resetDemoData(): { groups: IPGroup[]; allocations: IPAllocation[]; categories: DeviceCategory[] } {
   saveGroups(INITIAL_GROUPS);
   saveAllocations(INITIAL_ALLOCATIONS);
-  return { groups: INITIAL_GROUPS, allocations: INITIAL_ALLOCATIONS };
+  saveDeviceCategories(DEFAULT_DEVICE_CATEGORIES);
+  return { groups: INITIAL_GROUPS, allocations: INITIAL_ALLOCATIONS, categories: DEFAULT_DEVICE_CATEGORIES };
 }

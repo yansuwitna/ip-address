@@ -1,15 +1,12 @@
-export type DeviceType =
-  | 'server'
-  | 'router'
-  | 'switch'
-  | 'access_point'
-  | 'pc_workstation'
-  | 'cctv'
-  | 'printer'
-  | 'smartphone'
-  | 'iot'
-  | 'gateway'
-  | 'other';
+export type DeviceType = string;
+
+export interface DeviceCategory {
+  id: string;
+  name: string;
+  icon: string;
+  description?: string;
+  isDefault?: boolean;
+}
 
 export type IPStatus = 'used' | 'reserved' | 'dhcp' | 'available';
 
