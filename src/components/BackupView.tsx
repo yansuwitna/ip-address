@@ -144,7 +144,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
                     Cadangan Lengkap (JSON)
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Mencadangkan seluruh data sistem NetIPAM
+                    Mencadangkan seluruh data sistem IP Address
                   </p>
                 </div>
               </div>

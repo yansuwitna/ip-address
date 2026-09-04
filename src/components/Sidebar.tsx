@@ -115,14 +115,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-lg tracking-tight text-slate-900">NetIPAM</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                  Pro
-                </span>
+                <span className="font-extrabold text-lg tracking-tight text-slate-900">IP Address</span>
               </div>
               <p className="text-[10px] text-slate-400 font-medium">
-                IP Address Management
+                Manajemen Jaringan & Subnet
               </p>
+
             </div>
           </div>
 
@@ -211,10 +209,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             <button
               onClick={() => {
-                if (window.confirm('Keluar dari akun NetIPAM?')) {
+                if (window.confirm('Keluar dari aplikasi IP Address?')) {
                   onLogout();
                 }
               }}
+
               title="Keluar (Logout)"
               className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer flex-shrink-0"
             >

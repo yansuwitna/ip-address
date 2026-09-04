@@ -119,8 +119,9 @@ export const UsersView: React.FC<UsersViewProps> = ({
               Manajemen Akun Pengguna
             </h2>
             <p className="text-xs text-slate-500">
-              Kelola kredensial login, nama profil, email, dan kata sandi akun sistem NetIPAM.
+              Kelola kredensial login, nama profil, email, dan kata sandi akun sistem IP Address.
             </p>
+
           </div>
         </div>
 
@@ -240,7 +241,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
           <div className="p-4 bg-blue-50/60 rounded-2xl border border-blue-100 text-xs text-blue-900 flex items-start gap-3">
             <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="leading-relaxed">
-              <strong>Sistem Akun Tunggal (Single User):</strong> NetIPAM dikonfigurasi untuk menggunakan 1 akun utama terpusat. Anda dapat memperbarui nama, username, email, dan kata sandi kapan saja melalui tombol ubah di atas.
+              <strong>Sistem Akun Tunggal (Single User):</strong> Sistem IP Address dikonfigurasi untuk menggunakan 1 akun utama terpusat. Anda dapat memperbarui nama, username, email, dan kata sandi kapan saja melalui tombol ubah di atas.
             </div>
           </div>
 
@@ -262,10 +263,11 @@ export const UsersView: React.FC<UsersViewProps> = ({
                     {singleUser ? 'Ubah Profil & Kata Sandi' : 'Buat Akun Pengguna'}
                   </h3>
                   <p className="text-[11px] text-slate-500">
-                    Perbarui informasi akun sistem NetIPAM
+                    Perbarui informasi akun sistem IP Address
                   </p>
                 </div>
               </div>
+
 
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -322,7 +324,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Contoh: admin@netipam.corp"
+                  placeholder="Contoh: admin@ipaddress.lan"
                   className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
                 />
               </div>

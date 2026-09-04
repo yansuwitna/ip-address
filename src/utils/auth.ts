@@ -9,7 +9,7 @@ export const DEFAULT_USERS: UserAccount[] = [
     username: 'admin',
     password: 'admin123',
     name: 'Budi Hartono, S.Kom',
-    email: 'admin@netipam.corp',
+    email: 'admin@ipaddress.lan',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
     createdAt: '2026-01-01T08:00:00.000Z'
   }

@@ -100,6 +100,14 @@ export const App: React.FC = () => {
     saveDeviceCategories(categories);
   }, [categories]);
 
+  // Saat terbaca di tabel user tidak ada, otomatis membuka halaman daftar user
+  useEffect(() => {
+    if (users.length === 0 && !currentUser) {
+      setAuthView('login');
+    }
+  }, [users, currentUser]);
+
+
   const handleSaveCategory = (cat: DeviceCategory) => {
     setCategories(prev => {
       const exists = prev.some(c => c.id === cat.id);
@@ -222,6 +230,7 @@ export const App: React.FC = () => {
     if (authView === 'login') {
       return (
         <Login 
+          hasNoUsers={users.length === 0}
           onLoginSuccess={(user) => {
             setCurrentUser(user);
             setUsers(loadUsers());

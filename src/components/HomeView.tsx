@@ -8,14 +8,10 @@ import {
   Cpu, 
   Activity, 
   Sparkles, 
-  HardDrive, 
-  MapPin,
-  UserCheck,
-  ChevronRight
+  HardDrive
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory } from '../types/ipam';
 import { User } from '../types/auth';
-import { parseCidr } from '../utils/ipCalculator';
 
 interface HomeViewProps {
   groups: IPGroup[];
@@ -56,10 +52,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg tracking-tight text-slate-900">NetIPAM</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                  Pro
-                </span>
+                <span className="font-extrabold text-lg tracking-tight text-slate-900">IP Address</span>
               </div>
               <p className="text-[10px] text-slate-500 hidden sm:block">
                 Sistem Manajemen Alamat & Grup IP Terintegrasi
@@ -71,7 +64,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="hidden md:flex items-center gap-4 text-xs font-semibold text-slate-600">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Sistem IPAM Aktif</span>
+              <span>Sistem Aktif</span>
             </span>
             <span className="text-slate-400">•</span>
             <span>{groups.length} Subnet Terdaftar</span>
@@ -108,7 +101,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/80 text-xs font-semibold shadow-xs">
           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-          <span>Enterprise IP Address Management</span>
+          <span>Sistem Manajemen IP Address Terintegrasi</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight max-w-4xl mx-auto leading-tight sm:leading-tight">
@@ -182,140 +175,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
       </section>
 
-      {/* 3. SUBNET & NETWORK DATA OVERVIEW GRID */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs">
-          
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-            <div>
-              <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                Data Segmen Subnet Jaringan
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Rincian grup IP, CIDR, gateway, alokasi penggunaan host, dan utilisasi kapasitas.
-              </p>
-            </div>
-
-            <button
-              onClick={onNavigateToLogin}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs"
-            >
-              <span>Login untuk Kelola</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Grid Table of Subnets */}
-          <div className="overflow-x-auto mt-4">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-semibold text-[11px] border-b border-slate-200/80">
-                <tr>
-                  <th className="px-4 py-3">Nama Subnet</th>
-                  <th className="px-4 py-3">CIDR Subnet</th>
-                  <th className="px-4 py-3">Default Gateway</th>
-                  <th className="px-4 py-3">VLAN</th>
-                  <th className="px-4 py-3">Host Terpakai</th>
-                  <th className="px-4 py-3">Utilisasi Kapasitas</th>
-                  <th className="px-4 py-3 text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                {groups.map((grp) => {
-                  const grpAllocs = allocations.filter(a => a.groupId === grp.id);
-                  const used = grpAllocs.filter(a => a.status === 'used').length;
-                  const resv = grpAllocs.filter(a => a.status === 'reserved' || a.status === 'dhcp').length;
-                  const subnet = parseCidr(grp.cidr);
-                  const usable = subnet ? subnet.usableHosts : 254;
-                  const pct = usable > 0 ? Math.round(((used + resv) / usable) * 100) : 0;
-
-                  return (
-                    <tr key={grp.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-2.5">
-                          <span 
-                            className="w-3 h-3 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: grp.color || '#3b82f6' }}
-                          />
-                          <div>
-                            <div className="font-bold text-slate-900 text-xs">
-                              {grp.name}
-                            </div>
-                            {grp.location && (
-                              <div className="text-[11px] text-slate-400 flex items-center gap-1">
-                                <MapPin className="w-3 h-3" />
-                                <span>{grp.location}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="px-4 py-3.5 font-mono text-blue-700 font-bold">
-                        <span className="bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
-                          {grp.cidr}
-                        </span>
-                      </td>
-
-                      <td className="px-4 py-3.5 font-mono text-slate-700">
-                        {grp.gateway}
-                      </td>
-
-                      <td className="px-4 py-3.5">
-                        {grp.vlanId ? (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
-                            VLAN {grp.vlanId}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400">-</span>
-                        )}
-                      </td>
-
-                      <td className="px-4 py-3.5">
-                        <span className="font-bold text-slate-900">{used}</span>
-                        <span className="text-slate-400"> / {usable} Host</span>
-                      </td>
-
-                      <td className="px-4 py-3.5 min-w-[140px]">
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-                            <div 
-                              className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                          <span className="text-[11px] font-bold text-slate-700 w-8 text-right">
-                            {pct}%
-                          </span>
-                        </div>
-                      </td>
-
-                      <td className="px-4 py-3.5 text-right">
-                        <button
-                          onClick={onNavigateToLogin}
-                          className="px-3 py-1.5 bg-slate-100 hover:bg-blue-600 text-slate-600 hover:text-white rounded-lg text-xs font-semibold transition-all cursor-pointer inline-flex items-center gap-1"
-                        >
-                          <span>Rincian</span>
-                          <ChevronRight className="w-3 h-3" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* 4. PLATFORM FEATURES & ARCHITECTURE */}
+      {/* 3. PLATFORM FEATURES & ARCHITECTURE */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
         <div className="text-center space-y-2 max-w-2xl mx-auto mb-8">
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Fitur Utama NetIPAM Pro
+            Fitur Utama IP Address
           </h2>
           <p className="text-xs sm:text-sm text-slate-500">
             Didesain untuk efisiensi pengelolaan infrastruktur jaringan komputer.
@@ -364,7 +229,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
       </section>
 
-      {/* 5. BOTTOM CALL TO ACTION */}
+      {/* 4. BOTTOM CALL TO ACTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="relative rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-8 sm:p-12 shadow-2xl shadow-blue-600/20 overflow-hidden text-center space-y-6">
           
@@ -390,7 +255,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   onClick={onNavigateToDashboard}
                   className="px-6 py-3.5 bg-white hover:bg-blue-50 text-blue-700 font-bold rounded-xl text-sm shadow-lg active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <span>Buka Dashboard NetIPAM</span>
+                  <span>Buka Dashboard IP Address</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               )}
@@ -400,11 +265,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* 6. FOOTER */}
+      {/* 5. FOOTER */}
       <footer className="border-t border-slate-200/80 bg-white/70 py-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-800">NetIPAM Pro</span>
+            <span className="font-bold text-slate-800">IP Address</span>
             <span>•</span>
             <span>Sistem Manajemen Alamat & Grup IP Terintegrasi</span>
           </div>
@@ -412,7 +277,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="flex items-center gap-3 text-slate-400">
             <span>Versi 2.0.0</span>
             <span>•</span>
-            <span>Enterprise Network Suite</span>
+            <span>Enterprise Suite</span>
           </div>
         </div>
       </footer>

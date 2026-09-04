@@ -140,7 +140,7 @@ export const PingSimulatorModal: React.FC<PingSimulatorModalProps> = ({
             <div className="flex items-center justify-between text-slate-500 mb-2 border-b border-slate-800 pb-1.5">
               <div className="flex items-center gap-1.5">
                 <Terminal className="w-3.5 h-3.5 text-blue-400" />
-                <span className="text-[11px]">terminal@netipam:~$ ping {allocation.ip}</span>
+                <span className="text-[11px]">terminal@ipaddress:~$ ping {allocation.ip}</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-rose-500/80"></span>

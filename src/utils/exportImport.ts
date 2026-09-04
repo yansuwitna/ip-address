@@ -31,7 +31,7 @@ export function exportToXlsx(group: IPGroup, allocations: IPAllocation[]): void 
 
   // Informative header rows in sheet
   const summaryRows = [
-    ['LAPORAN ALOKASI IP ADDRESS - NETIPAM PRO'],
+    ['LAPORAN ALOKASI IP ADDRESS - IP ADDRESS'],
     ['Nama Subnet / Grup', group.name],
     ['Subnet CIDR', group.cidr],
     ['Default Gateway', group.gateway],
@@ -64,7 +64,7 @@ export function exportToXlsx(group: IPGroup, allocations: IPAllocation[]): void 
   const safeSheetName = (group.name.replace(/[:\\/?*\[\]]/g, '').slice(0, 31)) || 'Alokasi IP';
   XLSX.utils.book_append_sheet(workbook, worksheet, safeSheetName);
 
-  const fileName = `NetIPAM_${group.name.replace(/[^a-zA-Z0-9_-]/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const fileName = `IPAddress_${group.name.replace(/[^a-zA-Z0-9_-]/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(workbook, fileName);
 }
 
@@ -79,7 +79,7 @@ export function exportBackupJson(
   users?: UserAccount[]
 ): void {
   const backupData = {
-    appName: 'NetIPAM',
+    appName: 'IP Address',
     version: '2.0.0',
     exportDate: new Date().toISOString(),
     totalData: {
@@ -99,7 +99,7 @@ export function exportBackupJson(
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `NetIPAM_Cadangan_Lengkap_${new Date().toISOString().slice(0, 10)}.json`);
+  link.setAttribute('download', `IPAddress_Cadangan_Lengkap_${new Date().toISOString().slice(0, 10)}.json`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
