@@ -8,14 +8,19 @@ import {
   Wifi, 
   Shield,
   Search,
-  Info
+  Info,
+  ServerCog,
+  Cctv
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceType } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceType, IPService, DeviceCategory } from '../types/ipam';
 import { parseCidr, generateUsableIps } from '../utils/ipCalculator';
+import { getCategoryIconComponent } from './CategoriesView';
 
 interface IPMatrixGridProps {
   group: IPGroup;
   allocations: IPAllocation[];
+  services?: IPService[];
+  categories?: DeviceCategory[];
   onSelectIp: (ip: string, existingAllocation?: IPAllocation) => void;
   onPingIp: (allocation: IPAllocation) => void;
 }
@@ -23,6 +28,8 @@ interface IPMatrixGridProps {
 export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
   group,
   allocations,
+  services = [],
+  categories = [],
   onSelectIp
 }) => {
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -58,7 +65,7 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
       case 'gateway': return <Router className="w-3 h-3 text-blue-600" />;
       case 'access_point': return <Wifi className="w-3 h-3 text-cyan-600" />;
       case 'pc_workstation': return <Monitor className="w-3 h-3 text-indigo-600" />;
-      case 'cctv': return <Video className="w-3 h-3 text-emerald-600" />;
+      case 'cctv': return <Cctv className="w-3 h-3 text-emerald-600" />;
       case 'printer': return <Printer className="w-3 h-3 text-amber-600" />;
       default: return null;
     }
@@ -220,7 +227,14 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
                   {isGateway ? (
                     <Shield className="w-3 h-3 text-sky-700" />
                   ) : alloc ? (
-                    getDeviceIcon(alloc.deviceType) || <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                    (() => {
+                      const cat = categories.find(c => c.id.toLowerCase() === (alloc.deviceType || '').toLowerCase());
+                      if (cat) {
+                        const CatIcon = getCategoryIconComponent(cat.icon);
+                        return <CatIcon className="w-3 h-3 text-slate-700" />;
+                      }
+                      return getDeviceIcon(alloc.deviceType) || <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>;
+                    })()
                   ) : (
                     <span className="w-1 h-1 rounded-full bg-emerald-400"></span>
                   )}
@@ -262,9 +276,11 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
                 <span className="text-slate-400">Hostname:</span>
                 <span className="font-semibold text-slate-900">{activeHoveredAlloc.hostname}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Tipe:</span>
-                <span className="capitalize font-medium text-slate-800">{activeHoveredAlloc.deviceType.replace('_', ' ')}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-400">Kategori:</span>
+                <span className="font-medium text-slate-800">
+                  {categories.find(c => c.id.toLowerCase() === (activeHoveredAlloc.deviceType || '').toLowerCase())?.name || activeHoveredAlloc.deviceType.replace('_', ' ')}
+                </span>
               </div>
               {activeHoveredAlloc.macAddress && (
                 <div className="flex justify-between">
@@ -278,6 +294,32 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
                   <span className="text-slate-800 font-medium">{activeHoveredAlloc.assignedTo} ({activeHoveredAlloc.department || '-'})</span>
                 </div>
               )}
+
+              {/* Registered Services / Ports */}
+              {(() => {
+                const hoveredServices = services.filter(s => s.allocationId === activeHoveredAlloc.id || s.ip === activeHoveredAlloc.ip);
+                if (hoveredServices.length === 0) return null;
+                return (
+                  <div className="pt-1.5 border-t border-slate-100">
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-slate-700 mb-1">
+                      <ServerCog className="w-3 h-3 text-blue-600" />
+                      <span>Layanan & Port ({hoveredServices.length}):</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {hoveredServices.map(s => (
+                        <span 
+                          key={s.id}
+                          className="px-1.5 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-800 text-[10px] font-mono font-bold"
+                          title={s.name}
+                        >
+                          :{s.port} ({s.name.split(' ')[0]})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
               {activeHoveredAlloc.notes && (
                 <p className="text-[11px] text-slate-500 mt-1 italic border-t border-slate-100 pt-1">
                   "{activeHoveredAlloc.notes}"

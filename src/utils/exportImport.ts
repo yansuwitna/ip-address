@@ -1,33 +1,50 @@
 import * as XLSX from 'xlsx';
-import { IPGroup, IPAllocation, DeviceCategory } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService } from '../types/ipam';
 import { UserAccount } from '../types/auth';
 
-export function exportToXlsx(group: IPGroup, allocations: IPAllocation[]): void {
+export function exportToXlsx(
+  group: IPGroup, 
+  allocations: IPAllocation[], 
+  services?: IPService[],
+  categories?: DeviceCategory[]
+): void {
   const headers = [
     'No',
     'Alamat IP',
     'Hostname',
-    'Tipe Perangkat',
+    'Kategori Perangkat',
     'MAC Address',
     'PIC / Pengguna',
     'Departemen',
     'Status',
+    'Layanan & Port',
     'Tanggal Alokasi',
     'Keterangan'
   ];
 
-  const rows = allocations.map((a, idx) => [
-    idx + 1,
-    a.ip,
-    a.hostname,
-    a.deviceType,
-    a.macAddress || '-',
-    a.assignedTo || '-',
-    a.department || '-',
-    a.status === 'used' ? 'Digunakan' : a.status === 'reserved' ? 'Reserved' : a.status === 'dhcp' ? 'DHCP Pool' : 'Bebas',
-    a.assignedDate || '-',
-    a.notes || '-'
-  ]);
+  const rows = allocations.map((a, idx) => {
+    const itemServices = (services || []).filter(s => s.allocationId === a.id || s.ip === a.ip);
+    const servicesStr = itemServices.length > 0 
+      ? itemServices.map(s => `${s.name} (${s.port}/${s.protocol})`).join(', ')
+      : '-';
+
+    const cat = categories?.find(c => c.id.toLowerCase() === (a.deviceType || '').toLowerCase());
+    const categoryName = cat ? cat.name : (a.deviceType ? a.deviceType.replace(/_/g, ' ') : '-');
+
+    return [
+      idx + 1,
+      a.ip,
+      a.hostname,
+      categoryName,
+      a.macAddress || '-',
+      a.assignedTo || '-',
+      a.department || '-',
+      a.status === 'used' ? 'Digunakan' : a.status === 'reserved' ? 'Reserved' : a.status === 'dhcp' ? 'DHCP Pool' : 'Bebas',
+      servicesStr,
+      a.assignedDate || '-',
+      a.notes || '-'
+    ];
+  });
 
   // Informative header rows in sheet
   const summaryRows = [
@@ -56,6 +73,7 @@ export function exportToXlsx(group: IPGroup, allocations: IPAllocation[]): void 
     { wch: 22 }, // PIC / Pengguna
     { wch: 18 }, // Departemen
     { wch: 14 }, // Status
+    { wch: 30 }, // Layanan & Port
     { wch: 16 }, // Tanggal Alokasi
     { wch: 32 }  // Keterangan
   ];
@@ -76,22 +94,25 @@ export function exportBackupJson(
   groups: IPGroup[],
   allocations: IPAllocation[],
   categories?: DeviceCategory[],
-  users?: UserAccount[]
+  users?: UserAccount[],
+  services?: IPService[]
 ): void {
   const backupData = {
     appName: 'IP Address',
-    version: '2.0.0',
+    version: '2.1.0',
     exportDate: new Date().toISOString(),
     totalData: {
       groups: groups.length,
       allocations: allocations.length,
       categories: categories?.length || 0,
-      users: users?.length || 0
+      users: users?.length || 0,
+      services: services?.length || 0
     },
     groups,
     allocations,
     categories: categories || [],
-    users: users || []
+    users: users || [],
+    services: services || []
   };
 
   const jsonStr = JSON.stringify(backupData, null, 2);
@@ -111,6 +132,7 @@ export function parseImportJson(fileContent: string): {
   allocations: IPAllocation[];
   categories?: DeviceCategory[];
   users?: UserAccount[];
+  services?: IPService[];
 } {
   const parsed = JSON.parse(fileContent);
   if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.allocations)) {
@@ -120,7 +142,8 @@ export function parseImportJson(fileContent: string): {
     groups: parsed.groups,
     allocations: parsed.allocations,
     categories: Array.isArray(parsed.categories) ? parsed.categories : undefined,
-    users: Array.isArray(parsed.users) ? parsed.users : undefined
+    users: Array.isArray(parsed.users) ? parsed.users : undefined,
+    services: Array.isArray(parsed.services) ? parsed.services : undefined
   };
 }
 

@@ -9,11 +9,12 @@ import {
   LogOut, 
   ShieldCheck, 
   X, 
-  ChevronRight
+  ChevronRight,
+  ServerCog
 } from 'lucide-react';
 import { User } from '../types/auth';
 
-export type NavTab = 'dashboard' | 'groups' | 'categories' | 'users' | 'backup';
+export type NavTab = 'dashboard' | 'groups' | 'services' | 'categories' | 'users' | 'backup';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -26,6 +27,7 @@ interface SidebarProps {
   totalUsedIps: number;
   totalCategories?: number;
   totalUsers?: number;
+  totalServices?: number;
 }
 
 
@@ -39,7 +41,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   totalGroups,
   totalUsedIps,
   totalCategories,
-  totalUsers
+  totalUsers,
+  totalServices
 }) => {
   interface NavItem {
     id: NavTab;
@@ -83,7 +86,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Database,
       description: 'Ekspor & Impor JSON'
     }
-
   ];
 
 
@@ -141,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {navItems.map(item => {
             const Icon = item.icon;
-            const isActive = currentTab === item.id;
+            const isActive = currentTab === item.id || (currentTab === 'services' && item.id === 'groups');
 
             return (
               <button

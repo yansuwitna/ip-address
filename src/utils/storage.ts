@@ -1,9 +1,10 @@
-import { IPGroup, IPAllocation, DeviceCategory } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService } from '../types/ipam';
 
 const STORAGE_KEYS = {
   GROUPS: 'netipam_groups_v1',
   ALLOCATIONS: 'netipam_allocations_v1',
-  DEVICE_CATEGORIES: 'netipam_device_categories_v1'
+  DEVICE_CATEGORIES: 'netipam_device_categories_v1',
+  SERVICES: 'netipam_services_v1'
 };
 
 export const INITIAL_GROUPS: IPGroup[] = [
@@ -216,7 +217,7 @@ export const INITIAL_ALLOCATIONS: IPAllocation[] = [
     groupId: 'grp-server-dmz',
     ip: '10.10.20.1',
     hostname: 'fw-fortigate-100f',
-    deviceType: 'gateway',
+    deviceType: 'router',
     macAddress: '04:D5:90:3A:88:99',
     assignedTo: 'Network Security',
     department: 'IT Infrastructure',
@@ -379,7 +380,11 @@ export function loadAllocations(): IPAllocation[] {
       saveAllocations(INITIAL_ALLOCATIONS);
       return INITIAL_ALLOCATIONS;
     }
-    return JSON.parse(raw);
+    const parsed: IPAllocation[] = JSON.parse(raw);
+    return parsed.map(a => ({
+      ...a,
+      deviceType: a.deviceType === 'gateway' ? 'router' : a.deviceType
+    }));
   } catch (err) {
     console.error('Error loading allocations:', err);
     return INITIAL_ALLOCATIONS;
@@ -400,7 +405,7 @@ export const DEFAULT_DEVICE_CATEGORIES: DeviceCategory[] = [
   { id: 'switch', name: 'Switch Jaringan', icon: 'Network', description: 'Manageable switch L2/L3, distribusi' },
   { id: 'access_point', name: 'Access Point (Wi-Fi)', icon: 'Wifi', description: 'Wireless AP indoor / outdoor' },
   { id: 'pc_workstation', name: 'PC Workstation & Laptop', icon: 'Monitor', description: 'Komputer kerja karyawan & staf' },
-  { id: 'cctv', name: 'Kamera CCTV & NVR', icon: 'Video', description: 'IP camera keamanan dan perekam NVR' },
+  { id: 'cctv', name: 'Kamera CCTV & NVR', icon: 'Cctv', description: 'IP camera keamanan dan perekam NVR' },
   { id: 'printer', name: 'Printer & Scanner', icon: 'Printer', description: 'Printer jaringan & multifungsi' },
   { id: 'smartphone', name: 'Smartphone & Tablet', icon: 'Smartphone', description: 'Perangkat mobile pengguna' },
   { id: 'iot', name: 'Perangkat IoT & Sensor', icon: 'Cpu', description: 'Mesin absensi, smart display, sensor' },
@@ -414,7 +419,13 @@ export function loadDeviceCategories(): DeviceCategory[] {
       saveDeviceCategories(DEFAULT_DEVICE_CATEGORIES);
       return DEFAULT_DEVICE_CATEGORIES;
     }
-    return JSON.parse(raw);
+    const parsed: DeviceCategory[] = JSON.parse(raw);
+    return parsed.map(cat => {
+      if (cat.id === 'cctv' && cat.icon === 'Video') {
+        return { ...cat, icon: 'Cctv' };
+      }
+      return cat;
+    });
   } catch (err) {
     console.error('Error loading device categories:', err);
     return DEFAULT_DEVICE_CATEGORIES;
@@ -429,9 +440,343 @@ export function saveDeviceCategories(categories: DeviceCategory[]): void {
   }
 }
 
-export function resetDemoData(): { groups: IPGroup[]; allocations: IPAllocation[]; categories: DeviceCategory[] } {
+export const INITIAL_SERVICES: IPService[] = [
+  // 192.168.10.1 (Mikrotik Router Gateway)
+  {
+    id: 'srv-1',
+    allocationId: 'alloc-1',
+    ip: '192.168.10.1',
+    name: 'Mikrotik Winbox GUI',
+    port: 8291,
+    protocol: 'TCP',
+    category: 'network',
+    status: 'active',
+    version: 'RouterOS v7.12',
+    description: 'Manajemen graphical user interface router utama',
+    checkStatus: 'open',
+    checkLatency: 1.2,
+    createdAt: '2026-01-10T08:00:00Z',
+    updatedAt: '2026-01-10T08:00:00Z'
+  },
+  {
+    id: 'srv-2',
+    allocationId: 'alloc-1',
+    ip: '192.168.10.1',
+    name: 'WebFig HTTP Admin',
+    port: 80,
+    protocol: 'TCP',
+    category: 'web',
+    status: 'active',
+    url: 'http://192.168.10.1',
+    description: 'Web console administrator Mikrotik',
+    checkStatus: 'open',
+    checkLatency: 1.4,
+    createdAt: '2026-01-10T08:00:00Z',
+    updatedAt: '2026-01-10T08:00:00Z'
+  },
+  {
+    id: 'srv-3',
+    allocationId: 'alloc-1',
+    ip: '192.168.10.1',
+    name: 'SSH RouterOS',
+    port: 22,
+    protocol: 'TCP',
+    category: 'remote',
+    status: 'active',
+    description: 'Remote CLI console Mikrotik via SSH',
+    checkStatus: 'open',
+    checkLatency: 1.1,
+    createdAt: '2026-01-10T08:00:00Z',
+    updatedAt: '2026-01-10T08:00:00Z'
+  },
+  {
+    id: 'srv-4',
+    allocationId: 'alloc-1',
+    ip: '192.168.10.1',
+    name: 'Local DNS Cache',
+    port: 53,
+    protocol: 'UDP',
+    category: 'network',
+    status: 'active',
+    description: 'DNS Resolver lokal kantor lantai 1',
+    checkStatus: 'open',
+    checkLatency: 0.9,
+    createdAt: '2026-01-10T08:00:00Z',
+    updatedAt: '2026-01-10T08:00:00Z'
+  },
+
+  // 192.168.10.2 (Cisco Switch)
+  {
+    id: 'srv-5',
+    allocationId: 'alloc-2',
+    ip: '192.168.10.2',
+    name: 'SSH Switch Console',
+    port: 22,
+    protocol: 'TCP',
+    category: 'remote',
+    status: 'active',
+    version: 'Cisco IOS-XE 16.9',
+    description: 'Akses console CLI Cisco Catalyst 3850',
+    checkStatus: 'open',
+    checkLatency: 0.8,
+    createdAt: '2026-01-10T08:00:00Z',
+    updatedAt: '2026-01-10T08:00:00Z'
+  },
+  {
+    id: 'srv-6',
+    allocationId: 'alloc-2',
+    ip: '192.168.10.2',
+    name: 'SNMP Agent',
+    port: 161,
+    protocol: 'UDP',
+    category: 'monitoring',
+    status: 'active',
+    description: 'Monitoring MRTG / Zabbix bandwidth switch',
+    checkStatus: 'open',
+    checkLatency: 1.0,
+    createdAt: '2026-01-10T08:00:00Z',
+    updatedAt: '2026-01-10T08:00:00Z'
+  },
+
+  // 192.168.10.10 (HP LaserJet Printer)
+  {
+    id: 'srv-7',
+    allocationId: 'alloc-5',
+    ip: '192.168.10.10',
+    name: 'HP Embedded Web Server',
+    port: 80,
+    protocol: 'TCP',
+    category: 'web',
+    status: 'active',
+    url: 'http://192.168.10.10',
+    description: 'Web dashboard status tinta & kertas printer',
+    checkStatus: 'open',
+    checkLatency: 4.2,
+    createdAt: '2026-01-18T08:00:00Z',
+    updatedAt: '2026-01-18T08:00:00Z'
+  },
+  {
+    id: 'srv-8',
+    allocationId: 'alloc-5',
+    ip: '192.168.10.10',
+    name: 'IPP Printing Service',
+    port: 631,
+    protocol: 'TCP',
+    category: 'other',
+    status: 'active',
+    description: 'Internet Printing Protocol untuk cetak dari laptop',
+    checkStatus: 'open',
+    checkLatency: 3.8,
+    createdAt: '2026-01-18T08:00:00Z',
+    updatedAt: '2026-01-18T08:00:00Z'
+  },
+
+  // 10.10.20.1 (FortiGate Firewall)
+  {
+    id: 'srv-9',
+    allocationId: 'alloc-srv-1',
+    ip: '10.10.20.1',
+    name: 'FortiOS HTTPS Admin',
+    port: 443,
+    protocol: 'TCP',
+    category: 'security',
+    status: 'active',
+    version: 'FortiOS 7.2',
+    url: 'https://10.10.20.1',
+    description: 'Web GUI Dashboard FortiGate 100F',
+    checkStatus: 'open',
+    checkLatency: 0.5,
+    createdAt: '2026-01-12T08:00:00Z',
+    updatedAt: '2026-01-12T08:00:00Z'
+  },
+  {
+    id: 'srv-10',
+    allocationId: 'alloc-srv-1',
+    ip: '10.10.20.1',
+    name: 'SSL-VPN Portal',
+    port: 10443,
+    protocol: 'TCP',
+    category: 'security',
+    status: 'active',
+    url: 'https://10.10.20.1:10443',
+    description: 'Akses remote secure VPN untuk karyawan remote / WFH',
+    checkStatus: 'open',
+    checkLatency: 0.6,
+    createdAt: '2026-01-12T08:00:00Z',
+    updatedAt: '2026-01-12T08:00:00Z'
+  },
+
+  // 10.10.20.10 (PostgreSQL Master DB)
+  {
+    id: 'srv-11',
+    allocationId: 'alloc-srv-2',
+    ip: '10.10.20.10',
+    name: 'PostgreSQL Database Engine',
+    port: 5432,
+    protocol: 'TCP',
+    category: 'database',
+    status: 'active',
+    version: 'PostgreSQL 16.1',
+    description: 'Basis data utama transaksi produksi',
+    checkStatus: 'open',
+    checkLatency: 0.3,
+    createdAt: '2026-01-12T08:00:00Z',
+    updatedAt: '2026-01-12T08:00:00Z'
+  },
+  {
+    id: 'srv-12',
+    allocationId: 'alloc-srv-2',
+    ip: '10.10.20.10',
+    name: 'OpenSSH Server',
+    port: 22,
+    protocol: 'TCP',
+    category: 'remote',
+    status: 'active',
+    version: 'OpenSSH 9.6p1',
+    description: 'Akses remote server database untuk DBA',
+    checkStatus: 'open',
+    checkLatency: 0.4,
+    createdAt: '2026-01-12T08:00:00Z',
+    updatedAt: '2026-01-12T08:00:00Z'
+  },
+  {
+    id: 'srv-13',
+    allocationId: 'alloc-srv-2',
+    ip: '10.10.20.10',
+    name: 'Prometheus Node Exporter',
+    port: 9100,
+    protocol: 'TCP',
+    category: 'monitoring',
+    status: 'active',
+    url: 'http://10.10.20.10:9100/metrics',
+    description: 'Metrik CPU, RAM, disk I/O server database',
+    checkStatus: 'open',
+    checkLatency: 0.4,
+    createdAt: '2026-01-12T08:00:00Z',
+    updatedAt: '2026-01-12T08:00:00Z'
+  },
+
+  // 10.10.20.20 (srv-web-nginx-prod01)
+  {
+    id: 'srv-14',
+    allocationId: 'alloc-srv-4',
+    ip: '10.10.20.20',
+    name: 'Nginx Web Server HTTP',
+    port: 80,
+    protocol: 'TCP',
+    category: 'web',
+    status: 'active',
+    version: 'Nginx 1.24.0',
+    url: 'http://10.10.20.20',
+    description: 'Frontend Web Server & HTTP redirect to HTTPS',
+    checkStatus: 'open',
+    checkLatency: 0.5,
+    createdAt: '2026-01-15T08:00:00Z',
+    updatedAt: '2026-01-15T08:00:00Z'
+  },
+  {
+    id: 'srv-15',
+    allocationId: 'alloc-srv-4',
+    ip: '10.10.20.20',
+    name: 'Nginx HTTPS SSL/TLS',
+    port: 443,
+    protocol: 'TCP',
+    category: 'web',
+    status: 'active',
+    version: 'Nginx 1.24.0 (TLS 1.3)',
+    url: 'https://10.10.20.20',
+    description: 'Layanan web aplikasi utama dengan sertifikat SSL',
+    checkStatus: 'open',
+    checkLatency: 0.6,
+    createdAt: '2026-01-15T08:00:00Z',
+    updatedAt: '2026-01-15T08:00:00Z'
+  },
+  {
+    id: 'srv-16',
+    allocationId: 'alloc-srv-4',
+    ip: '10.10.20.20',
+    name: 'OpenSSH Server',
+    port: 22,
+    protocol: 'TCP',
+    category: 'remote',
+    status: 'active',
+    description: 'Akses remote deployment CI/CD dan DevOps',
+    checkStatus: 'open',
+    checkLatency: 0.4,
+    createdAt: '2026-01-15T08:00:00Z',
+    updatedAt: '2026-01-15T08:00:00Z'
+  },
+
+  // 172.16.50.10 (NVR Hikvision)
+  {
+    id: 'srv-17',
+    allocationId: 'alloc-cctv-2',
+    ip: '172.16.50.10',
+    name: 'RTSP CCTV Video Stream',
+    port: 554,
+    protocol: 'TCP',
+    category: 'streaming',
+    status: 'active',
+    description: 'Video streaming live feed 32 kanal kamera',
+    checkStatus: 'open',
+    checkLatency: 2.1,
+    createdAt: '2026-01-15T08:00:00Z',
+    updatedAt: '2026-01-15T08:00:00Z'
+  },
+  {
+    id: 'srv-18',
+    allocationId: 'alloc-cctv-2',
+    ip: '172.16.50.10',
+    name: 'Hikvision Web Admin',
+    port: 80,
+    protocol: 'TCP',
+    category: 'web',
+    status: 'active',
+    url: 'http://172.16.50.10',
+    description: 'Web dashboard manajemen rekaman NVR Hikvision',
+    checkStatus: 'open',
+    checkLatency: 1.9,
+    createdAt: '2026-01-15T08:00:00Z',
+    updatedAt: '2026-01-15T08:00:00Z'
+  }
+];
+
+export function loadServices(): IPService[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.SERVICES);
+    if (!raw) {
+      saveServices(INITIAL_SERVICES);
+      return INITIAL_SERVICES;
+    }
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error('Error loading services:', err);
+    return INITIAL_SERVICES;
+  }
+}
+
+export function saveServices(services: IPService[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(services));
+  } catch (err) {
+    console.error('Error saving services:', err);
+  }
+}
+
+export function resetDemoData(): { 
+  groups: IPGroup[]; 
+  allocations: IPAllocation[]; 
+  categories: DeviceCategory[];
+  services: IPService[];
+} {
   saveGroups(INITIAL_GROUPS);
   saveAllocations(INITIAL_ALLOCATIONS);
   saveDeviceCategories(DEFAULT_DEVICE_CATEGORIES);
-  return { groups: INITIAL_GROUPS, allocations: INITIAL_ALLOCATIONS, categories: DEFAULT_DEVICE_CATEGORIES };
+  saveServices(INITIAL_SERVICES);
+  return { 
+    groups: INITIAL_GROUPS, 
+    allocations: INITIAL_ALLOCATIONS, 
+    categories: DEFAULT_DEVICE_CATEGORIES,
+    services: INITIAL_SERVICES
+  };
 }

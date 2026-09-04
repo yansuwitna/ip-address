@@ -10,6 +10,41 @@ export interface DeviceCategory {
 
 export type IPStatus = 'used' | 'reserved' | 'dhcp' | 'available';
 
+export type ServiceCategory = 
+  | 'web' 
+  | 'database' 
+  | 'remote' 
+  | 'network' 
+  | 'file' 
+  | 'security' 
+  | 'streaming' 
+  | 'monitoring' 
+  | 'iot' 
+  | 'mail'
+  | 'other';
+
+export type ServiceStatus = 'active' | 'inactive' | 'filtered';
+export type ServiceProtocol = 'TCP' | 'UDP' | 'TCP/UDP';
+
+export interface IPService {
+  id: string;
+  allocationId: string;
+  ip: string;
+  name: string;
+  port: number;
+  protocol: ServiceProtocol;
+  category: ServiceCategory;
+  status: ServiceStatus;
+  version?: string;
+  url?: string;
+  description?: string;
+  lastChecked?: string;
+  checkStatus?: 'open' | 'closed' | 'timeout';
+  checkLatency?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface IPAllocation {
   id: string;
   groupId: string;
@@ -24,6 +59,7 @@ export interface IPAllocation {
   notes: string;
   lastPingStatus?: 'online' | 'offline' | 'untested';
   lastPingLatency?: number; // in ms
+  services?: IPService[];
 }
 
 export interface IPGroup {

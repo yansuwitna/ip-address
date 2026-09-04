@@ -22,19 +22,23 @@ import {
   X, 
   Check, 
   Layers,
-  HelpCircle
+  HelpCircle,
+  Cctv,
+  Webcam
 } from 'lucide-react';
 import { DeviceCategory, IPAllocation } from '../types/ipam';
 
 export const AVAILABLE_ICONS: { name: string; label: string; icon: React.FC<{ className?: string }> }[] = [
+  { name: 'Cctv', label: 'CCTV Kamera', icon: Cctv },
+  { name: 'Video', label: 'CCTV / NVR', icon: Video },
+  { name: 'Camera', label: 'Kamera', icon: Camera },
+  { name: 'Webcam', label: 'Webcam', icon: Webcam },
   { name: 'Monitor', label: 'PC / Monitor', icon: Monitor },
   { name: 'Laptop', label: 'Laptop', icon: Laptop },
   { name: 'Server', label: 'Server / VM', icon: Server },
   { name: 'Router', label: 'Router', icon: Router },
   { name: 'Network', label: 'Switch / Hub', icon: Network },
   { name: 'Wifi', label: 'Access Point', icon: Wifi },
-  { name: 'Video', label: 'CCTV / NVR', icon: Video },
-  { name: 'Camera', label: 'Kamera', icon: Camera },
   { name: 'Printer', label: 'Printer / Scanner', icon: Printer },
   { name: 'Smartphone', label: 'Smartphone', icon: Smartphone },
   { name: 'Tablet', label: 'Tablet', icon: Tablet },
@@ -366,7 +370,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                 <label className="block text-xs font-bold text-slate-700 mb-2">
                   Pilih Ikon Perangkat
                 </label>
-                <div className="grid grid-cols-5 gap-2 max-h-40 overflow-y-auto p-2 border border-slate-200 rounded-2xl bg-slate-50/50">
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 max-h-48 overflow-y-auto p-2.5 border border-slate-200 rounded-2xl bg-slate-50/60">
                   {AVAILABLE_ICONS.map(item => {
                     const IconComponent = item.icon;
                     const isSelected = icon.toLowerCase() === item.name.toLowerCase();
@@ -375,14 +379,15 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                         type="button"
                         key={item.name}
                         onClick={() => setIcon(item.name)}
-                        className={`flex flex-col items-center gap-1 p-2 rounded-xl border text-[10px] font-semibold transition-all cursor-pointer ${
+                        title={`${item.label} (${item.name})`}
+                        className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border text-[10px] font-semibold transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                            : 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200'
+                            ? 'bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-500/20'
+                            : 'bg-white text-slate-700 hover:bg-slate-100 hover:border-slate-300 border-slate-200'
                         }`}
                       >
-                        <IconComponent className="w-4 h-4" />
-                        <span className="truncate w-full text-center">{item.name}</span>
+                        <IconComponent className="w-5 h-5 flex-shrink-0" />
+                        <span className="truncate w-full text-center text-[10px] leading-tight">{item.name}</span>
                       </button>
                     );
                   })}

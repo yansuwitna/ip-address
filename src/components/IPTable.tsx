@@ -7,39 +7,40 @@ import {
   Activity, 
   Copy, 
   Check, 
-  Server, 
-  Router, 
-  Monitor, 
-  Video, 
-  Printer, 
-  Wifi, 
   Sparkles,
   Layers,
   ArrowUpDown,
-  Smartphone,
-  Cpu
+  Cpu,
+  ServerCog
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceType } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceType, IPService, DeviceCategory } from '../types/ipam';
 import { ipToInt, findNextAvailableIp } from '../utils/ipCalculator';
+import { getCategoryIconComponent } from './CategoriesView';
 
 interface IPTableProps {
   group: IPGroup;
   allocations: IPAllocation[];
+  services?: IPService[];
+  categories?: DeviceCategory[];
   onAddAllocation: (initialIp?: string) => void;
   onEditAllocation: (allocation: IPAllocation) => void;
   onDeleteAllocation: (id: string) => void;
   onBatchReserve: () => void;
   onPingAllocation: (allocation: IPAllocation) => void;
+  onManageServices: (allocation: IPAllocation) => void;
 }
 
 export const IPTable: React.FC<IPTableProps> = ({
   group,
   allocations,
+  services = [],
+  categories = [],
   onAddAllocation,
   onEditAllocation,
   onDeleteAllocation,
   onBatchReserve,
-  onPingAllocation
+  onPingAllocation,
+  onManageServices
 }) => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -65,27 +66,30 @@ export const IPTable: React.FC<IPTableProps> = ({
     setTimeout(() => setCopiedMac(null), 2000);
   };
 
-  const getDeviceIcon = (type: DeviceType) => {
-    switch (type) {
-      case 'server': return <Server className="w-4 h-4 text-purple-600" />;
-      case 'router':
-      case 'switch':
-      case 'gateway': return <Router className="w-4 h-4 text-blue-600" />;
-      case 'access_point': return <Wifi className="w-4 h-4 text-cyan-600" />;
-      case 'pc_workstation': return <Monitor className="w-4 h-4 text-indigo-600" />;
-      case 'cctv': return <Video className="w-4 h-4 text-emerald-600" />;
-      case 'printer': return <Printer className="w-4 h-4 text-amber-600" />;
-      case 'smartphone': return <Smartphone className="w-4 h-4 text-pink-600" />;
-      case 'iot': return <Cpu className="w-4 h-4 text-teal-600" />;
-      default: return <Server className="w-4 h-4 text-slate-500" />;
+  const getCategoryInfo = (type: DeviceType) => {
+    const found = categories.find(c => c.id.toLowerCase() === (type || '').toLowerCase());
+    if (found) {
+      return {
+        id: found.id,
+        name: found.name,
+        icon: getCategoryIconComponent(found.icon)
+      };
     }
+    const formatted = (type || 'other')
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, l => l.toUpperCase());
+    return {
+      id: type,
+      name: formatted,
+      icon: Cpu
+    };
   };
 
   const filteredAllocations = useMemo(() => {
     return groupAllocations
       .filter(item => {
         if (statusFilter !== 'all' && item.status !== statusFilter) return false;
-        if (deviceFilter !== 'all' && item.deviceType !== deviceFilter) return false;
+        if (deviceFilter !== 'all' && item.deviceType.toLowerCase() !== deviceFilter.toLowerCase()) return false;
 
         if (search.trim()) {
           const q = search.toLowerCase();
@@ -95,7 +99,9 @@ export const IPTable: React.FC<IPTableProps> = ({
           const matchPic = item.assignedTo?.toLowerCase().includes(q);
           const matchDept = item.department?.toLowerCase().includes(q);
           const matchNotes = item.notes?.toLowerCase().includes(q);
-          if (!matchIp && !matchHost && !matchMac && !matchPic && !matchDept && !matchNotes) {
+          const catInfo = getCategoryInfo(item.deviceType);
+          const matchCat = catInfo.name.toLowerCase().includes(q);
+          if (!matchIp && !matchHost && !matchMac && !matchPic && !matchDept && !matchNotes && !matchCat) {
             return false;
           }
         }
@@ -105,7 +111,7 @@ export const IPTable: React.FC<IPTableProps> = ({
         const diff = ipToInt(a.ip) - ipToInt(b.ip);
         return sortAsc ? diff : -diff;
       });
-  }, [groupAllocations, statusFilter, deviceFilter, search, sortAsc]);
+  }, [groupAllocations, statusFilter, deviceFilter, search, sortAsc, categories]);
 
   return (
     <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs flex flex-col font-poppins">
@@ -146,15 +152,9 @@ export const IPTable: React.FC<IPTableProps> = ({
             className="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2 text-slate-700 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           >
             <option value="all">Semua Kategori Perangkat</option>
-            <option value="server">Server</option>
-            <option value="router">Router / Gateway</option>
-            <option value="switch">Switch</option>
-            <option value="access_point">Access Point (WiFi)</option>
-            <option value="pc_workstation">PC / Laptop</option>
-            <option value="cctv">CCTV Camera</option>
-            <option value="printer">Printer Jaringan</option>
-            <option value="iot">IoT Device</option>
-            <option value="other">Lainnya</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
           </select>
         </div>
 
@@ -205,7 +205,8 @@ export const IPTable: React.FC<IPTableProps> = ({
                 </div>
               </th>
               <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">Hostname & Perangkat</th>
+              <th className="py-3 px-4">Hostname</th>
+              <th className="py-3 px-4">Kategori Perangkat</th>
               <th className="py-3 px-4">MAC Address</th>
               <th className="py-3 px-4">PIC / Departemen</th>
               <th className="py-3 px-4">Status Ping</th>
@@ -216,13 +217,14 @@ export const IPTable: React.FC<IPTableProps> = ({
           <tbody className="divide-y divide-slate-100 text-slate-700">
             {filteredAllocations.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-12 text-center text-slate-400 font-medium">
+                <td colSpan={9} className="py-12 text-center text-slate-400 font-medium">
                   Tidak ada data alokasi IP yang cocok dengan filter pencarian.
                 </td>
               </tr>
             ) : (
               filteredAllocations.map(item => {
                 const isGateway = item.ip === group.gateway;
+                const itemServices = services.filter(s => s.allocationId === item.id || s.ip === item.ip);
 
                 return (
                   <tr 
@@ -261,21 +263,63 @@ export const IPTable: React.FC<IPTableProps> = ({
                       </span>
                     </td>
 
-                    {/* Hostname & Device Type Column */}
+                    {/* Hostname Column */}
                     <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2.5">
-                        <div className="p-1.5 rounded-lg bg-slate-100 border border-slate-200/80 flex-shrink-0">
-                          {getDeviceIcon(item.deviceType)}
+                      <div>
+                        <div className="font-semibold text-slate-900 leading-tight">
+                          {item.hostname}
                         </div>
-                        <div>
-                          <div className="font-semibold text-slate-900 leading-tight">
-                            {item.hostname}
+
+                        {/* Open Ports & Services preview badges */}
+                        {itemServices.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                            {itemServices.slice(0, 3).map(svc => (
+                              <button
+                                key={svc.id}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onManageServices(item);
+                                }}
+                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-800 border border-slate-200/90 transition-colors cursor-pointer"
+                                title={`${svc.name} (Port ${svc.port}/${svc.protocol}) - Klik untuk kelola`}
+                              >
+                                <span className={`w-1.5 h-1.5 rounded-full ${svc.status === 'active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                                <span>:{svc.port}</span>
+                              </button>
+                            ))}
+                            {itemServices.length > 3 && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onManageServices(item);
+                                }}
+                                className="text-[10px] text-blue-600 font-bold hover:underline cursor-pointer"
+                                title="Lihat seluruh port terdaftar"
+                              >
+                                +{itemServices.length - 3} port
+                              </button>
+                            )}
                           </div>
-                          <div className="text-[11px] text-slate-500 capitalize">
-                            {item.deviceType.replace('_', ' ')}
-                          </div>
-                        </div>
+                        )}
                       </div>
+                    </td>
+
+                    {/* Kategori Perangkat Column */}
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      {(() => {
+                        const catInfo = getCategoryInfo(item.deviceType);
+                        const CatIcon = catInfo.icon;
+                        return (
+                          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200/90 text-slate-700 text-xs font-semibold">
+                            <span className="p-1 rounded-md bg-white border border-slate-200 text-blue-600 shadow-2xs">
+                              <CatIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                            </span>
+                            <span>{catInfo.name}</span>
+                          </div>
+                        );
+                      })()}
                     </td>
 
                     {/* MAC Address Column */}
@@ -349,6 +393,22 @@ export const IPTable: React.FC<IPTableProps> = ({
                     {/* Action Column */}
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end space-x-1">
+                        <button
+                          onClick={() => onManageServices(item)}
+                          title={`Kelola Layanan & Port (${itemServices.length} layanan terdaftar)`}
+                          className={`p-1.5 rounded-lg transition-all cursor-pointer relative ${
+                            itemServices.length > 0
+                              ? 'bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white shadow-2xs'
+                              : 'hover:bg-slate-100 text-slate-400 hover:text-blue-600'
+                          }`}
+                        >
+                          <ServerCog className="w-3.5 h-3.5" />
+                          {itemServices.length > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center ring-1 ring-white">
+                              {itemServices.length}
+                            </span>
+                          )}
+                        </button>
                         <button
                           onClick={() => onEditAllocation(item)}
                           title="Edit Alokasi IP"

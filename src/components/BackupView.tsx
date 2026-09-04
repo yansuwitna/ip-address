@@ -12,7 +12,7 @@ import {
   Trash2,
   ShieldAlert
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceCategory } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService } from '../types/ipam';
 import { UserAccount } from '../types/auth';
 import { exportBackupJson, parseImportJson, exportToXlsx } from '../utils/exportImport';
 
@@ -21,11 +21,13 @@ interface BackupViewProps {
   allocations: IPAllocation[];
   categories: DeviceCategory[];
   users: UserAccount[];
+  services?: IPService[];
   onImportData: (data: {
     groups: IPGroup[];
     allocations: IPAllocation[];
     categories?: DeviceCategory[];
     users?: UserAccount[];
+    services?: IPService[];
   }) => void;
   onWipeAllData: () => void;
 }
@@ -35,6 +37,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
   allocations,
   categories,
   users,
+  services = [],
   onImportData,
   onWipeAllData
 }) => {
@@ -42,7 +45,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
   const [hasBackedUp, setHasBackedUp] = useState(false);
 
   const handleBackupComplete = () => {
-    exportBackupJson(groups, allocations, categories, users);
+    exportBackupJson(groups, allocations, categories, users, services);
     setHasBackedUp(true);
   };
 
@@ -58,6 +61,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
         const details = [
           `• ${parsed.groups.length} Grup IP`,
           `• ${parsed.allocations.length} Alokasi Host`,
+          parsed.services ? `• ${parsed.services.length} Layanan & Port` : null,
           parsed.categories ? `• ${parsed.categories.length} Kategori Perangkat` : null,
           parsed.users ? `• ${parsed.users.length} Akun Pengguna` : null
         ].filter(Boolean).join('\n');
@@ -152,10 +156,11 @@ export const BackupView: React.FC<BackupViewProps> = ({
 
             <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100 text-xs text-slate-600 space-y-1">
               <div className="font-semibold text-slate-700">Cakupan data yang dicadangkan:</div>
-              <div className="grid grid-cols-2 gap-1 text-[11px] text-slate-500 font-medium">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 text-[11px] text-slate-500 font-medium">
                 <span>• {groups.length} Grup Subnet</span>
                 <span>• {allocations.length} Alokasi IP</span>
-                <span>• {categories.length} Kategori Perangkat</span>
+                <span>• {services.length} Layanan & Port</span>
+                <span>• {categories.length} Kategori</span>
                 <span>• {users.length} Akun Pengguna</span>
               </div>
             </div>
@@ -259,7 +264,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
                   </div>
 
                   <button
-                    onClick={() => exportToXlsx(group, groupAllocs)}
+                    onClick={() => exportToXlsx(group, groupAllocs, services, categories)}
                     title={`Unduh Excel (.xlsx) ${group.name}`}
                     className="p-2 bg-white hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200 rounded-xl transition-all cursor-pointer flex-shrink-0"
                   >
