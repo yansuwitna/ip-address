@@ -275,11 +275,12 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 1: DASHBOARD (HANYA MENAMPILKAN JUMLAH GRUP IP & IP YANG SUDAH DIGUNAKAN) */}
+          {/* TAB 1: DASHBOARD */}
           {currentTab === 'dashboard' && (
             <DashboardView
               groups={groups}
               allocations={allocations}
+              categories={categories}
               onNavigateToGroups={() => {
                 setIsViewingGroupAllocations(false);
                 setCurrentTab('groups');
