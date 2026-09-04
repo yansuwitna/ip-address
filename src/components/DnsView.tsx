@@ -288,7 +288,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
                 </div>
               ) : (
                 <div className="py-2 text-rose-400">
-                  <span>;; ->>HEADER&lt;&lt;- opcode: QUERY, status: <strong>NXDOMAIN</strong> (Domain tidak ditemukan atau nonaktif)</span>
+                  <span>{`;; ->>HEADER<<- opcode: QUERY, status: `}<strong>NXDOMAIN</strong>{` (Domain tidak ditemukan atau nonaktif)`}</span>
                 </div>
               )}
             </div>

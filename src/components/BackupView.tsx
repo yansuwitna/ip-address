@@ -6,15 +6,17 @@ import {
   FileSpreadsheet, 
   FileJson, 
   CheckCircle2, 
-  AlertTriangle,
-  Lock,
-  Unlock,
-  Trash2,
-  ShieldAlert
+  AlertTriangle, 
+  Lock, 
+  Unlock, 
+  Trash2, 
+  ShieldAlert,
+  Globe
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceCategory, IPService } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord } from '../types/ipam';
 import { UserAccount } from '../types/auth';
 import { exportBackupJson, parseImportJson, exportToXlsx } from '../utils/exportImport';
+import { showConfirm, showSuccess, showError, showWarning } from '../utils/swal';
 
 interface BackupViewProps {
   groups: IPGroup[];
@@ -22,12 +24,14 @@ interface BackupViewProps {
   categories: DeviceCategory[];
   users: UserAccount[];
   services?: IPService[];
+  dnsRecords?: DnsRecord[];
   onImportData: (data: {
     groups: IPGroup[];
     allocations: IPAllocation[];
     categories?: DeviceCategory[];
     users?: UserAccount[];
     services?: IPService[];
+    dnsRecords?: DnsRecord[];
   }) => void;
   onWipeAllData: () => void;
 }
@@ -38,15 +42,31 @@ export const BackupView: React.FC<BackupViewProps> = ({
   categories,
   users,
   services = [],
+  dnsRecords = [],
   onImportData,
   onWipeAllData
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasBackedUp, setHasBackedUp] = useState(false);
 
-  const handleBackupComplete = () => {
-    exportBackupJson(groups, allocations, categories, users, services);
+  const handleDownloadFullBackup = () => {
+    exportBackupJson(groups, allocations, categories, users, services, dnsRecords);
     setHasBackedUp(true);
+    showSuccess('Cadangan Berhasil Diunduh', 'Berkas cadangan format JSON berhasil disimpan.');
+  };
+
+  const handleExportAllToXlsx = () => {
+    if (groups.length === 0) {
+      showWarning('Data Kosong', 'Tidak ada grup subnet IP untuk diekspor ke format Excel.');
+      return;
+    }
+    groups.forEach((group, index) => {
+      setTimeout(() => {
+        const groupAllocs = allocations.filter(a => a.groupId === group.id);
+        exportToXlsx(group, groupAllocs, services, categories);
+      }, index * 200);
+    });
+    showSuccess('Ekspor Berjalan', `Mengekspor ${groups.length} berkas spreadsheet per subnet.`);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,51 +74,69 @@ export const BackupView: React.FC<BackupViewProps> = ({
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const content = event.target?.result as string;
         const parsed = parseImportJson(content);
         const details = [
-          `• ${parsed.groups.length} Grup IP`,
-          `• ${parsed.allocations.length} Alokasi Host`,
-          parsed.services ? `• ${parsed.services.length} Layanan & Port` : null,
+          `• ${parsed.groups.length} Grup Subnet IP`,
+          `• ${parsed.allocations.length} Alokasi Host IP`,
+          parsed.dnsRecords ? `• ${parsed.dnsRecords.length} Catatan DNS Server` : null,
+          parsed.services ? `• ${parsed.services.length} Layanan & Port Terdaftar` : null,
           parsed.categories ? `• ${parsed.categories.length} Kategori Perangkat` : null,
-          parsed.users ? `• ${parsed.users.length} Akun Pengguna` : null
+          parsed.users ? `• ${parsed.users.length} Akun Pengguna Sistem` : null
         ].filter(Boolean).join('\n');
 
-        if (window.confirm(`Validasi file cadangan berhasil:\n${details}\n\nLanjutkan pemulihan data? Data yang ada saat ini akan ditimpa.`)) {
+        const confirmed = await showConfirm({
+          title: 'Pulihkan Data dari Cadangan?',
+          text: `Validasi file cadangan berhasil:\n${details}\n\nSeluruh data yang ada saat ini akan ditimpa dengan data cadangan ini. Lanjutkan?`,
+          confirmButtonText: 'Ya, Pulihkan Sekarang',
+          cancelButtonText: 'Batal',
+          isDanger: true
+        });
+
+        if (confirmed) {
           onImportData(parsed);
-          alert('Data berhasil dipulihkan dari berkas cadangan!');
+          showSuccess('Pemulihan Sukses', 'Semua data sistem berhasil dipulihkan dari berkas cadangan!');
         }
       } catch (err: any) {
-        alert('Gagal mengimpor file: ' + err.message);
+        showError('Gagal Mengimpor Cadangan', err.message || 'Format file JSON tidak valid.');
       }
     };
     reader.readAsText(file);
     e.target.value = '';
   };
 
-  const handleWipeAll = () => {
+  const handleWipeAll = async () => {
     if (!hasBackedUp) {
-      alert('Aksi ditolak: Anda wajib mengunduh cadangan data terlebih dahulu melalui tombol "Cadangan Lengkap"!');
+      showWarning(
+        'Aksi Ditolak',
+        'Anda wajib mengunduh cadangan data terlebih dahulu melalui tombol "Cadangan Lengkap" sebelum menghapus bersih database!'
+      );
       return;
     }
 
-    const confirmFirst = window.confirm(
-      'PERINGATAN KRUSIAL:\nApakah Anda yakin ingin menghapus SEMUA data aktif?\n\n' +
-      'Seluruh Grup IP Subnet, Alokasi Host, Kategori Perangkat, dan Akun Pengguna akan dihapus total sehingga tidak ada data yang tertinggal.\n\n' +
-      'Klik OK untuk melanjutkan.'
-    );
+    const confirmFirst = await showConfirm({
+      title: 'Hapus SEMUA Data Sistem?',
+      text: 'PERINGATAN KRUSIAL: Seluruh Grup Subnet IP, Alokasi Host, Catatan DNS, Layanan & Port, Kategori, dan Akun Pengguna akan dihapus bersih total.',
+      confirmButtonText: 'Lanjutkan Tahap Akhir',
+      cancelButtonText: 'Batal',
+      isDanger: true
+    });
 
     if (!confirmFirst) return;
 
-    const confirmFinal = window.confirm(
-      'KONFIRMASI TERAKHIR:\nApakah Anda benar-benar yakin? Tindakan ini tidak dapat dibatalkan.'
-    );
+    const confirmFinal = await showConfirm({
+      title: 'KONFIRMASI TERAKHIR: Bersihkan Database?',
+      text: 'Tindakan pembersihan bersih ini bersifat permanen dan tidak dapat dibatalkan. Apakah Anda benar-benar yakin?',
+      confirmButtonText: 'Ya, Hapus Bersih Total',
+      cancelButtonText: 'Batal',
+      isDanger: true
+    });
 
     if (confirmFinal) {
       onWipeAllData();
-      alert('Semua data aktif telah berhasil dihapus bersih! Tidak ada data yang tertinggal.');
+      showSuccess('Database Bersih', 'Semua data aktif telah berhasil dihapus bersih dari sistem.');
     }
   };
 
@@ -106,113 +144,119 @@ export const BackupView: React.FC<BackupViewProps> = ({
     <div className="space-y-6 font-poppins animate-in fade-in duration-200">
       
       {/* Banner */}
-      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100">
+          <div className="p-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl border border-blue-100 dark:border-blue-800">
             <Database className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-              Pusat Cadangan & Manajemen Data
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+              Cadangan & Manajemen Data IP & DNS
             </h2>
-            <p className="text-xs text-slate-500">
-              Unduh salinan cadangan lengkap atau pulihkan data dari file JSON/XLSX.
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Ekspor seluruh data subnet, host, DNS, layanan, dan pulihkan dari berkas JSON.
             </p>
           </div>
         </div>
 
-        {hasBackedUp && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Cadangan telah diunduh pada sesi ini</span>
-          </div>
-        )}
+        <button
+          onClick={handleDownloadFullBackup}
+          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer flex-shrink-0"
+        >
+          <Download className="w-4 h-4" />
+          <span>Unduh Cadangan Lengkap (JSON)</span>
+        </button>
       </div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {/* Grid Features */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        {/* Backup JSON */}
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4 flex flex-col justify-between">
+        {/* Card 1: Ekspor Cadangan */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-5 flex flex-col justify-between">
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
-                  <FileJson className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">
-                    Cadangan Lengkap (JSON)
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Mencadangkan seluruh data sistem IP Address
-                  </p>
-                </div>
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                Lengkap
-              </span>
-            </div>
-
-            <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100 text-xs text-slate-600 space-y-1">
-              <div className="font-semibold text-slate-700">Cakupan data yang dicadangkan:</div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 text-[11px] text-slate-500 font-medium">
-                <span>• {groups.length} Grup Subnet</span>
-                <span>• {allocations.length} Alokasi IP</span>
-                <span>• {services.length} Layanan & Port</span>
-                <span>• {categories.length} Kategori</span>
-                <span>• {users.length} Akun Pengguna</span>
-              </div>
-            </div>
-
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Klik tombol di bawah untuk mengunduh seluruh data dalam satu berkas JSON. Ini juga akan membuka kunci fitur <strong>Hapus Semua Data Aktif</strong>.
-            </p>
-          </div>
-
-          <button
-            onClick={handleBackupComplete}
-            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            <span>Cadangkan Lengkap (Semua Data)</span>
-          </button>
-        </div>
-
-        {/* Restore JSON */}
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4 flex flex-col justify-between">
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
-                <Upload className="w-5 h-5" />
+            <div className="flex items-center gap-2.5">
+              <div className="p-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                <FileJson className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-sm">
-                  Pulihkan Cadangan (Restore)
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                  Ekspor Data Sistem (Backup)
                 </h3>
-                <p className="text-xs text-slate-500">
-                  Impor file cadangan JSON yang telah disimpan sebelumnya
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Simpan data lokal ke dalam berkas cadangan offline yang aman.
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Pilih berkas JSON cadangan dari perangkat Anda. Sistem akan memvalidasi skema data secara otomatis sebelum menimpa konfigurasi saat ini.
-            </p>
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/60 space-y-2 text-xs text-slate-600 dark:text-slate-300">
+              <div className="flex justify-between py-1 border-b border-slate-200/60 dark:border-slate-700/60">
+                <span>Grup Subnet IP:</span>
+                <strong className="text-slate-900 dark:text-slate-100">{groups.length} grup</strong>
+              </div>
+              <div className="flex justify-between py-1 border-b border-slate-200/60 dark:border-slate-700/60">
+                <span>Alokasi Host IP:</span>
+                <strong className="text-slate-900 dark:text-slate-100">{allocations.length} entri</strong>
+              </div>
+              <div className="flex justify-between py-1 border-b border-slate-200/60 dark:border-slate-700/60">
+                <span>Catatan DNS Server:</span>
+                <strong className="text-indigo-600 dark:text-indigo-400 font-bold">{dnsRecords.length} record</strong>
+              </div>
+              <div className="flex justify-between py-1 border-b border-slate-200/60 dark:border-slate-700/60">
+                <span>Layanan & Port Terdaftar:</span>
+                <strong className="text-slate-900 dark:text-slate-100">{services.length} layanan</strong>
+              </div>
+              <div className="flex justify-between py-1">
+                <span>Kategori Perangkat:</span>
+                <strong className="text-slate-900 dark:text-slate-100">{categories.length} tipe</strong>
+              </div>
+            </div>
+          </div>
 
-            <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-2xl text-[11px] text-amber-800">
-              Perhatian: Memulihkan cadangan akan menggantikan konfigurasi grup, alokasi, kategori, dan pengguna sesuai isi berkas.
+          <div className="space-y-2 pt-2">
+            <button
+              onClick={handleDownloadFullBackup}
+              className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Download className="w-4 h-4" />
+              <span>Unduh Berkas JSON (.json)</span>
+            </button>
+
+            <button
+              onClick={handleExportAllToXlsx}
+              className="w-full py-2.5 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border border-slate-200 dark:border-slate-700"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+              <span>Ekspor Semua Subnet ke Excel (.xlsx)</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Card 2: Pulihkan Data (Restore) */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-5 flex flex-col justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                <Upload className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                  Pemulihan Data (Restore)
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Pulihkan kembali seluruh data dari berkas JSON yang telah dicadangkan.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-amber-50/70 dark:bg-amber-950/30 rounded-2xl border border-amber-200/80 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                Memulihkan data akan menggantikan data subnet, host IP, DNS, dan akun saat ini dengan data yang ada di dalam berkas cadangan JSON.
+              </p>
             </div>
           </div>
 
           <div>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white rounded-xl text-xs font-bold shadow-sm shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
-            >
-              <Upload className="w-4 h-4" />
-              <span>Pilih File Backup JSON</span>
-            </button>
             <input
               type="file"
               ref={fileInputRef}
@@ -220,131 +264,55 @@ export const BackupView: React.FC<BackupViewProps> = ({
               accept=".json"
               className="hidden"
             />
-          </div>
-        </div>
-
-      </div>
-
-      {/* Excel (.xlsx) Export by Group */}
-      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-          <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
-            <FileSpreadsheet className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="font-bold text-slate-900 text-sm">
-              Ekspor Laporan Excel (.xlsx)
-            </h3>
-            <p className="text-xs text-slate-500">
-              Unduh data inventaris IP per grup subnet dalam format Microsoft Excel (.xlsx)
-            </p>
-          </div>
-        </div>
-
-        {groups.length === 0 ? (
-          <div className="p-6 text-center text-xs text-slate-400">
-            Tidak ada grup IP yang tersedia untuk diekspor ke Excel.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {groups.map(group => {
-              const groupAllocs = allocations.filter(a => a.groupId === group.id);
-              return (
-                <div 
-                  key={group.id}
-                  className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-2"
-                >
-                  <div className="truncate">
-                    <div className="font-bold text-xs text-slate-800 truncate">
-                      {group.name}
-                    </div>
-                    <div className="text-[11px] text-slate-500 font-mono">
-                      {group.cidr} • {groupAllocs.length} Alokasi
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => exportToXlsx(group, groupAllocs, services, categories)}
-                    title={`Unduh Excel (.xlsx) ${group.name}`}
-                    className="p-2 bg-white hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200 rounded-xl transition-all cursor-pointer flex-shrink-0"
-                  >
-                    <Download className="w-4 h-4" />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Danger Zone: Hapus Semua Data Aktif & Reset Demo */}
-      <div className="space-y-4">
-        
-        {/* Hapus Semua Data Aktif Card */}
-        <div className={`border rounded-3xl p-6 shadow-xs transition-all ${
-          hasBackedUp 
-            ? 'bg-rose-50/90 border-rose-300' 
-            : 'bg-slate-50/80 border-slate-200'
-        }`}>
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1.5 max-w-2xl">
-              <div className="flex items-center gap-2">
-                {hasBackedUp ? (
-                  <Unlock className="w-5 h-5 text-rose-600" />
-                ) : (
-                  <Lock className="w-5 h-5 text-slate-400" />
-                )}
-                <h3 className={`font-bold text-sm ${hasBackedUp ? 'text-rose-900' : 'text-slate-700'}`}>
-                  Hapus Semua Data Aktif (Bersih Total)
-                </h3>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                  hasBackedUp 
-                    ? 'bg-rose-100 text-rose-700 border-rose-300' 
-                    : 'bg-slate-200 text-slate-600 border-slate-300'
-                }`}>
-                  {hasBackedUp ? 'Terbuka' : 'Terkunci'}
-                </span>
-              </div>
-
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Menghapus seluruh data di dalam sistem tanpa ada data yang tertinggal (seluruh Grup IP, Alokasi Host, Kategori Perangkat, dan Akun Pengguna).
-              </p>
-
-              {!hasBackedUp ? (
-                <div className="flex items-center gap-1.5 text-xs text-amber-700 font-medium bg-amber-50/80 p-2.5 rounded-xl border border-amber-200">
-                  <ShieldAlert className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                  <span>
-                    Untuk keamanan, tombol ini terkunci. Anda harus mengklik <strong>"Cadangkan Lengkap"</strong> di atas terlebih dahulu.
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5 text-xs text-rose-700 font-medium bg-rose-100/60 p-2.5 rounded-xl border border-rose-200">
-                  <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0" />
-                  <span>
-                    Perhatian: Cadangan telah dibuat. Menghapus data akan membersihkan seluruh database hingga kosong sempurna.
-                  </span>
-                </div>
-              )}
-            </div>
-
             <button
-              onClick={handleWipeAll}
-              disabled={!hasBackedUp}
-              className={`px-5 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 flex-shrink-0 ${
-                hasBackedUp
-                  ? 'bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white shadow-md shadow-rose-600/30 cursor-pointer'
-                  : 'bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed'
-              }`}
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Trash2 className="w-4 h-4" />
-              <span>Hapus Semua Data Aktif</span>
+              <Upload className="w-4 h-4" />
+              <span>Pilih Berkas Cadangan (.json)</span>
             </button>
           </div>
         </div>
 
       </div>
 
+      {/* Danger Zone: Wipe All Data */}
+      <div className="bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-900/40 rounded-3xl p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 rounded-xl flex-shrink-0">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-rose-950 dark:text-rose-200">
+                Zona Bahaya: Hapus Bersih Seluruh Data Sistem
+              </h3>
+              <p className="text-xs text-rose-700 dark:text-rose-400 mt-0.5">
+                Menghapus total semua subnet, alokasi IP, DNS, port layanan, kategori, dan akun pengguna.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={handleWipeAll}
+            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex-shrink-0 ${
+              hasBackedUp
+                ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm shadow-rose-600/30 cursor-pointer'
+                : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+            }`}
+          >
+            {hasBackedUp ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+            <span>Hapus Bersih Database</span>
+          </button>
+        </div>
+
+        {!hasBackedUp && (
+          <p className="text-[11px] text-rose-600 dark:text-rose-400 font-medium">
+            * Tombol hapus terkunci demi keamanan. Silakan klik tombol "Unduh Cadangan Lengkap" terlebih dahulu untuk membuka kunci tombol ini.
+          </p>
+        )}
+      </div>
+
     </div>
   );
 };
-

@@ -47,6 +47,7 @@ import {
   ServicePreset 
 } from '../utils/servicePresets';
 import { ServiceModal } from './ServiceModal';
+import { showConfirm, showSuccess } from '../utils/swal';
 
 interface ServicesViewProps {
   services: IPService[];
@@ -760,9 +761,17 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
                             <button
-                              onClick={() => {
-                                if (window.confirm(`Hapus layanan "${svc.name}" (Port :${svc.port}) dari IP ${svc.ip}?`)) {
+                              onClick={async () => {
+                                const confirmed = await showConfirm({
+                                  title: 'Hapus Layanan?',
+                                  text: `Apakah Anda yakin ingin menghapus layanan "${svc.name}" (Port :${svc.port}) dari IP ${svc.ip}?`,
+                                  confirmButtonText: 'Ya, Hapus',
+                                  cancelButtonText: 'Batal',
+                                  isDanger: true
+                                });
+                                if (confirmed) {
                                   onDeleteService(svc.id);
+                                  showSuccess('Layanan Dihapus', `Layanan "${svc.name}" berhasil dihapus.`);
                                 }
                               }}
                               title="Hapus Layanan Ini"
@@ -876,9 +885,17 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
-                          onClick={() => {
-                            if (window.confirm(`Hapus layanan "${svc.name}" dari IP ${svc.ip}?`)) {
+                          onClick={async () => {
+                            const confirmed = await showConfirm({
+                              title: 'Hapus Layanan?',
+                              text: `Apakah Anda yakin ingin menghapus layanan "${svc.name}" dari IP ${svc.ip}?`,
+                              confirmButtonText: 'Ya, Hapus',
+                              cancelButtonText: 'Batal',
+                              isDanger: true
+                            });
+                            if (confirmed) {
                               onDeleteService(svc.id);
+                              showSuccess('Layanan Dihapus', `Layanan "${svc.name}" berhasil dihapus.`);
                             }
                           }}
                           className="p-1 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"

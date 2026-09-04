@@ -16,7 +16,7 @@ import {
   LayoutGrid,
   Table as TableIcon
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceCategory, IPService } from './types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord } from './types/ipam';
 import { User, UserAccount } from './types/auth';
 import { 
   getCurrentUser, 
@@ -37,10 +37,13 @@ import {
   loadDeviceCategories,
   saveDeviceCategories,
   loadServices,
-  saveServices
+  saveServices,
+  loadDnsRecords,
+  saveDnsRecords
 } from './utils/storage';
 import { exportToXlsx } from './utils/exportImport';
 import { parseCidr } from './utils/ipCalculator';
+import { showConfirm, showSuccess } from './utils/swal';
 
 import { HomeView } from './components/HomeView';
 import { Login } from './components/Login';
@@ -53,6 +56,9 @@ import { IPMatrixGrid } from './components/IPMatrixGrid';
 import { IPTable } from './components/IPTable';
 import { ServicesView } from './components/ServicesView';
 import { BackupView } from './components/BackupView';
+import { DnsView } from './components/DnsView';
+import { DnsModal } from './components/DnsModal';
+import { PrintModal } from './components/PrintModal';
 import { GroupModal } from './components/GroupModal';
 import { IPAllocationModal } from './components/IPAllocationModal';
 import { BatchReserveModal } from './components/BatchReserveModal';
@@ -75,11 +81,32 @@ export const App: React.FC = () => {
   const [allocations, setAllocations] = useState<IPAllocation[]>(loadAllocations);
   const [services, setServices] = useState<IPService[]>(loadServices);
   const [categories, setCategories] = useState<DeviceCategory[]>(loadDeviceCategories);
+  const [dnsRecords, setDnsRecords] = useState<DnsRecord[]>(loadDnsRecords);
   const [selectedGroupId, setSelectedGroupId] = useState<string>(groups[0]?.id || '');
   const [selectedServiceIp, setSelectedServiceIp] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'matrix' | 'table'>('matrix');
   const [subnetListViewMode, setSubnetListViewMode] = useState<'cards' | 'table'>('cards');
   const [globalSearch, setGlobalSearch] = useState('');
+
+  // Theme State
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('netipam_theme');
+    return (saved === 'dark') ? 'dark' : 'light';
+  });
+
+  // Apply theme class to document
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('netipam_theme', theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
 
   // Modals state
@@ -94,6 +121,14 @@ export const App: React.FC = () => {
   
   const [isPingModalOpen, setIsPingModalOpen] = useState(false);
   const [pingAlloc, setPingAlloc] = useState<IPAllocation | null>(null);
+
+  // DNS Modal state
+  const [isDnsModalOpen, setIsDnsModalOpen] = useState(false);
+  const [editingDnsRecord, setEditingDnsRecord] = useState<DnsRecord | null>(null);
+
+  // Print Modal state
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [printType, setPrintType] = useState<'allocations' | 'dns' | 'services'>('allocations');
 
   // Sync with LocalStorage
   useEffect(() => {
@@ -111,6 +146,10 @@ export const App: React.FC = () => {
   useEffect(() => {
     saveDeviceCategories(categories);
   }, [categories]);
+
+  useEffect(() => {
+    saveDnsRecords(dnsRecords);
+  }, [dnsRecords]);
 
   // Saat terbaca di tabel user tidak ada, otomatis membuka halaman daftar user
   useEffect(() => {
@@ -193,12 +232,14 @@ export const App: React.FC = () => {
     setAllocations([]);
     setServices([]);
     setCategories([]);
+    setDnsRecords([]);
     setSelectedGroupId('');
     setSelectedServiceIp(null);
     saveGroups([]);
     saveAllocations([]);
     saveServices([]);
     saveDeviceCategories([]);
+    saveDnsRecords([]);
     wipeAllUsers();
     setUsers([]);
     setCurrentUser(null);
@@ -212,6 +253,7 @@ export const App: React.FC = () => {
     categories?: DeviceCategory[];
     users?: UserAccount[];
     services?: IPService[];
+    dnsRecords?: DnsRecord[];
   }) => {
     setGroups(data.groups);
     setAllocations(data.allocations);
@@ -225,6 +267,10 @@ export const App: React.FC = () => {
     if (data.users) {
       saveUsers(data.users);
       setUsers(data.users);
+    }
+    if (data.dnsRecords) {
+      saveDnsRecords(data.dnsRecords);
+      setDnsRecords(data.dnsRecords);
     }
     setSelectedGroupId(data.groups[0]?.id || '');
   };
@@ -420,6 +466,7 @@ export const App: React.FC = () => {
     switch (tab) {
       case 'dashboard': return 'Dashboard';
       case 'groups': return 'Grup IP (Subnet)';
+      case 'dns': return 'Manajemen DNS';
       case 'services': return 'Layanan & Port';
       case 'categories': return 'Kategori Perangkat';
       case 'users': return 'Akun Pengguna';
@@ -436,7 +483,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex bg-slate-50 text-slate-800 font-poppins antialiased selection:bg-blue-600 selection:text-white">
+    <div className={`h-screen w-screen overflow-hidden flex ${theme === 'dark' ? 'bg-slate-950 text-slate-200' : 'bg-slate-50 text-slate-800'} font-poppins antialiased selection:bg-blue-600 selection:text-white`}>
       
       {/* 1. Left STATIC Dedicated Sidebar (Permanently anchored & pinned) */}
       <Sidebar
@@ -448,19 +495,24 @@ export const App: React.FC = () => {
         onLogout={handleLogout}
         totalGroups={groups.length}
         totalUsedIps={totalUsedIps}
+        totalDnsRecords={dnsRecords.length}
         totalCategories={categories.length}
         totalUsers={users.length}
         totalServices={services.length}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* 2. Main Work Area with Independent Smooth Scroll */}
-      <div className="flex-1 flex flex-col h-screen overflow-y-auto min-w-0 bg-slate-50">
+      <div className={`flex-1 flex flex-col h-screen overflow-y-auto min-w-0 ${theme === 'dark' ? 'bg-slate-950' : 'bg-slate-50'}`}>
         
         {/* Top Header (Sticky) */}
         <Header 
           onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)} 
           title={getTabTitle(currentTab)}
           onViewHome={() => setIsViewingPublicHome(true)}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
         />
 
 
@@ -676,6 +728,10 @@ export const App: React.FC = () => {
                         setSelectedServiceIp(alloc.ip);
                         setCurrentTab('services');
                       }}
+                      onOpenPrint={() => {
+                        setPrintType('allocations');
+                        setIsPrintModalOpen(true);
+                      }}
                     />
                   )}
                 </div>
@@ -856,10 +912,17 @@ export const App: React.FC = () => {
 
                                 <button
                                   disabled={hasUsedIps}
-                                  onClick={() => {
+                                  onClick={async () => {
                                     if (hasUsedIps) return;
-                                    if (window.confirm(`Hapus grup "${grp.name}" (${grp.cidr})?`)) {
+                                    const confirmed = await showConfirm({
+                                      title: 'Hapus Grup IP?',
+                                      text: `Grup "${grp.name}" (${grp.cidr}) akan dihapus beserta semua alokasi dan layanan terkait.`,
+                                      confirmText: 'Ya, Hapus',
+                                      cancelText: 'Batal'
+                                    });
+                                    if (confirmed) {
                                       handleDeleteGroup(grp.id);
+                                      showSuccess('Grup berhasil dihapus!');
                                     }
                                   }}
                                   title={
@@ -1015,10 +1078,17 @@ export const App: React.FC = () => {
 
                                       <button
                                         disabled={hasUsedIps}
-                                        onClick={() => {
+                                        onClick={async () => {
                                           if (hasUsedIps) return;
-                                          if (window.confirm(`Hapus grup "${grp.name}" (${grp.cidr})?`)) {
+                                          const confirmed = await showConfirm({
+                                            title: 'Hapus Grup IP?',
+                                            text: `Grup "${grp.name}" (${grp.cidr}) akan dihapus beserta semua alokasi dan layanan terkait.`,
+                                            confirmText: 'Ya, Hapus',
+                                            cancelText: 'Batal'
+                                          });
+                                          if (confirmed) {
                                             handleDeleteGroup(grp.id);
+                                            showSuccess('Grup berhasil dihapus!');
                                           }
                                         }}
                                         title={hasUsedIps ? "Tidak dapat dihapus: masih ada IP terpakai" : "Hapus Grup"}
@@ -1076,6 +1146,51 @@ export const App: React.FC = () => {
             />
           )}
 
+          {/* TAB: MANAJEMEN DNS */}
+          {currentTab === 'dns' && (
+            <DnsView
+              dnsRecords={dnsRecords}
+              groups={groups}
+              allocations={allocations}
+              onSaveRecord={(recordData) => {
+                const now = new Date().toISOString();
+                if (recordData.id) {
+                  setDnsRecords(prev => prev.map(r => r.id === recordData.id ? { ...r, ...recordData, updatedAt: now } as DnsRecord : r));
+                } else {
+                  const newRecord: DnsRecord = {
+                    id: `dns-${Date.now()}`,
+                    domain: recordData.domain || '',
+                    type: recordData.type || 'A',
+                    value: recordData.value || '',
+                    ttl: recordData.ttl || 3600,
+                    priority: recordData.priority,
+                    groupId: recordData.groupId,
+                    status: recordData.status || 'active',
+                    description: recordData.description || '',
+                    createdAt: now,
+                    updatedAt: now
+                  };
+                  setDnsRecords(prev => [...prev, newRecord]);
+                }
+              }}
+              onDeleteRecord={(id) => {
+                setDnsRecords(prev => prev.filter(r => r.id !== id));
+              }}
+              onOpenAddModal={() => {
+                setEditingDnsRecord(null);
+                setIsDnsModalOpen(true);
+              }}
+              onOpenEditModal={(record) => {
+                setEditingDnsRecord(record);
+                setIsDnsModalOpen(true);
+              }}
+              onOpenPrintModal={() => {
+                setPrintType('dns');
+                setIsPrintModalOpen(true);
+              }}
+            />
+          )}
+
           {/* TAB 3: KATEGORI PERANGKAT */}
           {currentTab === 'categories' && (
             <CategoriesView
@@ -1104,6 +1219,7 @@ export const App: React.FC = () => {
               categories={categories}
               users={users}
               services={services}
+              dnsRecords={dnsRecords}
               onImportData={handleImportData}
               onWipeAllData={handleWipeAllData}
             />
@@ -1162,6 +1278,56 @@ export const App: React.FC = () => {
           }}
           allocation={pingAlloc}
           onUpdateStatus={handleUpdatePingStatus}
+        />
+      )}
+
+      {isDnsModalOpen && (
+        <DnsModal
+          isOpen={isDnsModalOpen}
+          onClose={() => {
+            setIsDnsModalOpen(false);
+            setEditingDnsRecord(null);
+          }}
+          onSave={(recordData) => {
+            const now = new Date().toISOString();
+            if (recordData.id) {
+              setDnsRecords(prev => prev.map(r => r.id === recordData.id ? { ...r, ...recordData, updatedAt: now } as DnsRecord : r));
+            } else {
+              const newRecord: DnsRecord = {
+                id: `dns-${Date.now()}`,
+                domain: recordData.domain || '',
+                type: recordData.type || 'A',
+                value: recordData.value || '',
+                ttl: recordData.ttl || 3600,
+                priority: recordData.priority,
+                groupId: recordData.groupId,
+                status: recordData.status || 'active',
+                description: recordData.description || '',
+                createdAt: now,
+                updatedAt: now
+              };
+              setDnsRecords(prev => [...prev, newRecord]);
+            }
+            setIsDnsModalOpen(false);
+            setEditingDnsRecord(null);
+          }}
+          editRecord={editingDnsRecord}
+          groups={groups}
+          allocations={allocations}
+        />
+      )}
+
+      {isPrintModalOpen && (
+        <PrintModal
+          isOpen={isPrintModalOpen}
+          onClose={() => setIsPrintModalOpen(false)}
+          type={printType}
+          group={activeGroup}
+          allocations={activeGroup ? allocations.filter(a => a.groupId === activeGroup.id) : allocations}
+          dnsRecords={dnsRecords}
+          services={services}
+          categories={categories}
+          currentUser={currentUser}
         />
       )}
 

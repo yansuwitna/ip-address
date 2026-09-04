@@ -12,6 +12,7 @@ import {
 import { IPGroup, IPAllocation } from '../types/ipam';
 import { parseCidr } from '../utils/ipCalculator';
 import { exportToCsv } from '../utils/exportImport';
+import { showConfirm, showSuccess } from '../utils/swal';
 
 interface GroupListProps {
   groups: IPGroup[];
@@ -138,10 +139,18 @@ export const GroupList: React.FC<GroupListProps> = ({
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          if (window.confirm(`Hapus grup "${group.name}" beserta ${groupAllocations.length} data IP di dalamnya?`)) {
+                          const confirmed = await showConfirm({
+                            title: 'Hapus Grup Subnet?',
+                            text: `Hapus grup "${group.name}" beserta ${groupAllocations.length} data IP di dalamnya?`,
+                            confirmButtonText: 'Ya, Hapus',
+                            cancelButtonText: 'Batal',
+                            isDanger: true
+                          });
+                          if (confirmed) {
                             onDeleteGroup(group.id);
+                            showSuccess('Grup Dihapus', `Grup subnet ${group.name} berhasil dihapus.`);
                           }
                         }}
                         title="Hapus Grup"

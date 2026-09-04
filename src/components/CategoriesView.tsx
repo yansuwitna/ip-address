@@ -27,6 +27,7 @@ import {
   Webcam
 } from 'lucide-react';
 import { DeviceCategory, IPAllocation } from '../types/ipam';
+import { showConfirm, showSuccess } from '../utils/swal';
 
 export const AVAILABLE_ICONS: { name: string; label: string; icon: React.FC<{ className?: string }> }[] = [
   { name: 'Cctv', label: 'CCTV Kamera', icon: Cctv },
@@ -289,16 +290,24 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
 
                           <button
                             disabled={usageCount > 0}
-                            onClick={() => {
+                            onClick={async () => {
                               if (usageCount > 0) return;
-                              if (window.confirm(`Hapus kategori "${cat.name}"?`)) {
+                              const confirmed = await showConfirm({
+                                title: 'Hapus Kategori?',
+                                text: `Apakah Anda yakin ingin menghapus kategori "${cat.name}"?`,
+                                confirmButtonText: 'Ya, Hapus',
+                                cancelButtonText: 'Batal',
+                                isDanger: true
+                              });
+                              if (confirmed) {
                                 onDeleteCategory(cat.id);
+                                showSuccess('Kategori Dihapus', `Kategori "${cat.name}" berhasil dihapus.`);
                               }
                             }}
                             title={
                               usageCount > 0
                                 ? `Tidak dapat dihapus: kategori ini sedang digunakan oleh ${usageCount} IP`
-                                : "Hapus Kategori (Kurangi)"
+                                : "Hapus Kategori"
                             }
                             className={`p-2 rounded-xl transition-all ${
                               usageCount > 0

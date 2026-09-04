@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { IPGroup, IPAllocation, DeviceCategory, IPService } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord } from '../types/ipam';
 import { UserAccount } from '../types/auth';
 
 export function exportToXlsx(
@@ -55,7 +55,7 @@ export function exportToXlsx(
 
   // Informative header rows in sheet
   const summaryRows = [
-    ['LAPORAN ALOKASI IP ADDRESS - IP ADDRESS'],
+    ['LAPORAN ALOKASI IP HOST & INFRASTRUKTUR - IP & DNS'],
     ['Nama Subnet / Grup', group.name],
     ['Subnet CIDR', group.cidr],
     ['Default Gateway', group.gateway],
@@ -89,7 +89,7 @@ export function exportToXlsx(
   const safeSheetName = (group.name.replace(/[:\\/?*\[\]]/g, '').slice(0, 31)) || 'Alokasi IP';
   XLSX.utils.book_append_sheet(workbook, worksheet, safeSheetName);
 
-  const fileName = `IPAddress_${group.name.replace(/[^a-zA-Z0-9_-]/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const fileName = `IP_DNS_${group.name.replace(/[^a-zA-Z0-9_-]/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(workbook, fileName);
 }
 
@@ -102,24 +102,27 @@ export function exportBackupJson(
   allocations: IPAllocation[],
   categories?: DeviceCategory[],
   users?: UserAccount[],
-  services?: IPService[]
+  services?: IPService[],
+  dnsRecords?: DnsRecord[]
 ): void {
   const backupData = {
-    appName: 'IP Address',
-    version: '2.1.0',
+    appName: 'IP & DNS',
+    version: '2.2.0',
     exportDate: new Date().toISOString(),
     totalData: {
       groups: groups.length,
       allocations: allocations.length,
       categories: categories?.length || 0,
       users: users?.length || 0,
-      services: services?.length || 0
+      services: services?.length || 0,
+      dnsRecords: dnsRecords?.length || 0
     },
     groups,
     allocations,
     categories: categories || [],
     users: users || [],
-    services: services || []
+    services: services || [],
+    dnsRecords: dnsRecords || []
   };
 
   const jsonStr = JSON.stringify(backupData, null, 2);
@@ -127,7 +130,7 @@ export function exportBackupJson(
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `IPAddress_Cadangan_Lengkap_${new Date().toISOString().slice(0, 10)}.json`);
+  link.setAttribute('download', `IP_DNS_Cadangan_Lengkap_${new Date().toISOString().slice(0, 10)}.json`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -140,6 +143,7 @@ export function parseImportJson(fileContent: string): {
   categories?: DeviceCategory[];
   users?: UserAccount[];
   services?: IPService[];
+  dnsRecords?: DnsRecord[];
 } {
   const parsed = JSON.parse(fileContent);
   if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.allocations)) {
@@ -150,7 +154,7 @@ export function parseImportJson(fileContent: string): {
     allocations: parsed.allocations,
     categories: Array.isArray(parsed.categories) ? parsed.categories : undefined,
     users: Array.isArray(parsed.users) ? parsed.users : undefined,
-    services: Array.isArray(parsed.services) ? parsed.services : undefined
+    services: Array.isArray(parsed.services) ? parsed.services : undefined,
+    dnsRecords: Array.isArray(parsed.dnsRecords) ? parsed.dnsRecords : undefined
   };
 }
-
