@@ -9,7 +9,8 @@ import {
   CheckCircle2, 
   AlertCircle, 
   Clock, 
-  Activity
+  Activity,
+  Layers
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceType } from '../types/ipam';
 import { parseCidr } from '../utils/ipCalculator';
@@ -25,12 +26,10 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
   allocations,
   activeGroup
 }) => {
-  // Filter allocations for calculation if activeGroup is chosen, or calculate globally
   const relevantAllocations = activeGroup
     ? allocations.filter(a => a.groupId === activeGroup.id)
     : allocations;
 
-  // Calculate total usable hosts
   let totalUsable = 0;
   if (activeGroup) {
     const sub = parseCidr(activeGroup.cidr);
@@ -49,7 +48,6 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
   const availableCount = Math.max(0, totalUsable - totalOccupied);
   const utilization = totalUsable > 0 ? Math.min(100, Math.round((totalOccupied / totalUsable) * 100)) : 0;
 
-  // Count by device type
   const deviceCounts: Record<DeviceType, number> = {
     server: 0,
     router: 0,
@@ -74,93 +72,92 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* 4 Stat Cards */}
+      {/* 4 Stat Cards in Bright Theme */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
         {/* Card 1: Total Kapasitas IP */}
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 relative overflow-hidden shadow-sm">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Total Host Usable</span>
-            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Host Usable</span>
+            <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
               <Activity className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               {totalUsable.toLocaleString()}
             </span>
             <span className="text-xs text-slate-400">
-              {activeGroup ? 'dalam grup' : `dari ${groups.length} grup`}
+              {activeGroup ? 'dalam grup' : `total (${groups.length} grup)`}
             </span>
           </div>
-          <div className="mt-2 text-[11px] text-slate-400 truncate">
-            {activeGroup ? `Subnet ${activeGroup.cidr}` : 'Seluruh infrastruktur jaringan'}
+          <div className="mt-2 text-xs text-slate-500 truncate">
+            {activeGroup ? `Subnet ${activeGroup.cidr}` : 'Infrastruktur aktif'}
           </div>
         </div>
 
         {/* Card 2: IP Terpakai (In Use) */}
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 relative overflow-hidden shadow-sm">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">IP Aktif Terpakai</span>
-            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">IP Terpakai</span>
+            <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-bold text-emerald-400 tracking-tight">
+            <span className="text-2xl sm:text-3xl font-extrabold text-emerald-600 tracking-tight">
               {usedCount}
             </span>
-            <span className="text-xs font-medium text-emerald-500/90">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
               {totalUsable > 0 ? ((usedCount / totalUsable) * 100).toFixed(1) : 0}%
             </span>
           </div>
-          <div className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            <span>Perangkat online & terkonfigurasi</span>
+          <div className="mt-2 text-xs text-slate-500 truncate">
+            Host aktif teralokasi
           </div>
         </div>
 
-        {/* Card 3: Dicadangkan / DHCP */}
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 relative overflow-hidden shadow-sm">
+        {/* Card 3: Reservasi & DHCP */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Reservasi & DHCP</span>
-            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Reservasi & DHCP</span>
+            <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-bold text-amber-400 tracking-tight">
+            <span className="text-2xl sm:text-3xl font-extrabold text-amber-600 tracking-tight">
               {reservedCount + dhcpCount}
             </span>
             <span className="text-xs text-slate-400">
-              ({reservedCount} Resv / {dhcpCount} DHCP)
+              ({reservedCount} Rsv / {dhcpCount} DHCP)
             </span>
           </div>
-          <div className="mt-2 text-[11px] text-slate-400 truncate">
-            Dicadangkan untuk VIP & Pool otomatis
+          <div className="mt-2 text-xs text-slate-500 truncate">
+            Dicadangkan untuk VIP & Pool
           </div>
         </div>
 
         {/* Card 4: IP Bebas (Available) */}
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 relative overflow-hidden shadow-sm">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">IP Bebas / Tersedia</span>
-            <div className="p-2 rounded-lg bg-sky-500/10 text-sky-400">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">IP Bebas / Siap</span>
+            <div className="p-2.5 rounded-xl bg-sky-50 text-sky-600 border border-sky-100">
               <AlertCircle className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-bold text-sky-400 tracking-tight">
+            <span className="text-2xl sm:text-3xl font-extrabold text-blue-600 tracking-tight">
               {availableCount.toLocaleString()}
             </span>
             <span className="text-xs text-slate-400">
-              IP siap dipakai
+              tersisa
             </span>
           </div>
-          <div className="mt-2 w-full bg-slate-700/60 rounded-full h-1.5 overflow-hidden">
+          <div className="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/60">
             <div 
               className={`h-full rounded-full transition-all duration-500 ${
-                utilization >= 90 ? 'bg-rose-500' : utilization >= 70 ? 'bg-amber-500' : 'bg-blue-500'
+                utilization >= 90 ? 'bg-rose-500' : utilization >= 70 ? 'bg-amber-500' : 'bg-blue-600'
               }`}
               style={{ width: `${utilization}%` }}
             ></div>
@@ -170,55 +167,55 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
       </div>
 
       {/* Device Breakdown Tags */}
-      <div className="flex flex-wrap items-center gap-2 text-xs bg-slate-800/40 p-2.5 rounded-lg border border-slate-700/50">
-        <span className="text-slate-400 font-medium mr-1 flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-2 text-xs bg-white p-3 rounded-xl border border-slate-200/90 shadow-xs">
+        <span className="text-slate-500 font-medium mr-1 flex items-center gap-1">
           Distribusi Perangkat:
         </span>
         
         {deviceCounts.server > 0 && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-300 border border-purple-500/20">
-            <Server className="w-3 h-3" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 font-medium">
+            <Server className="w-3.5 h-3.5" />
             <span>Server: <strong>{deviceCounts.server}</strong></span>
           </span>
         )}
 
         {(deviceCounts.router > 0 || deviceCounts.switch > 0) && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-300 border border-blue-500/20">
-            <Router className="w-3 h-3" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-medium">
+            <Router className="w-3.5 h-3.5" />
             <span>Network SW/RT: <strong>{deviceCounts.router + deviceCounts.switch}</strong></span>
           </span>
         )}
 
         {deviceCounts.access_point > 0 && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-            <Wifi className="w-3 h-3" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200 font-medium">
+            <Wifi className="w-3.5 h-3.5" />
             <span>AP WiFi: <strong>{deviceCounts.access_point}</strong></span>
           </span>
         )}
 
         {deviceCounts.pc_workstation > 0 && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-            <Monitor className="w-3 h-3" />
-            <span>Workstation/PC: <strong>{deviceCounts.pc_workstation}</strong></span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 font-medium">
+            <Monitor className="w-3.5 h-3.5" />
+            <span>Workstation: <strong>{deviceCounts.pc_workstation}</strong></span>
           </span>
         )}
 
         {deviceCounts.cctv > 0 && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-            <Video className="w-3 h-3" />
-            <span>CCTV & IoT: <strong>{deviceCounts.cctv}</strong></span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+            <Video className="w-3.5 h-3.5" />
+            <span>CCTV: <strong>{deviceCounts.cctv}</strong></span>
           </span>
         )}
 
         {deviceCounts.printer > 0 && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20">
-            <Printer className="w-3 h-3" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 font-medium">
+            <Printer className="w-3.5 h-3.5" />
             <span>Printer: <strong>{deviceCounts.printer}</strong></span>
           </span>
         )}
 
         {deviceCounts.other > 0 && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-700/40 text-slate-300 border border-slate-600/30">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-medium">
             <span>Lainnya: <strong>{deviceCounts.other}</strong></span>
           </span>
         )}

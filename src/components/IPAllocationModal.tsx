@@ -76,7 +76,6 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
       setNotes('');
 
       if (!presetIp) {
-        // Auto-find next free IP
         const nextFree = findNextAvailableIp(group.cidr, groupAllocatedIps, group.gateway);
         if (nextFree) setIp(nextFree);
       }
@@ -84,7 +83,6 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
     setError(null);
   }, [editAllocation, presetIp, isOpen, group.cidr, groupAllocatedIps, group.gateway]);
 
-  // Conflict warning
   const isDuplicate = useMemo(() => {
     if (!ip.trim()) return false;
     return groupAllocatedIps.includes(ip.trim());
@@ -152,27 +150,27 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto font-poppins">
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center space-x-2.5">
+            <div className="p-2 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
               <Server className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-white text-base">
+              <h3 className="font-bold text-slate-900 text-base">
                 {editAllocation ? 'Edit Alokasi IP' : 'Alokasikan IP Baru'}
               </h3>
-              <p className="text-xs text-slate-400">
-                Grup: <span className="text-blue-300 font-medium">{group.name}</span> ({group.cidr})
+              <p className="text-xs text-slate-500">
+                Grup: <span className="text-blue-600 font-semibold">{group.name}</span> ({group.cidr})
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-700 transition-colors"
+            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -181,23 +179,23 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
         {/* Modal Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
               {error}
             </div>
           )}
 
           {/* IP Address & Auto Free IP Helper */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-medium text-slate-300">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-slate-700">
                 Alamat IP *
               </label>
               <button
                 type="button"
                 onClick={handlePickNextFree}
-                className="text-[11px] text-blue-400 hover:text-blue-300 flex items-center gap-1 font-medium transition-colors"
+                className="text-[11px] text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
               >
-                <Sparkles className="w-3 h-3" />
+                <Sparkles className="w-3.5 h-3.5" />
                 Cari IP Kosong Otomatis
               </button>
             </div>
@@ -207,23 +205,23 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
               value={ip}
               onChange={(e) => setIp(e.target.value)}
               placeholder="Contoh: 192.168.10.15"
-              className={`w-full font-mono bg-slate-900 border rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 ${
+              className={`w-full font-mono font-medium bg-slate-50 border rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 ${
                 isDuplicate 
-                  ? 'border-rose-500 focus:ring-rose-500' 
+                  ? 'border-rose-400 focus:ring-rose-500/20' 
                   : !isWithinSubnet && ip.trim()
-                  ? 'border-amber-500 focus:ring-amber-500'
-                  : 'border-slate-700 focus:ring-blue-500'
+                  ? 'border-amber-400 focus:ring-amber-500/20'
+                  : 'border-slate-200 focus:ring-blue-500/20 focus:border-blue-500'
               }`}
             />
             {isDuplicate && (
-              <p className="mt-1 text-[11px] text-rose-400 flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3" />
+              <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1">
+                <AlertTriangle className="w-3.5 h-3.5" />
                 Peringatan: IP ini sudah tercatat dalam alokasi lain!
               </p>
             )}
             {!isWithinSubnet && ip.trim() && !isDuplicate && (
-              <p className="mt-1 text-[11px] text-amber-400 flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3" />
+              <p className="mt-1 text-[11px] text-amber-600 flex items-center gap-1">
+                <AlertTriangle className="w-3.5 h-3.5" />
                 Perhatian: IP berada di luar rentang subnet {group.cidr}.
               </p>
             )}
@@ -232,7 +230,7 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
           {/* Hostname & Status */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Hostname / Nama Perangkat *
               </label>
               <input
@@ -241,18 +239,18 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
                 value={hostname}
                 onChange={(e) => setHostname(e.target.value)}
                 placeholder="Contoh: srv-db-01, pc-finance"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Status Alokasi *
               </label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as IPStatus)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
               >
                 <option value="used">Used (Aktif Digunakan)</option>
                 <option value="reserved">Reserved (Dicadangkan)</option>
@@ -264,13 +262,13 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
           {/* Tipe Perangkat & MAC Address */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Kategori Perangkat
               </label>
               <select
                 value={deviceType}
                 onChange={(e) => setDeviceType(e.target.value as DeviceType)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
               >
                 {DEVICE_TYPES.map(dt => (
                   <option key={dt.id} value={dt.id}>{dt.label}</option>
@@ -279,7 +277,7 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 MAC Address (Opsional)
               </label>
               <input
@@ -287,7 +285,7 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
                 value={macAddress}
                 onChange={(e) => setMacAddress(e.target.value)}
                 placeholder="AA:BB:CC:DD:EE:FF"
-                className="w-full font-mono bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+                className="w-full font-mono font-medium bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 uppercase"
               />
             </div>
           </div>
@@ -295,7 +293,7 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
           {/* Pengguna / PIC & Departemen */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Pengguna / PIC
               </label>
               <input
@@ -303,12 +301,12 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
                 value={assignedTo}
                 onChange={(e) => setAssignedTo(e.target.value)}
                 placeholder="Contoh: Budi Santoso"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Departemen / Unit
               </label>
               <input
@@ -316,27 +314,27 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
                 placeholder="Contoh: Keuangan, IT, Umum"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
           </div>
 
           {/* Tanggal Alokasi */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Tanggal Penetapan
             </label>
             <input
               type="date"
               value={assignedDate}
               onChange={(e) => setAssignedDate(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
             />
           </div>
 
           {/* Catatan */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Catatan / Deskripsi Tambahan
             </label>
             <textarea
@@ -344,22 +342,22 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Nomor port switch, spesifikasi perangkat, dll..."
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
 
           {/* Modal Actions */}
-          <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-700">
+          <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-md shadow-blue-600/30 transition-all"
+              className="px-5 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
             >
               {editAllocation ? 'Simpan Perubahan' : 'Alokasikan IP'}
             </button>

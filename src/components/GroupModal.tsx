@@ -60,7 +60,6 @@ export const GroupModal: React.FC<GroupModalProps> = ({
     setError(null);
   }, [editGroup, isOpen]);
 
-  // Live subnet info
   const subnetInfo = useMemo(() => {
     if (isValidCidr(cidr)) {
       return parseCidr(cidr);
@@ -68,7 +67,6 @@ export const GroupModal: React.FC<GroupModalProps> = ({
     return null;
   }, [cidr]);
 
-  // Auto-suggest gateway when CIDR changes (if default/new)
   const handleCidrChange = (val: string) => {
     setCidr(val);
     if (!editGroup && isValidCidr(val)) {
@@ -111,22 +109,25 @@ export const GroupModal: React.FC<GroupModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto font-poppins">
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center space-x-2.5">
+            <div className="p-2 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
               <Network className="w-5 h-5" />
             </div>
-            <h3 className="font-semibold text-white text-base">
-              {editGroup ? 'Edit Grup IP / Subnet' : 'Tambah Grup IP Baru'}
-            </h3>
+            <div>
+              <h3 className="font-bold text-slate-900 text-base">
+                {editGroup ? 'Edit Grup IP / Subnet' : 'Tambah Grup IP Baru'}
+              </h3>
+              <p className="text-xs text-slate-500">Konfigurasi subnet CIDR dan gateway</p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-700 transition-colors"
+            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -135,14 +136,14 @@ export const GroupModal: React.FC<GroupModalProps> = ({
         {/* Modal Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
               {error}
             </div>
           )}
 
           {/* Nama Grup */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Nama Grup / Segmen Jaringan *
             </label>
             <input
@@ -151,14 +152,14 @@ export const GroupModal: React.FC<GroupModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Contoh: LAN Kantor Lt. 1, Server Farm, WiFi Tamu"
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
 
           {/* Subnet CIDR & Gateway */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Subnet CIDR *
               </label>
               <input
@@ -167,11 +168,11 @@ export const GroupModal: React.FC<GroupModalProps> = ({
                 value={cidr}
                 onChange={(e) => handleCidrChange(e.target.value)}
                 placeholder="192.168.1.0/24"
-                className="w-full font-mono bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-blue-300 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full font-mono font-medium bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-blue-700 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Default Gateway *
               </label>
               <input
@@ -180,23 +181,23 @@ export const GroupModal: React.FC<GroupModalProps> = ({
                 value={gateway}
                 onChange={(e) => setGateway(e.target.value)}
                 placeholder="192.168.1.1"
-                className="w-full font-mono bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full font-mono font-medium bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
           </div>
 
           {/* Subnet Preview Box */}
           {subnetInfo && (
-            <div className="bg-slate-900/80 border border-slate-700/80 rounded-lg p-3 text-xs space-y-1.5 font-mono text-slate-300">
-              <div className="text-[11px] text-blue-400 font-sans font-medium flex items-center gap-1">
-                <Info className="w-3 h-3" />
-                <span>Kalkulasi Subnet Otomatis:</span>
+            <div className="bg-blue-50/60 border border-blue-200/80 rounded-xl p-3 text-xs space-y-1 font-mono text-slate-700">
+              <div className="text-[11px] text-blue-800 font-sans font-bold flex items-center gap-1">
+                <Info className="w-3.5 h-3.5 text-blue-600" />
+                <span>Kalkulasi Otomatis:</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-[11px]">
-                <div>Mask: <span className="text-white">{subnetInfo.netmask}</span></div>
-                <div>Total Host: <span className="text-white">{subnetInfo.usableHosts} usable</span></div>
-                <div>IP Pertama: <span className="text-emerald-400">{subnetInfo.firstUsableIp}</span></div>
-                <div>IP Terakhir: <span className="text-emerald-400">{subnetInfo.lastUsableIp}</span></div>
+                <div>Mask: <span className="font-bold text-slate-900">{subnetInfo.netmask}</span></div>
+                <div>Host Usable: <span className="font-bold text-blue-700">{subnetInfo.usableHosts}</span></div>
+                <div>IP Awal: <span className="font-bold text-emerald-700">{subnetInfo.firstUsableIp}</span></div>
+                <div>IP Akhir: <span className="font-bold text-emerald-700">{subnetInfo.lastUsableIp}</span></div>
               </div>
             </div>
           )}
@@ -204,7 +205,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
           {/* VLAN & PIC */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 VLAN ID (Opsional)
               </label>
               <input
@@ -212,11 +213,11 @@ export const GroupModal: React.FC<GroupModalProps> = ({
                 value={vlanId}
                 onChange={(e) => setVlanId(e.target.value)}
                 placeholder="Contoh: 10"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Penanggung Jawab (PIC)
               </label>
               <input
@@ -224,14 +225,14 @@ export const GroupModal: React.FC<GroupModalProps> = ({
                 value={pic}
                 onChange={(e) => setPic(e.target.value)}
                 placeholder="Contoh: Rian IT Support"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
           </div>
 
           {/* Lokasi */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Lokasi / Area Fisik
             </label>
             <input
@@ -239,22 +240,22 @@ export const GroupModal: React.FC<GroupModalProps> = ({
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Contoh: Gedung Utama Lantai 2, Rack 3"
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
 
           {/* Color Picker */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-2">
               Warna Penanda Grup
             </label>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2.5">
               {PRESET_COLORS.map(c => (
                 <button
                   key={c}
                   type="button"
                   onClick={() => setColor(c)}
-                  className="w-7 h-7 rounded-full transition-transform flex items-center justify-center relative shadow-sm hover:scale-110"
+                  className="w-7 h-7 rounded-full transition-transform flex items-center justify-center relative shadow-xs hover:scale-110 cursor-pointer"
                   style={{ backgroundColor: c }}
                 >
                   {color === c && <Check className="w-4 h-4 text-white" />}
@@ -265,7 +266,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
 
           {/* Deskripsi */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Keterangan / Catatan
             </label>
             <textarea
@@ -273,22 +274,22 @@ export const GroupModal: React.FC<GroupModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Penjelasan fungsi subnet atau alokasi perangkat..."
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-700">
+          <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-md shadow-blue-600/30 transition-all"
+              className="px-5 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
             >
               {editGroup ? 'Simpan Perubahan' : 'Buat Grup IP'}
             </button>

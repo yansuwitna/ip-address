@@ -4,22 +4,22 @@
 
 @layer base {
   body {
-    @apply font-poppins bg-slate-900 text-slate-100 antialiased min-h-screen selection:bg-blue-500 selection:text-white;
+    @apply font-poppins bg-slate-50 text-slate-800 antialiased min-h-screen selection:bg-blue-600 selection:text-white;
   }
 }
 
-/* Custom sleek scrollbar */
+/* Custom sleek scrollbar for bright theme */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(241, 245, 249, 0.8);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.4);
+  background: rgba(148, 163, 184, 0.5);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.7);
+  background: rgba(100, 116, 139, 0.8);
 }

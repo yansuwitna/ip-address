@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { X, Layers, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Layers, AlertCircle } from 'lucide-react';
 import { IPGroup, IPAllocation, IPStatus } from '../types/ipam';
 import { ipToInt, intToIp, isValidIpv4, isIpInCidr } from '../utils/ipCalculator';
 
@@ -34,7 +34,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
     const startNum = ipToInt(startIp);
     const endNum = ipToInt(endIp);
     if (startNum > endNum) return [];
-    if (endNum - startNum > 100) return []; // Limit batch to 100 at a time for safety
+    if (endNum - startNum > 100) return [];
 
     const list: string[] = [];
     for (let i = startNum; i <= endNum; i++) {
@@ -77,7 +77,6 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
     let counter = 1;
     for (let i = startNum; i <= endNum; i++) {
       const currentIp = intToIp(i);
-      // Don't overwrite if existing, unless confirmed
       if (existingIps.has(currentIp)) {
         continue;
       }
@@ -108,27 +107,27 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto font-poppins">
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="p-2 bg-purple-600/20 text-purple-400 rounded-lg">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center space-x-2.5">
+            <div className="p-2 bg-purple-50 text-purple-600 rounded-xl border border-purple-100">
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-white text-base">
+              <h3 className="font-bold text-slate-900 text-base">
                 Reservasi Rentang IP Sekaligus
               </h3>
-              <p className="text-xs text-slate-400">
-                Grup: <span className="text-blue-300 font-medium">{group.name}</span>
+              <p className="text-xs text-slate-500">
+                Grup: <span className="text-blue-600 font-semibold">{group.name}</span>
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-700 transition-colors"
+            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -137,7 +136,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
               {error}
             </div>
           )}
@@ -145,7 +144,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
           {/* Start & End IP */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 IP Awal Rentang *
               </label>
               <input
@@ -154,12 +153,12 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
                 value={startIp}
                 onChange={(e) => setStartIp(e.target.value)}
                 placeholder="Contoh: 192.168.10.100"
-                className="w-full font-mono bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full font-mono font-medium bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 IP Akhir Rentang *
               </label>
               <input
@@ -168,7 +167,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
                 value={endIp}
                 onChange={(e) => setEndIp(e.target.value)}
                 placeholder="Contoh: 192.168.10.150"
-                className="w-full font-mono bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full font-mono font-medium bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
               />
             </div>
           </div>
@@ -176,13 +175,13 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
           {/* Status & Hostname Prefix */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Status Reservasi
               </label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as IPStatus)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 font-medium"
               >
                 <option value="dhcp">DHCP Pool Range</option>
                 <option value="reserved">Reserved (Dicadangkan Khusus)</option>
@@ -190,7 +189,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Awalan Hostname (Prefix)
               </label>
               <input
@@ -198,54 +197,54 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
                 value={hostnamePrefix}
                 onChange={(e) => setHostnamePrefix(e.target.value)}
                 placeholder="dhcp-pool / resv-host"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
               />
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Catatan Reservasi
             </label>
             <input
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Contoh: Rentang alokasi otomatis DHCP router mikrotik"
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Contoh: Rentang alokasi otomatis DHCP router"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
             />
           </div>
 
           {/* Summary Preview */}
           {ipListPreview.length > 0 && (
-            <div className="bg-slate-900/80 border border-slate-700/80 rounded-lg p-3 text-xs space-y-1">
+            <div className="bg-purple-50/60 border border-purple-200 rounded-xl p-3.5 text-xs space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Total IP yang akan dibuat:</span>
-                <strong className="text-purple-400 font-mono text-sm">{ipListPreview.length - conflictCount} IP baru</strong>
+                <span className="text-slate-600 font-medium">Total IP baru yang akan dibuat:</span>
+                <strong className="text-purple-700 font-mono text-sm">{ipListPreview.length - conflictCount} IP baru</strong>
               </div>
               {conflictCount > 0 && (
-                <div className="text-amber-400 flex items-center gap-1 text-[11px]">
+                <div className="text-amber-700 flex items-center gap-1.5 text-[11px] pt-1">
                   <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>{conflictCount} IP yang sudah terdaftar akan dilewati (tidak ditimpa).</span>
+                  <span>{conflictCount} IP yang sudah digunakan akan dilewati (tidak ditimpa).</span>
                 </div>
               )}
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-700">
+          <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={ipListPreview.length === 0}
-              className="px-5 py-2 text-xs font-medium bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white rounded-lg shadow-md shadow-purple-600/30 transition-all"
+              className="px-5 py-2 text-xs font-semibold bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl shadow-sm shadow-purple-600/30 transition-all cursor-pointer"
             >
               Simpan Rentang IP
             </button>
