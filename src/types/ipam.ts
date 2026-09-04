@@ -95,3 +95,22 @@ export interface GroupStats {
   available: number;
   utilizationPercentage: number;
 }
+
+export type DnsRecordType = 'A' | 'AAAA' | 'CNAME' | 'PTR' | 'MX' | 'TXT' | 'NS' | 'SRV' | 'SOA';
+export type DnsRecordStatus = 'active' | 'inactive';
+
+export interface DnsRecord {
+  id: string;
+  domain: string;
+  type: DnsRecordType;
+  value: string;
+  ttl: number;
+  priority?: number;
+  ip?: string;
+  groupId?: string;
+  status: DnsRecordStatus;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
