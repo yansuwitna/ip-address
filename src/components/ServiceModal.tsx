@@ -158,7 +158,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
       <div 
-        className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 my-8 space-y-5 animate-in fade-in zoom-in-95 duration-200"
+        className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 my-8 space-y-5 animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -168,25 +168,25 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
               <ServerCog className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-extrabold text-slate-900 text-lg tracking-tight">
+              <h2 className="font-extrabold text-slate-900 dark:text-slate-100 text-lg tracking-tight">
                 {editService ? 'Edit Layanan & Port' : 'Tambah Layanan / Port Baru'}
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Konfigurasikan aplikasi, daemon, atau port terbuka untuk host IP ini.
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            className="p-2 text-slate-400 hover:text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-all cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Quick Presets Catalog Bar */}
-        <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-2">
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 rounded-2xl p-3">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
             <Sparkles className="w-3.5 h-3.5 text-blue-600" />
             <span>Pilih Cepat dari Template Layanan Populer:</span>
           </div>
@@ -201,7 +201,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                   className={`text-[11px] px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 cursor-pointer border ${
                     isSelected
                       ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                      : 'bg-white hover:bg-blue-50 text-slate-700 border-slate-200 hover:border-blue-300'
+                      : 'bg-white dark:bg-slate-900 hover:bg-blue-50 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-blue-300'
                   }`}
                 >
                   <span>{preset.name.split(' ')[0]}</span>
@@ -232,7 +232,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                       if (autoUrl) setUrl(autoUrl);
                     }
                   }}
-                  className="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  className="w-full bg-white dark:bg-slate-900 border border-blue-300 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 >
                   {allocations.map(a => {
                     const raw = (a.deviceType || '').toLowerCase();
@@ -284,7 +284,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Service Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Nama Layanan / Aplikasi *
               </label>
               <input
@@ -293,13 +293,13 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                 placeholder="Contoh: Nginx Web Server, PostgreSQL DB, OpenSSH"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               />
             </div>
 
             {/* Port & Protocol */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Nomor Port & Protokol *
               </label>
               <div className="flex gap-2">
@@ -311,12 +311,12 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                   placeholder="80, 443, 22..."
                   value={port}
                   onChange={(e) => handlePortChange(e.target.value ? parseInt(e.target.value, 10) : '')}
-                  className="w-2/3 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  className="w-2/3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                 />
                 <select
                   value={protocol}
                   onChange={(e) => setProtocol(e.target.value as ServiceProtocol)}
-                  className="w-1/3 bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  className="w-1/3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 >
                   <option value="TCP">TCP</option>
                   <option value="UDP">UDP</option>
@@ -327,13 +327,13 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
 
             {/* Category */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Kategori Layanan
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ServiceCategory)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 {SERVICE_CATEGORIES.map(cat => (
                   <option key={cat.id} value={cat.id}>
@@ -345,13 +345,13 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
 
             {/* Status */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Status Port / Layanan
               </label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as ServiceStatus)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 <option value="active">🟢 Aktif / Terbuka (Listening / Open)</option>
                 <option value="inactive">🔴 Nonaktif (Closed / Disabled)</option>
@@ -361,7 +361,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
 
             {/* Application Version */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Versi Software / Daemon (Opsional)
               </label>
               <input
@@ -369,13 +369,13 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                 placeholder="Contoh: v1.24.0, 16.1-alpine, OpenSSH 9.6"
                 value={version}
                 onChange={(e) => setVersion(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               />
             </div>
 
             {/* Direct URL / Endpoint */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 URL / Akses Cepat (Opsional)
               </label>
               <div className="relative">
@@ -387,7 +387,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                     setUrl(e.target.value);
                     setIsCustomUrl(true);
                   }}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-3 pr-8 py-2 text-xs font-mono text-blue-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-3 pr-8 py-2 text-xs font-mono text-blue-700 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                 />
                 {url && (
                   <a
@@ -406,7 +406,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
               Keterangan / Catatan Tambahan (Opsional)
             </label>
             <textarea
@@ -414,7 +414,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
               placeholder="Contoh: Server database produksi utama transaksi e-commerce"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
             />
           </div>
 
@@ -423,7 +423,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+              className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-all cursor-pointer"
             >
               Batal
             </button>

@@ -84,7 +84,7 @@ export const PingSimulatorModal: React.FC<PingSimulatorModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto font-poppins">
-      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -93,17 +93,17 @@ export const PingSimulatorModal: React.FC<PingSimulatorModalProps> = ({
               <Activity className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base">
+              <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
                 Simulasi Uji Ping (ICMP)
               </h3>
-              <p className="text-xs text-slate-500 font-mono">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                 {allocation.hostname} • <span className="font-bold text-blue-600">{allocation.ip}</span>
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+            className="text-slate-400 hover:text-slate-700 dark:text-slate-300 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -113,14 +113,14 @@ export const PingSimulatorModal: React.FC<PingSimulatorModalProps> = ({
         <div className="p-6 space-y-4">
           
           {/* Controls */}
-          <div className="flex items-center justify-between bg-slate-50 p-3 rounded-2xl border border-slate-200">
-            <label className="flex items-center gap-2 text-xs text-slate-700 font-medium cursor-pointer select-none">
+          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 font-medium cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={simulateFailure}
                 onChange={(e) => setSimulateFailure(e.target.checked)}
                 disabled={isRunning}
-                className="rounded border-slate-300 text-blue-600 focus:ring-0"
+                className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-0"
               />
               <span>Simulasikan Perangkat Offline (Timeout)</span>
             </label>
@@ -137,7 +137,7 @@ export const PingSimulatorModal: React.FC<PingSimulatorModalProps> = ({
 
           {/* Terminal Console (Unix Tech style) */}
           <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs text-slate-300 min-h-[160px] max-h-[220px] overflow-y-auto space-y-1 shadow-inner">
-            <div className="flex items-center justify-between text-slate-500 mb-2 border-b border-slate-800 pb-1.5">
+            <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2 border-b border-slate-800 pb-1.5">
               <div className="flex items-center gap-1.5">
                 <Terminal className="w-3.5 h-3.5 text-blue-400" />
                 <span className="text-[11px]">terminal@ipaddress:~$ ping {allocation.ip}</span>
@@ -191,7 +191,7 @@ export const PingSimulatorModal: React.FC<PingSimulatorModalProps> = ({
           <div className="flex justify-end pt-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
             >
               Tutup
             </button>

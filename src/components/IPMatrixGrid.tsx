@@ -105,11 +105,11 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
     <div className="space-y-4 font-poppins">
       
       {/* Subnet Toolbar & Filter */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-xs">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
         
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="text-slate-500 font-semibold mr-1">Filter Host:</span>
+          <span className="text-slate-500 dark:text-slate-400 font-semibold mr-1">Filter Host:</span>
           {[
             { id: 'all', label: 'Semua IP' },
             { id: 'available', label: '🟢 Bebas / Siap' },
@@ -123,7 +123,7 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
               className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer text-xs ${
                 filterStatus === f.id
                   ? 'bg-blue-600 text-white font-semibold shadow-xs'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium'
               }`}
             >
               {f.label}
@@ -139,14 +139,14 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Sorot nomor host / IP..."
-            className="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl pl-8 pr-3 py-1.5 text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-xs rounded-xl pl-8 pr-3 py-1.5 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
           />
         </div>
       </div>
 
       {/* Visual Legend Bar */}
-      <div className="flex flex-wrap items-center gap-4 text-xs bg-white px-4 py-2.5 rounded-xl border border-slate-200/90 text-slate-700 shadow-xs">
-        <span className="text-slate-500 font-semibold flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-4 text-xs bg-white dark:bg-slate-900 px-4 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-xs">
+        <span className="text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1">
           <Info className="w-3.5 h-3.5 text-blue-600" />
           Indikator:
         </span>
@@ -178,12 +178,12 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
       </div>
 
       {/* Interactive Subnet Grid Box */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs relative">
-        <div className="flex items-center justify-between mb-3 text-xs text-slate-500">
-          <span className="font-semibold text-slate-700">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-xs relative">
+        <div className="flex items-center justify-between mb-3 text-xs text-slate-500 dark:text-slate-400">
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
             Peta Subnet: <span className="font-mono text-blue-600">{subnet?.firstUsableIp}</span> s/d <span className="font-mono text-blue-600">{subnet?.lastUsableIp}</span>
           </span>
-          <span className="text-slate-500">Menampilkan {filteredIps.length} host</span>
+          <span className="text-slate-500 dark:text-slate-400">Menampilkan {filteredIps.length} host</span>
         </div>
 
         {/* The Grid of Host Tiles */}
@@ -238,7 +238,7 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
                       );
                       if (cat) {
                         const CatIcon = getCategoryIconComponent(cat.icon);
-                        return <CatIcon className="w-3 h-3 text-slate-700" />;
+                        return <CatIcon className="w-3 h-3 text-slate-700 dark:text-slate-300" />;
                       }
                       return getDeviceIcon(alloc.deviceType) || <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>;
                     })()
@@ -254,10 +254,10 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
 
       {/* Floating Hover Info Card */}
       {hoveredIp && (
-        <div className="bg-white/95 border border-slate-200 shadow-2xl rounded-2xl p-4 max-w-sm fixed bottom-6 right-6 z-20 backdrop-blur-md pointer-events-none transition-all">
+        <div className="bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 shadow-2xl rounded-2xl p-4 max-w-sm fixed bottom-6 right-6 z-20 backdrop-blur-md pointer-events-none transition-all">
           <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2 mb-2">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-sm font-bold text-slate-900">{hoveredIp}</span>
+              <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">{hoveredIp}</span>
               {isHoveredGateway && (
                 <span className="text-[10px] bg-sky-100 text-sky-800 border border-sky-300 font-bold px-1.5 py-0.5 rounded">
                   Gateway
@@ -278,14 +278,14 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
           </div>
 
           {activeHoveredAlloc ? (
-            <div className="space-y-1 text-xs text-slate-600">
+            <div className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
               <div className="flex justify-between">
                 <span className="text-slate-400">Hostname:</span>
-                <span className="font-semibold text-slate-900">{activeHoveredAlloc.hostname}</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">{activeHoveredAlloc.hostname}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-400">Kategori:</span>
-                <span className="font-medium text-slate-800">
+                <span className="font-medium text-slate-800 dark:text-slate-200">
                   {(() => {
                     const raw = (activeHoveredAlloc.deviceType || '').toLowerCase();
                     const cleanRaw = raw.replace(/_/g, ' ');
@@ -302,13 +302,13 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
               {activeHoveredAlloc.macAddress && (
                 <div className="flex justify-between">
                   <span className="text-slate-400">MAC:</span>
-                  <span className="font-mono text-slate-700">{activeHoveredAlloc.macAddress}</span>
+                  <span className="font-mono text-slate-700 dark:text-slate-300">{activeHoveredAlloc.macAddress}</span>
                 </div>
               )}
               {activeHoveredAlloc.assignedTo && (
                 <div className="flex justify-between">
                   <span className="text-slate-400">PIC / User:</span>
-                  <span className="text-slate-800 font-medium">{activeHoveredAlloc.assignedTo} ({activeHoveredAlloc.department || '-'})</span>
+                  <span className="text-slate-800 dark:text-slate-200 font-medium">{activeHoveredAlloc.assignedTo} ({activeHoveredAlloc.department || '-'})</span>
                 </div>
               )}
 
@@ -318,7 +318,7 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
                 if (hoveredServices.length === 0) return null;
                 return (
                   <div className="pt-1.5 border-t border-slate-100">
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-slate-700 mb-1">
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                       <ServerCog className="w-3 h-3 text-blue-600" />
                       <span>Layanan & Port ({hoveredServices.length}):</span>
                     </div>
@@ -338,7 +338,7 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
               })()}
 
               {activeHoveredAlloc.notes && (
-                <p className="text-[11px] text-slate-500 mt-1 italic border-t border-slate-100 pt-1">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 italic border-t border-slate-100 pt-1">
                   "{activeHoveredAlloc.notes}"
                 </p>
               )}

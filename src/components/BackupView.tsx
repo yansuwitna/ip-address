@@ -298,7 +298,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
             className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex-shrink-0 ${
               hasBackedUp
                 ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm shadow-rose-600/30 cursor-pointer'
-                : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 dark:text-slate-400 cursor-not-allowed'
             }`}
           >
             {hasBackedUp ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}

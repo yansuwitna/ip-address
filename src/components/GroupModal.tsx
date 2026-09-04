@@ -110,7 +110,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto font-poppins">
-      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -119,15 +119,15 @@ export const GroupModal: React.FC<GroupModalProps> = ({
               <Network className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base">
+              <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
                 {editGroup ? 'Edit Grup IP / Subnet' : 'Tambah Grup IP Baru'}
               </h3>
-              <p className="text-xs text-slate-500">Konfigurasi subnet CIDR dan gateway</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Konfigurasi subnet CIDR dan gateway</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+            className="text-slate-400 hover:text-slate-700 dark:text-slate-300 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -143,7 +143,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
 
           {/* Nama Grup */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
               Nama Grup / Segmen Jaringan *
             </label>
             <input
@@ -152,14 +152,14 @@ export const GroupModal: React.FC<GroupModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Contoh: LAN Kantor Lt. 1, Server Farm, WiFi Tamu"
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
 
           {/* Subnet CIDR & Gateway */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 Subnet CIDR *
               </label>
               <input
@@ -168,11 +168,11 @@ export const GroupModal: React.FC<GroupModalProps> = ({
                 value={cidr}
                 onChange={(e) => handleCidrChange(e.target.value)}
                 placeholder="192.168.1.0/24"
-                className="w-full font-mono font-medium bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-blue-700 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full font-mono font-medium bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-blue-700 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 Default Gateway *
               </label>
               <input
@@ -181,20 +181,20 @@ export const GroupModal: React.FC<GroupModalProps> = ({
                 value={gateway}
                 onChange={(e) => setGateway(e.target.value)}
                 placeholder="192.168.1.1"
-                className="w-full font-mono font-medium bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full font-mono font-medium bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
           </div>
 
           {/* Subnet Preview Box */}
           {subnetInfo && (
-            <div className="bg-blue-50/60 border border-blue-200/80 rounded-xl p-3 text-xs space-y-1 font-mono text-slate-700">
+            <div className="bg-blue-50/60 border border-blue-200/80 rounded-xl p-3 text-xs space-y-1 font-mono text-slate-700 dark:text-slate-300">
               <div className="text-[11px] text-blue-800 font-sans font-bold flex items-center gap-1">
                 <Info className="w-3.5 h-3.5 text-blue-600" />
                 <span>Kalkulasi Otomatis:</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-[11px]">
-                <div>Mask: <span className="font-bold text-slate-900">{subnetInfo.netmask}</span></div>
+                <div>Mask: <span className="font-bold text-slate-900 dark:text-slate-100">{subnetInfo.netmask}</span></div>
                 <div>Host Usable: <span className="font-bold text-blue-700">{subnetInfo.usableHosts}</span></div>
                 <div>IP Awal: <span className="font-bold text-emerald-700">{subnetInfo.firstUsableIp}</span></div>
                 <div>IP Akhir: <span className="font-bold text-emerald-700">{subnetInfo.lastUsableIp}</span></div>
@@ -205,7 +205,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
           {/* VLAN & PIC */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 VLAN ID (Opsional)
               </label>
               <input
@@ -213,11 +213,11 @@ export const GroupModal: React.FC<GroupModalProps> = ({
                 value={vlanId}
                 onChange={(e) => setVlanId(e.target.value)}
                 placeholder="Contoh: 10"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 Penanggung Jawab (PIC)
               </label>
               <input
@@ -225,14 +225,14 @@ export const GroupModal: React.FC<GroupModalProps> = ({
                 value={pic}
                 onChange={(e) => setPic(e.target.value)}
                 placeholder="Contoh: Rian IT Support"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
           </div>
 
           {/* Lokasi */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
               Lokasi / Area Fisik
             </label>
             <input
@@ -240,13 +240,13 @@ export const GroupModal: React.FC<GroupModalProps> = ({
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Contoh: Gedung Utama Lantai 2, Rack 3"
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
 
           {/* Color Picker */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-2">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
               Warna Penanda Grup
             </label>
             <div className="flex items-center space-x-2.5">
@@ -266,7 +266,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
 
           {/* Deskripsi */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
               Keterangan / Catatan
             </label>
             <textarea
@@ -274,7 +274,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Penjelasan fungsi subnet atau alokasi perangkat..."
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
 
@@ -283,7 +283,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors cursor-pointer"
             >
               Batal
             </button>

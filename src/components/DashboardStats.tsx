@@ -76,30 +76,30 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
         {/* Card 1: Total Kapasitas IP */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Host Usable</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Host Usable</span>
             <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
               <Activity className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
               {totalUsable.toLocaleString()}
             </span>
             <span className="text-xs text-slate-400">
               {activeGroup ? 'dalam grup' : `total (${groups.length} grup)`}
             </span>
           </div>
-          <div className="mt-2 text-xs text-slate-500 truncate">
+          <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">
             {activeGroup ? `Subnet ${activeGroup.cidr}` : 'Infrastruktur aktif'}
           </div>
         </div>
 
         {/* Card 2: IP Terpakai (In Use) */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">IP Terpakai</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">IP Terpakai</span>
             <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
               <CheckCircle2 className="w-4 h-4" />
             </div>
@@ -112,15 +112,15 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
               {totalUsable > 0 ? ((usedCount / totalUsable) * 100).toFixed(1) : 0}%
             </span>
           </div>
-          <div className="mt-2 text-xs text-slate-500 truncate">
+          <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">
             Host aktif teralokasi
           </div>
         </div>
 
         {/* Card 3: Reservasi & DHCP */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Reservasi & DHCP</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Reservasi & DHCP</span>
             <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
               <Clock className="w-4 h-4" />
             </div>
@@ -133,15 +133,15 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
               ({reservedCount} Rsv / {dhcpCount} DHCP)
             </span>
           </div>
-          <div className="mt-2 text-xs text-slate-500 truncate">
+          <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">
             Dicadangkan untuk VIP & Pool
           </div>
         </div>
 
         {/* Card 4: IP Bebas (Available) */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">IP Bebas / Siap</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">IP Bebas / Siap</span>
             <div className="p-2.5 rounded-xl bg-sky-50 text-sky-600 border border-sky-100">
               <AlertCircle className="w-4 h-4" />
             </div>
@@ -154,7 +154,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
               tersisa
             </span>
           </div>
-          <div className="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/60">
+          <div className="mt-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-200/60">
             <div 
               className={`h-full rounded-full transition-all duration-500 ${
                 utilization >= 90 ? 'bg-rose-500' : utilization >= 70 ? 'bg-amber-500' : 'bg-blue-600'
@@ -167,8 +167,8 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
       </div>
 
       {/* Device Breakdown Tags */}
-      <div className="flex flex-wrap items-center gap-2 text-xs bg-white p-3 rounded-xl border border-slate-200/90 shadow-xs">
-        <span className="text-slate-500 font-medium mr-1 flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-2 text-xs bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
+        <span className="text-slate-500 dark:text-slate-400 font-medium mr-1 flex items-center gap-1">
           Distribusi Perangkat:
         </span>
         
@@ -215,7 +215,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
         )}
 
         {deviceCounts.other > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-medium">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-medium">
             <span>Lainnya: <strong>{deviceCounts.other}</strong></span>
           </span>
         )}

@@ -275,7 +275,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
                   {simResult.records.map(r => (
                     <div key={r.id} className="flex items-center gap-3 text-slate-200 pl-3">
                       <span className="text-cyan-300 font-bold">{r.domain}</span>
-                      <span className="text-slate-500">{r.ttl}</span>
+                      <span className="text-slate-500 dark:text-slate-400">{r.ttl}</span>
                       <span className="text-amber-300 font-bold">IN</span>
                       <span className="text-purple-300 font-bold">{r.type}</span>
                       <span className="text-emerald-300 font-bold">{r.value}</span>
@@ -377,7 +377,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Cari domain, IP, deskripsi..."
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl pl-9 pr-3 py-2 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl pl-9 pr-3 py-2 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:bg-white dark:bg-slate-900 dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               />
             </div>
 
@@ -420,7 +420,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
+              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50/80 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
                 <th className="py-3 px-4">Nama Host / FQDN</th>
                 <th className="py-3 px-4 text-center">Tipe</th>
                 <th className="py-3 px-4">Target Nilai (IP / Domain)</th>
@@ -434,7 +434,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                  <td colSpan={8} className="py-12 text-center text-slate-400 dark:text-slate-500 dark:text-slate-400 font-medium">
                     Tidak ada catatan DNS yang sesuai dengan kriteria pencarian.
                   </td>
                 </tr>
@@ -509,7 +509,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
                         <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${
                           item.status === 'active'
                             ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                           <span className="capitalize">{item.status === 'active' ? 'Aktif' : 'Nonaktif'}</span>

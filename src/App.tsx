@@ -483,7 +483,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className={`h-screen w-screen overflow-hidden flex ${theme === 'dark' ? 'bg-slate-950 text-slate-200' : 'bg-slate-50 text-slate-800'} font-poppins antialiased selection:bg-blue-600 selection:text-white`}>
+    <div className={`h-screen w-screen overflow-hidden flex ${theme === 'dark' ? 'bg-slate-950 text-slate-200' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200'} font-poppins antialiased selection:bg-blue-600 selection:text-white`}>
       
       {/* 1. Left STATIC Dedicated Sidebar (Permanently anchored & pinned) */}
       <Sidebar
@@ -504,7 +504,7 @@ export const App: React.FC = () => {
       />
 
       {/* 2. Main Work Area with Independent Smooth Scroll */}
-      <div className={`flex-1 flex flex-col h-screen overflow-y-auto min-w-0 ${theme === 'dark' ? 'bg-slate-950' : 'bg-slate-50'}`}>
+      <div className={`flex-1 flex flex-col h-screen overflow-y-auto min-w-0 ${theme === 'dark' ? 'bg-slate-950' : 'bg-slate-50 dark:bg-slate-800/50'}`}>
         
         {/* Top Header (Sticky) */}
         <Header 
@@ -571,9 +571,9 @@ export const App: React.FC = () => {
                   <div className="flex items-center justify-between gap-3">
                     <button
                       onClick={() => setIsViewingGroupAllocations(false)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold shadow-xs transition-all cursor-pointer group"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100 border border-slate-200 dark:border-slate-700 text-xs font-bold shadow-xs transition-all cursor-pointer group"
                     >
-                      <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-slate-500 group-hover:text-slate-900" />
+                      <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100" />
                       <span>Kembali</span>
                     </button>
 
@@ -591,7 +591,7 @@ export const App: React.FC = () => {
                   </div>
 
                   {/* Active Group Header Card */}
-                  <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs">
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       
                       <div className="space-y-1.5">
@@ -600,7 +600,7 @@ export const App: React.FC = () => {
                             className="w-3.5 h-3.5 rounded-full flex-shrink-0 shadow-xs"
                             style={{ backgroundColor: activeGroup.color || '#3b82f6' }}
                           />
-                          <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
                             {activeGroup.name}
                           </h2>
                           {activeGroup.vlanId && (
@@ -610,12 +610,12 @@ export const App: React.FC = () => {
                           )}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-medium">
-                          <span className="font-mono bg-slate-100 px-2 py-0.5 rounded-lg text-blue-700 font-bold border border-slate-200">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                          <span className="font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg text-blue-700 font-bold border border-slate-200 dark:border-slate-700">
                             {activeGroup.cidr}
                           </span>
                           <span>•</span>
-                          <span>Gateway: <strong className="text-slate-800 font-mono">{activeGroup.gateway}</strong></span>
+                          <span>Gateway: <strong className="text-slate-800 dark:text-slate-200 font-mono">{activeGroup.gateway}</strong></span>
                           {activeGroup.location && (
                             <>
                               <span>•</span>
@@ -639,13 +639,13 @@ export const App: React.FC = () => {
 
                       {/* View Mode Toggle & XLSX Export */}
                       <div className="flex items-center gap-2 self-start sm:self-center">
-                        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
                           <button
                             onClick={() => setViewMode('matrix')}
                             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                               viewMode === 'matrix'
-                                ? 'bg-white text-blue-700 shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
+                                ? 'bg-white dark:bg-slate-900 text-blue-700 shadow-xs'
+                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100'
                             }`}
                             title="Peta Grid Visual Seluruh Host"
                           >
@@ -656,8 +656,8 @@ export const App: React.FC = () => {
                             onClick={() => setViewMode('table')}
                             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                               viewMode === 'table'
-                                ? 'bg-white text-blue-700 shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
+                                ? 'bg-white dark:bg-slate-900 text-blue-700 shadow-xs'
+                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100'
                             }`}
                             title="Daftar Tabel Rinci"
                           >
@@ -739,23 +739,23 @@ export const App: React.FC = () => {
                 /* Sub-tampilan: Daftar Kartu Grup IP */
                 <div className="space-y-6">
                   {/* Top Banner */}
-                  <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                      <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
                         Manajemen Grup IP & Subnet
                       </h2>
-                      <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         Kelola segmen subnet CIDR, VLAN ID, Gateway, dan lokasi infrastruktur jaringan.
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                      <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
                         <button
                           onClick={() => setSubnetListViewMode('cards')}
                           className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                             subnetListViewMode === 'cards'
-                              ? 'bg-white text-blue-700 shadow-xs'
-                              : 'text-slate-600 hover:text-slate-900'
+                              ? 'bg-white dark:bg-slate-900 text-blue-700 shadow-xs'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100'
                           }`}
                           title="Tampilan Kartu Subnet"
                         >
@@ -766,8 +766,8 @@ export const App: React.FC = () => {
                           onClick={() => setSubnetListViewMode('table')}
                           className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                             subnetListViewMode === 'table'
-                              ? 'bg-white text-blue-700 shadow-xs'
-                              : 'text-slate-600 hover:text-slate-900'
+                              ? 'bg-white dark:bg-slate-900 text-blue-700 shadow-xs'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100'
                           }`}
                           title="Tampilan Tabel Subnet"
                         >
@@ -807,7 +807,7 @@ export const App: React.FC = () => {
                         return (
                           <div
                             key={grp.id}
-                            className="bg-white border border-slate-200/90 hover:border-blue-300 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
+                            className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-blue-300 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
                           >
                             <div 
                               className="absolute top-0 left-0 right-0 h-1.5"
@@ -816,7 +816,7 @@ export const App: React.FC = () => {
 
                             <div>
                               <div className="flex items-start justify-between gap-2 mb-2">
-                                <h3 className="font-extrabold text-slate-900 text-base">
+                                <h3 className="font-extrabold text-slate-900 dark:text-slate-100 text-base">
                                   {grp.name}
                                 </h3>
                                 {grp.vlanId && (
@@ -826,19 +826,19 @@ export const App: React.FC = () => {
                                 )}
                               </div>
 
-                              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 font-mono mb-3">
-                                <span className="bg-slate-100 px-2 py-0.5 rounded-lg text-blue-700 font-bold border border-slate-200">
+                              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 dark:text-slate-400 font-mono mb-3">
+                                <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg text-blue-700 font-bold border border-slate-200 dark:border-slate-700">
                                   {grp.cidr}
                                 </span>
                                 <span>GW: {grp.gateway}</span>
                               </div>
 
-                              <p className="text-xs text-slate-500 line-clamp-2 mb-4">
+                              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-4">
                                 {grp.description || 'Tidak ada catatan deskripsi.'}
                               </p>
 
                               {(grp.location || grp.pic) && (
-                                <div className="flex items-center gap-3 text-xs text-slate-500 mb-4 pt-2 border-t border-slate-100">
+                                <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mb-4 pt-2 border-t border-slate-100">
                                   {grp.location && (
                                     <span className="flex items-center gap-1">
                                       <MapPin className="w-3.5 h-3.5 text-slate-400" />
@@ -858,8 +858,8 @@ export const App: React.FC = () => {
                             {/* Footer Actions */}
                             <div className="pt-3 border-t border-slate-100 space-y-2.5">
                               <div className="flex items-center justify-between text-xs font-semibold">
-                                <span className="text-slate-500">Host Terpakai:</span>
-                                <span className="text-slate-900">
+                                <span className="text-slate-500 dark:text-slate-400">Host Terpakai:</span>
+                                <span className="text-slate-900 dark:text-slate-100">
                                   <strong className="text-blue-600 font-black">{used}</strong> / {usable} IP ({pct}%)
                                 </span>
                               </div>
@@ -888,7 +888,7 @@ export const App: React.FC = () => {
                                   className={`p-2 rounded-xl transition-all cursor-pointer relative ${
                                     grpServicesCount > 0
                                       ? 'bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white shadow-2xs'
-                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900'
+                                      : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100'
                                   }`}
                                 >
                                   <ServerCog className="w-4 h-4" />
@@ -905,7 +905,7 @@ export const App: React.FC = () => {
                                     setIsGroupModalOpen(true);
                                   }}
                                   title="Edit Grup"
-                                  className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-colors cursor-pointer"
+                                  className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100 rounded-xl transition-colors cursor-pointer"
                                 >
                                   <Edit3 className="w-4 h-4" />
                                 </button>
@@ -917,8 +917,8 @@ export const App: React.FC = () => {
                                     const confirmed = await showConfirm({
                                       title: 'Hapus Grup IP?',
                                       text: `Grup "${grp.name}" (${grp.cidr}) akan dihapus beserta semua alokasi dan layanan terkait.`,
-                                      confirmText: 'Ya, Hapus',
-                                      cancelText: 'Batal'
+                                      confirmButtonText: 'Ya, Hapus',
+                                      cancelButtonText: 'Batal'
                                     });
                                     if (confirmed) {
                                       handleDeleteGroup(grp.id);
@@ -932,7 +932,7 @@ export const App: React.FC = () => {
                                   }
                                   className={`p-2 rounded-xl transition-all ${
                                     hasUsedIps
-                                      ? 'bg-slate-100 text-slate-300 cursor-not-allowed border border-slate-200/70'
+                                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-300 cursor-not-allowed border border-slate-200/70'
                                       : 'bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white cursor-pointer'
                                   }`}
                                 >
@@ -946,11 +946,11 @@ export const App: React.FC = () => {
                     </div>
                   ) : (
                     /* Table View of Subnets */
-                    <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
                       <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
                           <thead>
-                            <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-500 uppercase tracking-wider font-semibold text-[11px]">
+                            <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50/80 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
                               <th className="py-3.5 px-4">Nama Subnet / Grup</th>
                               <th className="py-3.5 px-4">Subnet CIDR & Netmask</th>
                               <th className="py-3.5 px-4">Gateway</th>
@@ -961,7 +961,7 @@ export const App: React.FC = () => {
                               <th className="py-3.5 px-4 text-right">Aksi</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-100 text-slate-700">
+                          <tbody className="divide-y divide-slate-100 text-slate-700 dark:text-slate-300">
                             {groups.map(grp => {
                               const grpAllocs = allocations.filter(a => a.groupId === grp.id);
                               const used = grpAllocs.filter(a => a.status === 'used').length;
@@ -982,7 +982,7 @@ export const App: React.FC = () => {
                                         style={{ backgroundColor: grp.color || '#3b82f6' }}
                                       />
                                       <div>
-                                        <div className="font-bold text-slate-900 text-sm">{grp.name}</div>
+                                        <div className="font-bold text-slate-900 dark:text-slate-100 text-sm">{grp.name}</div>
                                         {grp.description && (
                                           <div className="text-[11px] text-slate-400 truncate max-w-xs">{grp.description}</div>
                                         )}
@@ -991,12 +991,12 @@ export const App: React.FC = () => {
                                   </td>
 
                                   <td className="py-3.5 px-4 whitespace-nowrap font-mono">
-                                    <span className="bg-slate-100 px-2 py-0.5 rounded text-blue-700 font-bold border border-slate-200">
+                                    <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-blue-700 font-bold border border-slate-200 dark:border-slate-700">
                                       {grp.cidr}
                                     </span>
                                   </td>
 
-                                  <td className="py-3.5 px-4 whitespace-nowrap font-mono text-slate-700">
+                                  <td className="py-3.5 px-4 whitespace-nowrap font-mono text-slate-700 dark:text-slate-300">
                                     {grp.gateway}
                                   </td>
 
@@ -1011,19 +1011,19 @@ export const App: React.FC = () => {
                                   </td>
 
                                   <td className="py-3.5 px-4">
-                                    <div className="text-slate-800 font-medium">{grp.location || '-'}</div>
+                                    <div className="text-slate-800 dark:text-slate-200 font-medium">{grp.location || '-'}</div>
                                     {grp.pic && <div className="text-[11px] text-slate-400">PIC: {grp.pic}</div>}
                                   </td>
 
                                   <td className="py-3.5 px-4 whitespace-nowrap">
                                     <div className="flex items-center gap-2">
-                                      <div className="w-16 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                      <div className="w-16 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
                                         <div 
                                           className={`h-full rounded-full ${pct >= 85 ? 'bg-rose-500' : pct >= 60 ? 'bg-amber-500' : 'bg-blue-600'}`}
                                           style={{ width: `${pct}%` }}
                                         />
                                       </div>
-                                      <span className="font-semibold text-slate-800">{used}/{usable} ({pct}%)</span>
+                                      <span className="font-semibold text-slate-800 dark:text-slate-200">{used}/{usable} ({pct}%)</span>
                                     </div>
                                   </td>
 
@@ -1031,7 +1031,7 @@ export const App: React.FC = () => {
                                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${
                                       grpServicesCount > 0
                                         ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                        : 'bg-slate-50 text-slate-500 border-slate-200'
+                                        : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                                     }`}>
                                       <ServerCog className="w-3 h-3" />
                                       <span>{grpServicesCount} Layanan</span>
@@ -1071,7 +1071,7 @@ export const App: React.FC = () => {
                                           setIsGroupModalOpen(true);
                                         }}
                                         title="Edit Grup"
-                                        className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-lg transition-colors cursor-pointer"
+                                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 dark:text-slate-200 rounded-lg transition-colors cursor-pointer"
                                       >
                                         <Edit3 className="w-3.5 h-3.5" />
                                       </button>
@@ -1083,8 +1083,8 @@ export const App: React.FC = () => {
                                           const confirmed = await showConfirm({
                                             title: 'Hapus Grup IP?',
                                             text: `Grup "${grp.name}" (${grp.cidr}) akan dihapus beserta semua alokasi dan layanan terkait.`,
-                                            confirmText: 'Ya, Hapus',
-                                            cancelText: 'Batal'
+                                            confirmButtonText: 'Ya, Hapus',
+                                            cancelButtonText: 'Batal'
                                           });
                                           if (confirmed) {
                                             handleDeleteGroup(grp.id);

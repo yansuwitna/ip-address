@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
         {onToggleSidebar && (
           <button
             onClick={onToggleSidebar}
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer lg:hidden"
+            className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 dark:text-slate-200 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-800 transition-colors cursor-pointer lg:hidden"
             title="Menu Navigasi"
           >
             <Menu className="w-5 h-5" />
@@ -47,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
               </>
             ) : (
               <>
-                <Moon className="w-3.5 h-3.5 text-slate-600" />
+                <Moon className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                 <span className="hidden sm:inline">Mode Gelap</span>
               </>
             )}
