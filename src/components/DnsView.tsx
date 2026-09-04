@@ -1,3 +1,4 @@
+import { SubDomainView } from "./SubDomainView";
 import React, { useState, useMemo } from 'react';
 import { 
   Globe, 
@@ -44,6 +45,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
   onOpenPrintModal
 }) => {
   const [search, setSearch] = useState('');
+  const [selectedDomainForSub, setSelectedDomainForSub] = useState<DnsRecord | null>(null);
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 

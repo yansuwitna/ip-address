@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import os
+
+filepath = 'src/components/SubDomainView.tsx'
+
+content = """import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Search, Edit2, Trash2, Globe, Check, Database, Folder, Hash, Server } from 'lucide-react';
 import { DnsRecord, SubDomainRecord } from '../types/ipam';
 import { loadSubDomains, saveSubDomains } from '../utils/storage';
@@ -410,3 +414,8 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({ parentDomain, onBa
     </div>
   );
 };
+"""
+
+with open(filepath, 'w') as f:
+    f.write(content)
+print("SubDomainView rewritten.")
