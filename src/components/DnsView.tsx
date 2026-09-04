@@ -434,7 +434,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                  <td colSpan={8} className="py-12 text-center text-slate-400 dark:text-slate-500 dark:text-slate-400 font-medium">
                     Tidak ada catatan DNS yang sesuai dengan kriteria pencarian.
                   </td>
                 </tr>

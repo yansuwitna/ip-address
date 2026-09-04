@@ -470,7 +470,7 @@ export const IPTable: React.FC<IPTableProps> = ({
                                   );
                                 }}
                                 title={`Tidak dapat dihapus: masih ada ${itemServices.length} data layanan atau port aktif pada IP ini.`}
-                                className="p-1.5 text-slate-300 dark:text-slate-600 cursor-not-allowed rounded-lg transition-colors border border-transparent"
+                                className="p-1.5 text-slate-300 dark:text-slate-600 dark:text-slate-400 cursor-not-allowed rounded-lg transition-colors border border-transparent"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>

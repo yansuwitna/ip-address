@@ -83,7 +83,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
+              className="p-2 text-slate-400 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
               title="Tutup Pratinjau"
             >
               <X className="w-4 h-4" />

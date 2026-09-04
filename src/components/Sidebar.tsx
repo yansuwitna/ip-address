@@ -158,7 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Close Button on Mobile */}
           <button 
             onClick={onCloseMobile}
-            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg lg:hidden cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-800 rounded-lg lg:hidden cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -166,14 +166,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation Menu */}
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+          <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 dark:text-slate-400 flex items-center justify-between">
             <span>Navigasi Menu</span>
             {onToggleTheme && (
               <button
                 type="button"
                 onClick={onToggleTheme}
                 title={`Ganti ke mode ${theme === 'dark' ? 'Terang (Light)' : 'Gelap (Dark)'}`}
-                className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors cursor-pointer"
+                className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-800 text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors cursor-pointer"
               >
                 {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />}
               </button>
@@ -191,12 +191,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
                   isActive
                     ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20 font-bold'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100 dark:text-slate-100 dark:hover:text-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon className={`w-4 h-4 transition-colors ${
-                    isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                    isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
                   }`} />
                   <div className="text-left">
                     <div>{item.label}</div>
@@ -252,7 +252,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   type="button"
                   onClick={onToggleTheme}
                   title={`Ganti ke mode ${theme === 'dark' ? 'Terang' : 'Gelap'}`}
-                  className="p-1.5 text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                  className="p-1.5 text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
                 >
                   {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
                 </button>
