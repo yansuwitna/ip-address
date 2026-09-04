@@ -46,7 +46,6 @@ export const DnsView: React.FC<DnsViewProps> = ({
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [showSubDns, setShowSubDns] = useState(false);
 
   // DNS Resolver Simulator State
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
@@ -65,10 +64,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
     return dnsRecords.filter(r => {
       if (typeFilter !== 'all' && r.type !== typeFilter) return false;
       if (statusFilter !== 'all' && r.status !== statusFilter) return false;
-      if (showSubDns) {
-        const dotCount = (r.domain.match(/\./g) || []).length;
-        if (dotCount < 2) return false;
-      }
+
 
       if (search.trim()) {
         const q = search.toLowerCase();
@@ -193,20 +189,6 @@ export const DnsView: React.FC<DnsViewProps> = ({
           >
             <Printer className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
             <span>Cetak Direktori</span>
-          </button>
-
-          {/* Toggle Sub DNS Button */}
-          <button
-            onClick={() => setShowSubDns(!showSubDns)}
-            className={`flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-              showSubDns
-                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
-            }`}
-            title={showSubDns ? "Tampilkan Semua DNS" : "Hanya Tampilkan Sub DNS"}
-          >
-            <Filter className="w-3.5 h-3.5" />
-            <span>{showSubDns ? 'Semua DNS' : 'Sub DNS'}</span>
           </button>
 
           {/* Tambah DNS Record Button */}
@@ -543,6 +525,13 @@ export const DnsView: React.FC<DnsViewProps> = ({
                       {/* Action Column */}
                       <td className="py-3.5 px-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end space-x-1">
+                          <button
+                            onClick={() => setSearch('.' + item.domain)}
+                            title="Tampilkan Data Sub-Domain"
+                            className="p-1.5 hover:bg-indigo-50 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Layers className="w-3.5 h-3.5" />
+                          </button>
                           <button
                             onClick={() => onOpenEditModal(item)}
                             title="Edit Catatan DNS"

@@ -114,3 +114,15 @@ export interface DnsRecord {
   updatedAt: string;
 }
 
+
+export type SubDomainTargetType = 'ip' | 'port' | 'folder';
+
+export interface SubDomainRecord {
+  id: string;
+  parentDomainId: string;
+  subName: string; // e.g. "api", resulting in api.example.com
+  targetType: SubDomainTargetType;
+  targetValue: string; // "192.168.1.10", "8080", "/var/www/html"
+  description?: string;
+  createdAt: string;
+}
