@@ -67,7 +67,19 @@ export const IPTable: React.FC<IPTableProps> = ({
   };
 
   const getCategoryInfo = (type: DeviceType) => {
-    const found = categories.find(c => c.id.toLowerCase() === (type || '').toLowerCase());
+    const rawType = (type || '').trim().toLowerCase();
+    const cleanRaw = rawType.replace(/_/g, ' ');
+    const found = categories.find(c => {
+      const cId = c.id.toLowerCase();
+      const cName = c.name.toLowerCase();
+      return (
+        cId === rawType || 
+        cName === rawType ||
+        cId.replace(/_/g, ' ') === cleanRaw ||
+        cName.replace(/_/g, ' ') === cleanRaw
+      );
+    });
+
     if (found) {
       return {
         id: found.id,
@@ -89,7 +101,17 @@ export const IPTable: React.FC<IPTableProps> = ({
     return groupAllocations
       .filter(item => {
         if (statusFilter !== 'all' && item.status !== statusFilter) return false;
-        if (deviceFilter !== 'all' && item.deviceType.toLowerCase() !== deviceFilter.toLowerCase()) return false;
+        if (deviceFilter !== 'all') {
+          const filterVal = deviceFilter.toLowerCase();
+          const cleanFilter = filterVal.replace(/_/g, ' ');
+          const cat = getCategoryInfo(item.deviceType);
+          const rawItemType = (item.deviceType || '').toLowerCase();
+          const cleanItemType = rawItemType.replace(/_/g, ' ');
+          const matchType = rawItemType === filterVal || cleanItemType === cleanFilter;
+          const matchCatId = cat.id.toLowerCase() === filterVal || cat.id.toLowerCase().replace(/_/g, ' ') === cleanFilter;
+          const matchCatName = cat.name.toLowerCase() === filterVal || cat.name.toLowerCase().replace(/_/g, ' ') === cleanFilter;
+          if (!matchType && !matchCatId && !matchCatName) return false;
+        }
 
         if (search.trim()) {
           const q = search.toLowerCase();

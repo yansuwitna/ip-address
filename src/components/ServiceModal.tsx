@@ -234,10 +234,17 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                   className="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 >
                   {allocations.map(a => {
-                    const cat = categories.find(c => c.id.toLowerCase() === (a.deviceType || '').toLowerCase());
+                    const raw = (a.deviceType || '').toLowerCase();
+                    const cleanRaw = raw.replace(/_/g, ' ');
+                    const cat = categories.find(c => 
+                      c.id.toLowerCase() === raw || 
+                      c.name.toLowerCase() === raw ||
+                      c.id.toLowerCase().replace(/_/g, ' ') === cleanRaw ||
+                      c.name.toLowerCase().replace(/_/g, ' ') === cleanRaw
+                    );
                     return (
                       <option key={a.id} value={a.ip}>
-                        {a.ip} — {a.hostname} ({cat ? cat.name : a.deviceType})
+                        {a.ip} — {a.hostname} ({cat ? cat.name : (a.deviceType ? a.deviceType.replace(/_/g, ' ') : '-')})
                       </option>
                     );
                   })}

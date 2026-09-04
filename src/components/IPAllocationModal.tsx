@@ -27,7 +27,7 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
 }) => {
   const [ip, setIp] = useState('');
   const [hostname, setHostname] = useState('');
-  const [deviceType, setDeviceType] = useState<DeviceType>('server');
+  const [deviceType, setDeviceType] = useState<DeviceType>(() => categories[0]?.id || 'router');
   const [macAddress, setMacAddress] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
   const [department, setDepartment] = useState('');
@@ -43,6 +43,8 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
   }, [allocations, group.id, editAllocation]);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     if (editAllocation) {
       setIp(editAllocation.ip);
       setHostname(editAllocation.hostname);
@@ -55,9 +57,14 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
       setNotes(editAllocation.notes || '');
     } else {
       const today = new Date().toISOString().slice(0, 10);
+      const isGw = presetIp && presetIp === group.gateway;
+      const defaultCategory = isGw 
+        ? (categories.find(c => c.id === 'router')?.id || categories[0]?.id || 'router')
+        : (categories[0]?.id || 'router');
+
       setIp(presetIp || '');
       setHostname('');
-      setDeviceType('pc_workstation');
+      setDeviceType(defaultCategory);
       setMacAddress('');
       setAssignedTo('');
       setDepartment('');
@@ -71,7 +78,7 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
       }
     }
     setError(null);
-  }, [editAllocation, presetIp, isOpen, group.cidr, groupAllocatedIps, group.gateway]);
+  }, [isOpen, editAllocation, presetIp]);
 
   const isDuplicate = useMemo(() => {
     if (!ip.trim()) return false;
@@ -125,7 +132,7 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
       groupId: group.id,
       ip: ip.trim(),
       hostname: hostname.trim(),
-      deviceType,
+      deviceType: deviceType || categories[0]?.id || 'router',
       macAddress: macAddress.trim().toUpperCase(),
       assignedTo: assignedTo.trim(),
       department: department.trim(),

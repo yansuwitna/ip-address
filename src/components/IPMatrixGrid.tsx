@@ -228,7 +228,14 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
                     <Shield className="w-3 h-3 text-sky-700" />
                   ) : alloc ? (
                     (() => {
-                      const cat = categories.find(c => c.id.toLowerCase() === (alloc.deviceType || '').toLowerCase());
+                      const raw = (alloc.deviceType || '').toLowerCase();
+                      const cleanRaw = raw.replace(/_/g, ' ');
+                      const cat = categories.find(c => 
+                        c.id.toLowerCase() === raw || 
+                        c.name.toLowerCase() === raw ||
+                        c.id.toLowerCase().replace(/_/g, ' ') === cleanRaw ||
+                        c.name.toLowerCase().replace(/_/g, ' ') === cleanRaw
+                      );
                       if (cat) {
                         const CatIcon = getCategoryIconComponent(cat.icon);
                         return <CatIcon className="w-3 h-3 text-slate-700" />;
@@ -279,7 +286,17 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
               <div className="flex justify-between items-center">
                 <span className="text-slate-400">Kategori:</span>
                 <span className="font-medium text-slate-800">
-                  {categories.find(c => c.id.toLowerCase() === (activeHoveredAlloc.deviceType || '').toLowerCase())?.name || activeHoveredAlloc.deviceType.replace('_', ' ')}
+                  {(() => {
+                    const raw = (activeHoveredAlloc.deviceType || '').toLowerCase();
+                    const cleanRaw = raw.replace(/_/g, ' ');
+                    const found = categories.find(c => 
+                      c.id.toLowerCase() === raw || 
+                      c.name.toLowerCase() === raw ||
+                      c.id.toLowerCase().replace(/_/g, ' ') === cleanRaw ||
+                      c.name.toLowerCase().replace(/_/g, ' ') === cleanRaw
+                    );
+                    return found ? found.name : activeHoveredAlloc.deviceType.replace(/_/g, ' ');
+                  })()}
                 </span>
               </div>
               {activeHoveredAlloc.macAddress && (

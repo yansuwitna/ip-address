@@ -326,6 +326,7 @@ export const App: React.FC = () => {
 
   // Allocation Handlers
   const handleSaveAllocation = (allocData: Partial<IPAllocation>) => {
+    const fallbackCategory = categories[0]?.id || 'router';
     if (allocData.id) {
       setAllocations(prev => prev.map(a => a.id === allocData.id ? { ...a, ...allocData } as IPAllocation : a));
     } else {
@@ -334,7 +335,7 @@ export const App: React.FC = () => {
         groupId: allocData.groupId || selectedGroupId || groups[0]?.id || '',
         ip: allocData.ip || '',
         hostname: allocData.hostname || 'new-host',
-        deviceType: allocData.deviceType || 'pc_workstation',
+        deviceType: allocData.deviceType || fallbackCategory,
         macAddress: allocData.macAddress || '',
         assignedTo: allocData.assignedTo || '',
         department: allocData.department || '',

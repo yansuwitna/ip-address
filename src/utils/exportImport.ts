@@ -28,7 +28,14 @@ export function exportToXlsx(
       ? itemServices.map(s => `${s.name} (${s.port}/${s.protocol})`).join(', ')
       : '-';
 
-    const cat = categories?.find(c => c.id.toLowerCase() === (a.deviceType || '').toLowerCase());
+    const raw = (a.deviceType || '').toLowerCase();
+    const cleanRaw = raw.replace(/_/g, ' ');
+    const cat = categories?.find(c => 
+      c.id.toLowerCase() === raw || 
+      c.name.toLowerCase() === raw ||
+      c.id.toLowerCase().replace(/_/g, ' ') === cleanRaw ||
+      c.name.toLowerCase().replace(/_/g, ' ') === cleanRaw
+    );
     const categoryName = cat ? cat.name : (a.deviceType ? a.deviceType.replace(/_/g, ' ') : '-');
 
     return [

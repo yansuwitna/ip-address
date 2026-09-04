@@ -106,6 +106,26 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
         .replace(/[^a-z0-9]+/g, '_')
         .replace(/^_+|_+$/g, '');
       setId(slug);
+
+      // Auto-suggest icon based on category keywords
+      const lower = val.toLowerCase();
+      if (lower.includes('cctv') || lower.includes('kamera') || lower.includes('camera')) {
+        setIcon('Cctv');
+      } else if (lower.includes('router') || lower.includes('modem') || lower.includes('gateway') || lower.includes('mikrotik')) {
+        setIcon('Router');
+      } else if (lower.includes('switch') || lower.includes('hub') || lower.includes('patch')) {
+        setIcon('Network');
+      } else if (lower.includes('wifi') || lower.includes('wi-fi') || lower.includes('access point') || lower.includes('ap ') || lower.endsWith(' ap')) {
+        setIcon('Wifi');
+      } else if (lower.includes('printer') || lower.includes('scanner') || lower.includes('cetak')) {
+        setIcon('Printer');
+      } else if (lower.includes('server') || lower.includes('vm') || lower.includes('host') || lower.includes('datacenter')) {
+        setIcon('Server');
+      } else if (lower.includes('firewall') || lower.includes('security') || lower.includes('fortinet') || lower.includes('pfsense')) {
+        setIcon('Shield');
+      } else if (lower.includes('nas') || lower.includes('storage') || lower.includes('san') || lower.includes('harddisk')) {
+        setIcon('HardDrive');
+      }
     }
   };
 
@@ -211,9 +231,18 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
               ) : (
                 filteredCategories.map((cat, idx) => {
                   const IconComp = getCategoryIconComponent(cat.icon);
-                  const usageCount = allocations.filter(
-                    a => a.deviceType.toLowerCase() === cat.id.toLowerCase()
-                  ).length;
+                  const usageCount = allocations.filter(a => {
+                    const rawType = (a.deviceType || '').toLowerCase();
+                    const cleanRaw = rawType.replace(/_/g, ' ');
+                    const cId = cat.id.toLowerCase();
+                    const cName = cat.name.toLowerCase();
+                    return (
+                      rawType === cId ||
+                      rawType === cName ||
+                      cleanRaw === cId.replace(/_/g, ' ') ||
+                      cleanRaw === cName.replace(/_/g, ' ')
+                    );
+                  }).length;
 
                   return (
                     <tr key={cat.id} className="hover:bg-slate-50/60 transition-colors">

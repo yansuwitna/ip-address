@@ -298,10 +298,17 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                     {activeAllocation.hostname}
                   </span>
                   {(() => {
-                    const cat = categories.find(c => c.id.toLowerCase() === (activeAllocation.deviceType || '').toLowerCase());
+                    const raw = (activeAllocation.deviceType || '').toLowerCase();
+                    const cleanRaw = raw.replace(/_/g, ' ');
+                    const cat = categories.find(c => 
+                      c.id.toLowerCase() === raw || 
+                      c.name.toLowerCase() === raw ||
+                      c.id.toLowerCase().replace(/_/g, ' ') === cleanRaw ||
+                      c.name.toLowerCase().replace(/_/g, ' ') === cleanRaw
+                    );
                     return (
                       <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-                        {cat ? cat.name : activeAllocation.deviceType.replace('_', ' ')}
+                        {cat ? cat.name : activeAllocation.deviceType.replace(/_/g, ' ')}
                       </span>
                     );
                   })()}
@@ -367,10 +374,17 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
               <option value="all">🌐 Tampilkan Semua Host IP</option>
               <optgroup label="Daftar Host IP Terdaftar">
                 {allocations.map(a => {
-                  const cat = categories.find(c => c.id.toLowerCase() === (a.deviceType || '').toLowerCase());
+                  const raw = (a.deviceType || '').toLowerCase();
+                  const cleanRaw = raw.replace(/_/g, ' ');
+                  const cat = categories.find(c => 
+                    c.id.toLowerCase() === raw || 
+                    c.name.toLowerCase() === raw ||
+                    c.id.toLowerCase().replace(/_/g, ' ') === cleanRaw ||
+                    c.name.toLowerCase().replace(/_/g, ' ') === cleanRaw
+                  );
                   return (
                     <option key={a.id} value={a.ip}>
-                      {a.ip} — {a.hostname} ({cat ? cat.name : a.deviceType})
+                      {a.ip} — {a.hostname} ({cat ? cat.name : (a.deviceType ? a.deviceType.replace(/_/g, ' ') : '-')})
                     </option>
                   );
                 })}
