@@ -46,6 +46,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [showSubDns, setShowSubDns] = useState(false);
 
   // DNS Resolver Simulator State
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
@@ -64,6 +65,10 @@ export const DnsView: React.FC<DnsViewProps> = ({
     return dnsRecords.filter(r => {
       if (typeFilter !== 'all' && r.type !== typeFilter) return false;
       if (statusFilter !== 'all' && r.status !== statusFilter) return false;
+      if (showSubDns) {
+        const dotCount = (r.domain.match(/\./g) || []).length;
+        if (dotCount < 2) return false;
+      }
 
       if (search.trim()) {
         const q = search.toLowerCase();
@@ -161,7 +166,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center sm:justify-start gap-2 w-full lg:w-auto">
           {/* Uji Resolusi Simulator Button */}
           <button
             onClick={() => {
@@ -170,7 +175,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
                 setTestDomain(dnsRecords[0].domain);
               }
             }}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+            className={`flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
               isSimulatorOpen
                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
                 : 'bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
@@ -183,17 +188,31 @@ export const DnsView: React.FC<DnsViewProps> = ({
           {/* Tombol Cetak Dokumen DNS */}
           <button
             onClick={onOpenPrintModal}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
             title="Cetak Direktori Catatan DNS (A4)"
           >
             <Printer className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
             <span>Cetak Direktori</span>
           </button>
 
+          {/* Toggle Sub DNS Button */}
+          <button
+            onClick={() => setShowSubDns(!showSubDns)}
+            className={`flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+              showSubDns
+                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+            }`}
+            title={showSubDns ? "Tampilkan Semua DNS" : "Hanya Tampilkan Sub DNS"}
+          >
+            <Filter className="w-3.5 h-3.5" />
+            <span>{showSubDns ? 'Semua DNS' : 'Sub DNS'}</span>
+          </button>
+
           {/* Tambah DNS Record Button */}
           <button
             onClick={onOpenAddModal}
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Tambah DNS Baru</span>
@@ -385,7 +404,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full sm:w-auto bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             >
               <option value="all">Semua Tipe Record</option>
               <option value="A">Tipe A (IPv4)</option>
@@ -402,7 +421,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full sm:w-auto bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             >
               <option value="all">Semua Status</option>
               <option value="active">Aktif (Enabled)</option>
@@ -467,7 +486,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
 
                       {/* Target Value Column */}
                       <td className="py-3.5 px-4 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
+                        <div className="flex items-center justify-center gap-1.5 font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
                           <span>{item.value}</span>
                           {item.priority !== undefined && (
                             <span className="text-[10px] font-sans font-semibold text-slate-400">
@@ -485,7 +504,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
                       {/* Subnet Link */}
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         {linkedGroup ? (
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center justify-center gap-1.5">
                             <span 
                               className="w-2 h-2 rounded-full flex-shrink-0"
                               style={{ backgroundColor: linkedGroup.color || '#3b82f6' }}

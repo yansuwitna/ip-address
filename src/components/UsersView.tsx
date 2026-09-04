@@ -128,7 +128,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
         {singleUser && (
           <button
             onClick={openEditModal}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer w-fit mx-auto sm:mx-0 flex-shrink-0"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer w-full sm:w-auto justify-center sm:justify-start flex-shrink-0"
           >
             <Edit3 className="w-4 h-4" />
             <span>Edit Profil & Kata Sandi</span>
@@ -344,7 +344,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
               </div>
 
               {/* Form Actions */}
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-3 border-t border-slate-100 w-full">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}

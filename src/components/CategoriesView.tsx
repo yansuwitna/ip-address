@@ -183,7 +183,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
 
         <button
           onClick={openAddModal}
-          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer w-fit mx-auto sm:mx-0"
+          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer w-full sm:w-auto justify-center sm:justify-start"
         >
           <Plus className="w-4 h-4" />
           <span>Tambah Kategori Baru</span>
@@ -447,7 +447,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
+              <div className="pt-3 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 w-full">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}

@@ -113,11 +113,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </p>
 
         {/* Action Button */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-2 w-full sm:w-auto px-4 sm:px-0">
           {!currentUser ? (
             <button
               onClick={onNavigateToLogin}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl text-sm shadow-xl shadow-blue-600/25 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+              className="px-6 py-3 justify-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl text-sm shadow-xl shadow-blue-600/25 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
             >
               <LogIn className="w-4 h-4" />
               <span>Akses Login Portal</span>
@@ -126,7 +126,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           ) : (
             <button
               onClick={onNavigateToDashboard}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-xl shadow-blue-600/25 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+              className="px-6 py-3 justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-xl shadow-blue-600/25 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
             >
               <span>Ke Dashboard Utama</span>
               <ArrowRight className="w-4 h-4" />

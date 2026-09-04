@@ -250,11 +250,11 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
         </div>
 
         {/* Action Button: Tambah Layanan */}
-        <div className="flex items-center gap-2 self-center">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 w-full lg:w-auto">
           <button
             onClick={handleTestAllPorts}
             disabled={isTestingAll || filteredServices.length === 0}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
               isTestingAll 
                 ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700 cursor-not-allowed'
                 : 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 shadow-xs'
@@ -271,7 +271,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
               setPresetForNew(null);
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Tambah Layanan</span>
@@ -370,7 +370,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                 setSelectedIp(val);
                 if (onSelectIp) onSelectIp(val === 'all' ? null : val);
               }}
-              className="bg-slate-50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer min-w-[200px]"
+              className="w-full sm:w-auto bg-slate-50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer min-w-[200px]"
             >
               <option value="all">🌐 Tampilkan Semua Host IP</option>
               <optgroup label="Daftar Host IP Terdaftar">
@@ -498,7 +498,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
               <select
                 value={selectedSubnetId}
                 onChange={(e) => setSelectedSubnetId(e.target.value)}
-                className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full sm:w-auto bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 <option value="all">Semua Subnet</option>
                 {groups.map(g => (
@@ -511,7 +511,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full sm:w-auto bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             >
               <option value="all">Semua Status Port</option>
               <option value="active">🟢 Aktif / Open</option>
@@ -523,7 +523,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
             <select
               value={protocolFilter}
               onChange={(e) => setProtocolFilter(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full sm:w-auto bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             >
               <option value="all">Semua Protokol</option>
               <option value="TCP">TCP</option>
@@ -535,7 +535,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full sm:w-auto bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             >
               <option value="all">Semua Kategori</option>
               {SERVICE_CATEGORIES.map(cat => (
@@ -624,7 +624,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
 
                         {/* Port & Protocol Column */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center justify-center gap-1.5">
                             <span className="font-mono text-sm font-black text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-lg">
                               :{svc.port}
                             </span>
@@ -647,7 +647,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
 
                         {/* Host IP Column */}
                         <td className="py-3.5 px-4 whitespace-nowrap font-mono text-xs">
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center justify-center gap-1.5">
                             <span className="font-bold text-blue-700">{svc.ip}</span>
                             {alloc && (
                               <span className="text-[11px] font-sans text-slate-500 dark:text-slate-400">
@@ -682,7 +682,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                         {/* URL / Endpoint Column */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
                           {svc.url ? (
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center justify-center gap-1.5">
                               <a
                                 href={svc.url}
                                 target="_blank"
@@ -811,7 +811,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                           <h4 className="font-extrabold text-slate-900 dark:text-slate-100 text-sm">
                             {svc.name}
                           </h4>
-                          <div className="flex items-center gap-1.5 mt-1">
+                          <div className="flex items-center justify-center gap-1.5 mt-1">
                             <span className="font-mono text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/40 px-2 py-0.5 rounded-lg border border-blue-200 dark:border-blue-800">
                               :{svc.port} / {svc.protocol}
                             </span>
