@@ -3,11 +3,12 @@ export interface User {
   username: string;
   name: string;
   email: string;
-  role: 'admin' | 'operator';
+  role?: string;
   avatar?: string;
   lastLogin?: string;
   createdAt?: string;
 }
+
 
 export interface UserAccount extends User {
   password: string;

@@ -73,10 +73,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'users',
-      label: 'Pengguna Sistem',
+      label: 'Akun Pengguna',
       icon: Users,
-      description: 'Kelola Akun & Akses',
-      badge: totalUsers !== undefined ? totalUsers.toString() : undefined
+      description: 'Profil & Kredensial'
     },
     {
       id: 'backup',
@@ -84,6 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Database,
       description: 'Ekspor & Impor JSON'
     }
+
   ];
 
 
@@ -202,12 +202,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="text-xs font-bold text-slate-900 truncate">
                   {currentUser.name}
                 </div>
-                <div className="text-[10px] text-blue-600 font-semibold capitalize flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3" />
-                  <span>{currentUser.role === 'admin' ? 'Administrator' : 'Operator'}</span>
+                <div className="text-[10px] text-slate-500 font-mono truncate">
+                  @{currentUser.username}
                 </div>
               </div>
             </div>
+
 
             <button
               onClick={() => {

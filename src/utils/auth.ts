@@ -10,19 +10,8 @@ export const DEFAULT_USERS: UserAccount[] = [
     password: 'admin123',
     name: 'Budi Hartono, S.Kom',
     email: 'admin@netipam.corp',
-    role: 'admin',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
     createdAt: '2026-01-01T08:00:00.000Z'
-  },
-  {
-    id: 'usr-2',
-    username: 'operator',
-    password: 'operator123',
-    name: 'Siti Rahmawati',
-    email: 'operator@netipam.corp',
-    role: 'operator',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
-    createdAt: '2026-01-15T09:30:00.000Z'
   }
 ];
 
@@ -34,7 +23,14 @@ export function loadUsers(): UserAccount[] {
       saveUsers(DEFAULT_USERS);
       return DEFAULT_USERS;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    // If more than 1 user existed from previous session, keep only the first user
+    if (Array.isArray(parsed) && parsed.length > 1) {
+      const single = [parsed[0]];
+      saveUsers(single);
+      return single;
+    }
+    return parsed;
   } catch (e) {
     console.error('Failed to load users:', e);
     return DEFAULT_USERS;
@@ -54,10 +50,14 @@ export function createUser(userData: {
   name: string;
   email: string;
   password: string;
-  role: 'admin' | 'operator';
+  role?: string;
   avatar?: string;
 }): { success: boolean; error?: string; user?: UserAccount } {
   const users = loadUsers();
+  if (users.length >= 1) {
+    return { success: false, error: 'Sistem hanya memerlukan 1 pengguna saja. Silakan perbarui akun yang sudah ada.' };
+  }
+
   const normalizedUsername = userData.username.trim().toLowerCase();
 
   if (!normalizedUsername) {
@@ -70,27 +70,22 @@ export function createUser(userData: {
     return { success: false, error: 'Nama lengkap wajib diisi!' };
   }
 
-  const exists = users.some(u => u.username.toLowerCase() === normalizedUsername);
-  if (exists) {
-    return { success: false, error: `Username "${userData.username}" sudah digunakan!` };
-  }
-
   const newUser: UserAccount = {
     id: `usr-${Date.now()}`,
     username: normalizedUsername,
     name: userData.name.trim(),
     email: userData.email.trim(),
     password: userData.password,
-    role: userData.role,
     avatar: userData.avatar || undefined,
     createdAt: new Date().toISOString()
   };
 
-  const updatedUsers = [...users, newUser];
+  const updatedUsers = [newUser];
   saveUsers(updatedUsers);
 
   return { success: true, user: newUser };
 }
+
 
 export function updateUser(
   id: string,

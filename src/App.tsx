@@ -127,7 +127,7 @@ export const App: React.FC = () => {
     name: string;
     email: string;
     password?: string;
-    role: 'admin' | 'operator';
+    role?: string;
     avatar?: string;
   }) => {
     if (userData.id) {
@@ -146,7 +146,6 @@ export const App: React.FC = () => {
         name: userData.name,
         email: userData.email,
         password: userData.password || '123456',
-        role: userData.role,
         avatar: userData.avatar
       });
       if (res.success) {
@@ -155,6 +154,7 @@ export const App: React.FC = () => {
       return res;
     }
   };
+
 
   const handleDeleteUser = (userId: string) => {
     const res = deleteUser(userId);
@@ -365,10 +365,11 @@ export const App: React.FC = () => {
       case 'dashboard': return 'Dashboard';
       case 'groups': return 'Grup IP (Subnet)';
       case 'categories': return 'Kategori Perangkat';
-      case 'users': return 'Manajemen Pengguna';
+      case 'users': return 'Akun Pengguna';
       case 'backup': return 'Cadangan & Data';
     }
   };
+
 
   const handleSelectTab = (tab: NavTab) => {
     if (tab === 'groups') {
