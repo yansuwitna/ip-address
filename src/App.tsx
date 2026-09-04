@@ -39,7 +39,8 @@ import {
   loadServices,
   saveServices,
   loadDnsRecords,
-  saveDnsRecords
+  saveDnsRecords,
+  saveSubDomains
 } from './utils/storage';
 import { exportToXlsx } from './utils/exportImport';
 import { parseCidr } from './utils/ipCalculator';
@@ -249,31 +250,49 @@ export const App: React.FC = () => {
   };
 
   const handleImportData = (data: {
-    groups: IPGroup[];
-    allocations: IPAllocation[];
+    groups?: IPGroup[];
+    allocations?: IPAllocation[];
     categories?: DeviceCategory[];
     users?: UserAccount[];
     services?: IPService[];
     dnsRecords?: DnsRecord[];
+    subDomains?: SubDomainRecord[];
   }) => {
-    setGroups(data.groups);
-    setAllocations(data.allocations);
-    if (data.services) {
-      saveServices(data.services);
-      setServices(data.services);
+    if (data.groups) {
+      setGroups(data.groups);
+      saveGroups(data.groups);
+    }
+    if (data.allocations) {
+      setAllocations(data.allocations);
+      saveAllocations(data.allocations);
     }
     if (data.categories) {
       setCategories(data.categories);
+      saveDeviceCategories(data.categories);
     }
-    if (data.users) {
-      saveUsers(data.users);
+    if (data.users && data.users.length > 0) {
       setUsers(data.users);
+      wipeAllUsers();
+      saveUsers(data.users);
+    }
+    if (data.services) {
+      setServices(data.services);
+      saveServices(data.services);
     }
     if (data.dnsRecords) {
-      saveDnsRecords(data.dnsRecords);
       setDnsRecords(data.dnsRecords);
+      saveDnsRecords(data.dnsRecords);
     }
-    setSelectedGroupId(data.groups[0]?.id || '');
+    if (data.subDomains) {
+      saveSubDomains(data.subDomains);
+    }
+    
+    if (data.groups && data.groups.length > 0) {
+      setSelectedGroupId(data.groups[0].id);
+    }
+    
+    setAuthView('home');
+    setIsViewingPublicHome(false);
   };
 
   const handleLogout = () => {
