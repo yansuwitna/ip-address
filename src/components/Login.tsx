@@ -5,13 +5,10 @@ import {
   User as UserIcon, 
   Eye, 
   EyeOff, 
-  ShieldCheck, 
   ArrowRight, 
   Sparkles,
   Layers,
-  Activity,
-  CheckCircle2,
-  KeyRound
+  Activity
 } from 'lucide-react';
 import { loginUser } from '../utils/auth';
 import { User } from '../types/auth';
@@ -21,14 +18,19 @@ interface LoginProps {
 }
 
 export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username.trim() || !password.trim()) {
+      setError('Username dan kata sandi wajib diisi!');
+      return;
+    }
+
     setError(null);
     setIsLoading(true);
 
@@ -43,21 +45,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     }, 400);
   };
 
-  const handleQuickLogin = (usr: string, pwd: string) => {
-    setUsername(usr);
-    setPassword(pwd);
-    setError(null);
-    setIsLoading(true);
-
-    setTimeout(() => {
-      const res = loginUser(usr, pwd);
-      setIsLoading(false);
-      if (res.success && res.user) {
-        onLoginSuccess(res.user);
-      }
-    }, 300);
-  };
-
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-sky-50/60 to-blue-100/50 flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden font-poppins">
       
@@ -66,7 +53,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       <div className="absolute bottom-[-10%] right-[-5%] w-96 h-96 bg-indigo-300/25 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-200/20 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* Grid Pattern Overlay for Unique Network Tech Feel */}
+      {/* Grid Pattern Overlay */}
       <div 
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
@@ -98,7 +85,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               Selamat Datang
             </h1>
             <p className="text-xs text-slate-500 mt-1">
-              Silakan login untuk mengakses data grup IP & alokasi host
+              Silakan login untuk mengakses sistem manajemen grup & alokasi IP
             </p>
           </div>
 
@@ -152,7 +139,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -163,52 +150,16 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium rounded-xl text-sm shadow-lg shadow-blue-600/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 group cursor-pointer"
+              className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl text-sm shadow-lg shadow-blue-600/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 group cursor-pointer"
             >
               <span>{isLoading ? 'Memverifikasi...' : 'Masuk ke Dashboard'}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </form>
 
-          {/* Quick Demo Login Option */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider text-center mb-3">
-              1-Klik Masuk Demo (Pilih Akun)
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin', 'admin123')}
-                className="p-2.5 rounded-xl border border-blue-200 bg-blue-50/50 hover:bg-blue-100/60 text-left transition-all group"
-              >
-                <div className="flex items-center gap-1.5 text-blue-800 font-semibold text-xs">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Admin</span>
-                </div>
-                <div className="text-[10px] text-slate-500 mt-0.5 font-mono">
-                  admin / admin123
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('operator', 'operator123')}
-                className="p-2.5 rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-slate-100 text-left transition-all group"
-              >
-                <div className="flex items-center gap-1.5 text-slate-800 font-semibold text-xs">
-                  <KeyRound className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Operator</span>
-                </div>
-                <div className="text-[10px] text-slate-500 mt-0.5 font-mono">
-                  operator / operator123
-                </div>
-              </button>
-            </div>
-          </div>
-
         </div>
 
-        {/* Bottom Feature Badges (Cerah, Unik & Modern) */}
+        {/* Bottom Feature Badges */}
         <div className="mt-6 flex items-center justify-center gap-4 text-xs text-slate-500">
           <span className="flex items-center gap-1.5">
             <Layers className="w-3.5 h-3.5 text-blue-600" />
