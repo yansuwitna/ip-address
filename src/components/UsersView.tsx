@@ -109,16 +109,16 @@ export const UsersView: React.FC<UsersViewProps> = ({
     <div className="space-y-6 font-poppins animate-in fade-in duration-200">
       
       {/* Top Banner */}
-      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100">
             <UserIcon className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               Manajemen Akun Pengguna
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Kelola kredensial login, nama profil, email, dan kata sandi akun sistem IP & DNS.
             </p>
 
@@ -146,12 +146,12 @@ export const UsersView: React.FC<UsersViewProps> = ({
 
       {/* Single User Card */}
       {!singleUser ? (
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-12 text-center shadow-xs space-y-3">
-          <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-12 text-center shadow-xs space-y-3">
+          <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
             <UserIcon className="w-6 h-6" />
           </div>
-          <h3 className="text-sm font-bold text-slate-800">Belum Ada Akun Pengguna</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Belum Ada Akun Pengguna</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
             Database pengguna saat ini kosong. Klik tombol di bawah untuk membuat akun pengguna sistem.
           </p>
           <button
@@ -162,7 +162,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
           </button>
         </div>
       ) : (
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-slate-100 pb-6">
             <div className="flex items-center gap-4">
@@ -170,7 +170,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
                 <img
                   src={singleUser.avatar}
                   alt={singleUser.name}
-                  className="w-16 h-16 rounded-2xl object-cover border border-slate-200 shadow-xs"
+                  className="w-16 h-16 rounded-2xl object-cover border border-slate-200 dark:border-slate-700 shadow-xs"
                 />
               ) : (
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-xl shadow-md shadow-blue-500/20">
@@ -180,14 +180,14 @@ export const UsersView: React.FC<UsersViewProps> = ({
 
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-xl font-bold text-slate-900">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
                     {singleUser.name}
                   </h3>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
                     Akun Utama
                   </span>
                 </div>
-                <p className="text-xs font-mono text-slate-500 mt-0.5">
+                <p className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-0.5">
                   @{singleUser.username}
                 </p>
               </div>
@@ -195,9 +195,9 @@ export const UsersView: React.FC<UsersViewProps> = ({
 
             <button
               onClick={openEditModal}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 self-start sm:self-center"
+              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 self-start sm:self-center"
             >
-              <Edit3 className="w-4 h-4 text-slate-600" />
+              <Edit3 className="w-4 h-4 text-slate-600 dark:text-slate-400" />
               <span>Ubah Kredensial</span>
             </button>
           </div>
@@ -205,32 +205,32 @@ export const UsersView: React.FC<UsersViewProps> = ({
           {/* Details Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             
-            <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 space-y-1">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/40/80 rounded-2xl border border-slate-100 space-y-1">
               <div className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-slate-400" />
                 <span>Alamat Email</span>
               </div>
-              <div className="text-xs font-bold text-slate-800 break-all">
+              <div className="text-xs font-bold text-slate-800 dark:text-slate-200 break-all">
                 {singleUser.email || '-'}
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 space-y-1">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/40/80 rounded-2xl border border-slate-100 space-y-1">
               <div className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-slate-400" />
                 <span>Sesi Terakhir Login</span>
               </div>
-              <div className="text-xs font-bold text-slate-800">
+              <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
                 {singleUser.lastLogin ? new Date(singleUser.lastLogin).toLocaleString('id-ID') : 'Baru saja'}
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 space-y-1">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/40/80 rounded-2xl border border-slate-100 space-y-1">
               <div className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-slate-400" />
                 <span>Tanggal Terdaftar</span>
               </div>
-              <div className="text-xs font-bold text-slate-800">
+              <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
                 {singleUser.createdAt ? new Date(singleUser.createdAt).toLocaleDateString('id-ID') : '01/01/2026'}
               </div>
             </div>
@@ -251,7 +251,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
       {/* Edit / Create User Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
             
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2.5">
@@ -259,10 +259,10 @@ export const UsersView: React.FC<UsersViewProps> = ({
                   <UserCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm">
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
                     {singleUser ? 'Ubah Profil & Kata Sandi' : 'Buat Akun Pengguna'}
                   </h3>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     Perbarui informasi akun sistem IP & DNS
                   </p>
                 </div>
@@ -271,7 +271,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
 
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -287,7 +287,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
             <form onSubmit={handleFormSubmit} className="space-y-3.5">
               {/* Full Name */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Nama Lengkap *
                 </label>
                 <input
@@ -296,13 +296,13 @@ export const UsersView: React.FC<UsersViewProps> = ({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Contoh: Budi Hartono, S.Kom"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                  className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-900 transition-all"
                 />
               </div>
 
               {/* Username */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Username *
                 </label>
                 <input
@@ -311,13 +311,13 @@ export const UsersView: React.FC<UsersViewProps> = ({
                   value={username}
                   onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_.-]/g, ''))}
                   placeholder="Contoh: admin"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                  className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-900 transition-all"
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Alamat Email
                 </label>
                 <input
@@ -325,13 +325,13 @@ export const UsersView: React.FC<UsersViewProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Contoh: admin@ipaddress.lan"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                  className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-900 transition-all"
                 />
               </div>
 
               {/* Password */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   {singleUser ? 'Kata Sandi Baru (Kosongkan jika tidak diubah)' : 'Kata Sandi *'}
                 </label>
                 <input
@@ -339,7 +339,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={singleUser ? 'Masukkan sandi baru jika ingin mengganti' : 'Minimal 4 karakter'}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                  className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-900 transition-all"
                 />
               </div>
 
@@ -348,7 +348,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
                 >
                   Batal
                 </button>

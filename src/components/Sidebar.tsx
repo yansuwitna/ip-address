@@ -175,7 +175,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 title={`Ganti ke mode ${theme === 'dark' ? 'Terang (Light)' : 'Gelap (Dark)'}`}
                 className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors cursor-pointer"
               >
-                {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-slate-600" />}
+                {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />}
               </button>
             )}
           </div>
@@ -222,8 +222,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* User Profile & Logout */}
-        <div className="p-3 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 flex-shrink-0">
-          <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200/60 dark:hover:border-slate-700">
+        <div className="p-3 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40/70 dark:bg-slate-900/60 flex-shrink-0">
+          <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl hover:bg-white dark:bg-slate-900 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200/60 dark:hover:border-slate-700">
             <div className="flex items-center gap-2.5 truncate">
               {currentUser.avatar ? (
                 <img

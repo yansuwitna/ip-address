@@ -139,7 +139,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
             <button
               type="button"
               onClick={onBackToHome}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-xs transition-all cursor-pointer group"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 bg-white dark:bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-xs transition-all cursor-pointer group"
             >
               <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
               <span>Kembali ke Halaman Beranda (Home)</span>
@@ -148,7 +148,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
         )}
         
         {/* Card Body */}
-        <div className="bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-3xl p-7 sm:p-9 shadow-2xl shadow-blue-500/10 transition-all">
+        <div className="bg-white dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800 rounded-3xl p-7 sm:p-9 shadow-2xl shadow-blue-500/10 transition-all">
           
           {hasNoUsers ? (
             /* OTOMATIS TAMPILKAN FORM PENDAFTARAN JIKA BELUM ADA USER */
@@ -157,10 +157,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
                 <div className="inline-flex p-3.5 bg-gradient-to-tr from-blue-600 via-blue-500 to-cyan-400 text-white rounded-2xl shadow-lg shadow-blue-500/30 mb-3 transform hover:scale-105 transition-transform">
                   <UserPlus className="w-8 h-8" />
                 </div>
-                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
                   Daftar Akun Pengguna
                 </h1>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Database akun belum memiliki pengguna. Daftarkan akun utama Anda untuk menggunakan sistem.
                 </p>
               </div>
@@ -182,7 +182,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
               <form onSubmit={handleRegisterSubmit} className="space-y-4">
                 {/* Nama Lengkap */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     Nama Lengkap *
                   </label>
                   <div className="relative">
@@ -195,14 +195,14 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
                       value={regName}
                       onChange={(e) => setRegName(e.target.value)}
                       placeholder="Contoh: Budi Hartono, S.Kom"
-                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Username */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     Username *
                   </label>
                   <div className="relative">
@@ -215,14 +215,14 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
                       value={regUsername}
                       onChange={(e) => setRegUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_.-]/g, ''))}
                       placeholder="Contoh: admin"
-                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-sm text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 font-mono placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Email */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     Email (Opsional)
                   </label>
                   <input
@@ -230,13 +230,13 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
                     placeholder="Contoh: admin@corp.net"
-                    className="w-full px-4 py-2.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
 
                 {/* Password */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     Kata Sandi *
                   </label>
                   <div className="relative">
@@ -249,12 +249,12 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
                       placeholder="Minimal 4 karakter"
-                      className="w-full pl-10 pr-11 py-2.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full pl-10 pr-11 py-2.5 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -279,10 +279,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
                 <div className="inline-flex p-3.5 bg-gradient-to-tr from-blue-600 via-blue-500 to-cyan-400 text-white rounded-2xl shadow-lg shadow-blue-500/30 mb-3 transform hover:scale-105 transition-transform">
                   <Network className="w-8 h-8" />
                 </div>
-                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
                   Selamat Datang
                 </h1>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Silakan login untuk mengakses sistem manajemen IP & DNS
                 </p>
               </div>
@@ -299,7 +299,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
               <form onSubmit={handleLoginSubmit} className="space-y-4">
                 {/* Username Input */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     Username Akun
                   </label>
                   <div className="relative">
@@ -312,14 +312,14 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Masukkan username"
-                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Password Input */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     Kata Sandi
                   </label>
                   <div className="relative">
@@ -332,12 +332,12 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Masukkan kata sandi"
-                      className="w-full pl-10 pr-11 py-2.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full pl-10 pr-11 py-2.5 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -360,7 +360,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
         </div>
 
         {/* Bottom Feature Badges */}
-        <div className="mt-6 flex items-center justify-center gap-4 text-xs text-slate-500">
+        <div className="mt-6 flex items-center justify-center gap-4 text-xs text-slate-500 dark:text-slate-400">
           <span className="flex items-center gap-1.5">
             <Layers className="w-3.5 h-3.5 text-blue-600" />
             <span>Kalkulator Subnet</span>

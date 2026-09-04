@@ -140,7 +140,7 @@ export const IPTable: React.FC<IPTableProps> = ({
   }, [groupAllocations, statusFilter, deviceFilter, search, sortAsc, categories]);
 
   return (
-    <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs flex flex-col font-poppins">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs flex flex-col font-poppins">
       
       {/* Table Action Bar */}
       <div className="p-4 border-b border-slate-200/80 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
@@ -155,7 +155,7 @@ export const IPTable: React.FC<IPTableProps> = ({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari IP, Hostname, MAC, PIC..."
-              className="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl pl-9 pr-3 py-2 text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl pl-9 pr-3 py-2 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
             />
           </div>
 
@@ -163,7 +163,7 @@ export const IPTable: React.FC<IPTableProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2 text-slate-700 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           >
             <option value="all">Semua Status</option>
             <option value="used">Aktif Terpakai (Used)</option>
@@ -175,7 +175,7 @@ export const IPTable: React.FC<IPTableProps> = ({
           <select
             value={deviceFilter}
             onChange={(e) => setDeviceFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2 text-slate-700 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-medium focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           >
             <option value="all">Semua Kategori Perangkat</option>
             {categories.map(cat => (
@@ -212,9 +212,9 @@ export const IPTable: React.FC<IPTableProps> = ({
             <button
               onClick={onOpenPrint}
               title="Cetak Laporan Alokasi Host Subnet Ini (A4)"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-slate-200"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
             >
-              <Printer className="w-3.5 h-3.5 text-slate-600" />
+              <Printer className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
               <span>Cetak</span>
             </button>
           )}
@@ -235,7 +235,7 @@ export const IPTable: React.FC<IPTableProps> = ({
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-500 uppercase tracking-wider font-semibold text-[11px]">
+            <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40/80 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
               <th className="py-3 px-4 cursor-pointer select-none" onClick={() => setSortAsc(!sortAsc)}>
                 <div className="flex items-center gap-1.5">
                   <span>Alamat IP</span>
@@ -252,7 +252,7 @@ export const IPTable: React.FC<IPTableProps> = ({
               <th className="py-3 px-4 text-right">Aksi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 text-slate-700">
+          <tbody className="divide-y divide-slate-100 text-slate-700 dark:text-slate-300">
             {filteredAllocations.length === 0 ? (
               <tr>
                 <td colSpan={9} className="py-12 text-center text-slate-400 font-medium">
@@ -272,7 +272,7 @@ export const IPTable: React.FC<IPTableProps> = ({
                     {/* IP Column */}
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-slate-900 text-sm">
+                        <span className="font-mono font-bold text-slate-900 dark:text-slate-100 text-sm">
                           {item.ip}
                         </span>
                         {isGateway && (
@@ -304,7 +304,7 @@ export const IPTable: React.FC<IPTableProps> = ({
                     {/* Hostname Column */}
                     <td className="py-3.5 px-4">
                       <div>
-                        <div className="font-semibold text-slate-900 leading-tight">
+                        <div className="font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                           {item.hostname}
                         </div>
 
@@ -319,7 +319,7 @@ export const IPTable: React.FC<IPTableProps> = ({
                                   e.stopPropagation();
                                   onManageServices(item);
                                 }}
-                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-800 border border-slate-200/90 transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 text-slate-700 dark:text-slate-300 hover:text-blue-800 border border-slate-200/90 dark:border-slate-800 transition-colors cursor-pointer"
                                 title={`${svc.name} (Port ${svc.port}/${svc.protocol}) - Klik untuk kelola`}
                               >
                                 <span className={`w-1.5 h-1.5 rounded-full ${svc.status === 'active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -350,8 +350,8 @@ export const IPTable: React.FC<IPTableProps> = ({
                         const catInfo = getCategoryInfo(item.deviceType);
                         const CatIcon = catInfo.icon;
                         return (
-                          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200/90 text-slate-700 text-xs font-semibold">
-                            <span className="p-1 rounded-md bg-white border border-slate-200 text-blue-600 shadow-2xs">
+                          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+                            <span className="p-1 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 shadow-2xs">
                               <CatIcon className="w-3.5 h-3.5 flex-shrink-0" />
                             </span>
                             <span>{catInfo.name}</span>
@@ -361,14 +361,14 @@ export const IPTable: React.FC<IPTableProps> = ({
                     </td>
 
                     {/* MAC Address Column */}
-                    <td className="py-3.5 px-4 whitespace-nowrap font-mono text-slate-600">
+                    <td className="py-3.5 px-4 whitespace-nowrap font-mono text-slate-600 dark:text-slate-400">
                       {item.macAddress ? (
                         <div className="flex items-center gap-1.5">
                           <span>{item.macAddress}</span>
                           <button
                             onClick={() => handleCopyMac(item.macAddress)}
                             title="Salin MAC Address"
-                            className="text-slate-400 hover:text-slate-700 p-0.5 cursor-pointer"
+                            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 p-0.5 cursor-pointer"
                           >
                             {copiedMac === item.macAddress ? (
                               <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -384,7 +384,7 @@ export const IPTable: React.FC<IPTableProps> = ({
 
                     {/* PIC & Dept Column */}
                     <td className="py-3.5 px-4">
-                      <div className="font-medium text-slate-800">
+                      <div className="font-medium text-slate-800 dark:text-slate-200">
                         {item.assignedTo || '-'}
                       </div>
                       {item.department && (
@@ -416,7 +416,7 @@ export const IPTable: React.FC<IPTableProps> = ({
                         <button
                           onClick={() => onPingAllocation(item)}
                           title="Simulasikan Uji Ping ICMP"
-                          className="p-1 hover:bg-slate-100 text-slate-400 hover:text-blue-600 rounded-lg transition-colors cursor-pointer"
+                          className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-blue-600 rounded-lg transition-colors cursor-pointer"
                         >
                           <Activity className="w-3.5 h-3.5" />
                         </button>
@@ -424,7 +424,7 @@ export const IPTable: React.FC<IPTableProps> = ({
                     </td>
 
                     {/* Notes Column */}
-                    <td className="py-3.5 px-4 max-w-xs truncate text-slate-500" title={item.notes}>
+                    <td className="py-3.5 px-4 max-w-xs truncate text-slate-500 dark:text-slate-400" title={item.notes}>
                       {item.notes || '-'}
                     </td>
 
@@ -437,7 +437,7 @@ export const IPTable: React.FC<IPTableProps> = ({
                           className={`p-1.5 rounded-lg transition-all cursor-pointer relative ${
                             itemServices.length > 0
                               ? 'bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white shadow-2xs'
-                              : 'hover:bg-slate-100 text-slate-400 hover:text-blue-600'
+                              : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-blue-600'
                           }`}
                         >
                           <ServerCog className="w-3.5 h-3.5" />
