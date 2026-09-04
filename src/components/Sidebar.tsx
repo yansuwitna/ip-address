@@ -4,6 +4,7 @@ import {
   LayoutDashboard, 
   Layers, 
   Cpu,
+  Users,
   Database, 
   LogOut, 
   ShieldCheck, 
@@ -12,7 +13,7 @@ import {
 } from 'lucide-react';
 import { User } from '../types/auth';
 
-export type NavTab = 'dashboard' | 'groups' | 'categories' | 'backup';
+export type NavTab = 'dashboard' | 'groups' | 'categories' | 'users' | 'backup';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -24,7 +25,9 @@ interface SidebarProps {
   totalGroups: number;
   totalUsedIps: number;
   totalCategories?: number;
+  totalUsers?: number;
 }
+
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
@@ -35,7 +38,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLogout,
   totalGroups,
   totalUsedIps,
-  totalCategories
+  totalCategories,
+  totalUsers
 }) => {
   interface NavItem {
     id: NavTab;
@@ -68,12 +72,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: totalCategories !== undefined ? totalCategories.toString() : undefined
     },
     {
+      id: 'users',
+      label: 'Pengguna Sistem',
+      icon: Users,
+      description: 'Kelola Akun & Akses',
+      badge: totalUsers !== undefined ? totalUsers.toString() : undefined
+    },
+    {
       id: 'backup',
       label: 'Cadangan & Data',
       icon: Database,
       description: 'Ekspor & Impor JSON'
     }
   ];
+
 
   const handleNavClick = (tab: NavTab) => {
     onSelectTab(tab);

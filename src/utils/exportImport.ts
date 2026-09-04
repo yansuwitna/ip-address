@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
-import { IPGroup, IPAllocation } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory } from '../types/ipam';
+import { UserAccount } from '../types/auth';
 
 export function exportToXlsx(group: IPGroup, allocations: IPAllocation[]): void {
   const headers = [
@@ -70,13 +71,27 @@ export function exportToXlsx(group: IPGroup, allocations: IPAllocation[]): void 
 // Backwards compatibility alias
 export const exportToCsv = exportToXlsx;
 
-export function exportBackupJson(groups: IPGroup[], allocations: IPAllocation[]): void {
+
+export function exportBackupJson(
+  groups: IPGroup[],
+  allocations: IPAllocation[],
+  categories?: DeviceCategory[],
+  users?: UserAccount[]
+): void {
   const backupData = {
     appName: 'NetIPAM',
-    version: '1.0.0',
+    version: '2.0.0',
     exportDate: new Date().toISOString(),
+    totalData: {
+      groups: groups.length,
+      allocations: allocations.length,
+      categories: categories?.length || 0,
+      users: users?.length || 0
+    },
     groups,
-    allocations
+    allocations,
+    categories: categories || [],
+    users: users || []
   };
 
   const jsonStr = JSON.stringify(backupData, null, 2);
@@ -84,20 +99,28 @@ export function exportBackupJson(groups: IPGroup[], allocations: IPAllocation[])
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `NetIPAM_Backup_${new Date().toISOString().slice(0, 10)}.json`);
+  link.setAttribute('download', `NetIPAM_Cadangan_Lengkap_${new Date().toISOString().slice(0, 10)}.json`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
 
-export function parseImportJson(fileContent: string): { groups: IPGroup[]; allocations: IPAllocation[] } {
+export function parseImportJson(fileContent: string): {
+  groups: IPGroup[];
+  allocations: IPAllocation[];
+  categories?: DeviceCategory[];
+  users?: UserAccount[];
+} {
   const parsed = JSON.parse(fileContent);
   if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.allocations)) {
-    throw new Error('Format file backup JSON tidak valid!');
+    throw new Error('Format file backup JSON tidak valid! Wajib memiliki array groups dan allocations.');
   }
   return {
     groups: parsed.groups,
-    allocations: parsed.allocations
+    allocations: parsed.allocations,
+    categories: Array.isArray(parsed.categories) ? parsed.categories : undefined,
+    users: Array.isArray(parsed.users) ? parsed.users : undefined
   };
 }
+

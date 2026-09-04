@@ -14,8 +14,18 @@ import {
   Trash2
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory } from './types/ipam';
-import { User } from './types/auth';
-import { getCurrentUser, logoutUser } from './utils/auth';
+import { User, UserAccount } from './types/auth';
+import { 
+  getCurrentUser, 
+  logoutUser, 
+  loadUsers, 
+  saveUsers,
+  createUser, 
+  updateUser, 
+  deleteUser, 
+  wipeAllUsers 
+} from './utils/auth';
+
 import { 
   loadGroups, 
   saveGroups, 
@@ -28,11 +38,13 @@ import {
 import { exportToXlsx } from './utils/exportImport';
 import { parseCidr } from './utils/ipCalculator';
 
+import { HomeView } from './components/HomeView';
 import { Login } from './components/Login';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { DashboardView } from './components/DashboardView';
 import { CategoriesView } from './components/CategoriesView';
+import { UsersView } from './components/UsersView';
 import { IPMatrixGrid } from './components/IPMatrixGrid';
 import { IPTable } from './components/IPTable';
 import { BackupView } from './components/BackupView';
@@ -44,6 +56,9 @@ import { PingSimulatorModal } from './components/PingSimulatorModal';
 export const App: React.FC = () => {
   // Authentication State
   const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser);
+  const [authView, setAuthView] = useState<'home' | 'login'>('home');
+  const [users, setUsers] = useState<UserAccount[]>(loadUsers);
+  const [isViewingPublicHome, setIsViewingPublicHome] = useState(false);
 
   // Navigation & UI State
   const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
@@ -57,6 +72,7 @@ export const App: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<string>(groups[0]?.id || '');
   const [viewMode, setViewMode] = useState<'matrix' | 'table'>('matrix');
   const [globalSearch, setGlobalSearch] = useState('');
+
 
   // Modals state
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
@@ -105,15 +121,140 @@ export const App: React.FC = () => {
     }
   }, [groups, selectedGroupId]);
 
+  const handleSaveUser = (userData: {
+    id?: string;
+    username: string;
+    name: string;
+    email: string;
+    password?: string;
+    role: 'admin' | 'operator';
+    avatar?: string;
+  }) => {
+    if (userData.id) {
+      const res = updateUser(userData.id, userData);
+      if (res.success) {
+        setUsers(loadUsers());
+        if (currentUser && currentUser.id === userData.id) {
+          const updated = getCurrentUser();
+          if (updated) setCurrentUser(updated);
+        }
+      }
+      return res;
+    } else {
+      const res = createUser({
+        username: userData.username,
+        name: userData.name,
+        email: userData.email,
+        password: userData.password || '123456',
+        role: userData.role,
+        avatar: userData.avatar
+      });
+      if (res.success) {
+        setUsers(loadUsers());
+      }
+      return res;
+    }
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    const res = deleteUser(userId);
+    if (res.success) {
+      setUsers(loadUsers());
+      if (currentUser && currentUser.id === userId) {
+        setCurrentUser(null);
+        setAuthView('home');
+      }
+    }
+    return res;
+  };
+
+  const handleWipeAllData = () => {
+    setGroups([]);
+    setAllocations([]);
+    setCategories([]);
+    setSelectedGroupId('');
+    saveGroups([]);
+    saveAllocations([]);
+    saveDeviceCategories([]);
+    wipeAllUsers();
+    setUsers([]);
+    setCurrentUser(null);
+    setAuthView('home');
+    setIsViewingPublicHome(false);
+  };
+
+  const handleResetDemo = () => {
+    const demo = resetDemoData();
+    setGroups(demo.groups);
+    setAllocations(demo.allocations);
+    setCategories(demo.categories);
+    setSelectedGroupId(demo.groups[0]?.id || '');
+    setUsers(loadUsers());
+  };
+
+  const handleImportData = (data: {
+    groups: IPGroup[];
+    allocations: IPAllocation[];
+    categories?: DeviceCategory[];
+    users?: UserAccount[];
+  }) => {
+    setGroups(data.groups);
+    setAllocations(data.allocations);
+    if (data.categories) {
+      setCategories(data.categories);
+    }
+    if (data.users) {
+      saveUsers(data.users);
+      setUsers(data.users);
+    }
+    setSelectedGroupId(data.groups[0]?.id || '');
+  };
+
   const handleLogout = () => {
     logoutUser();
     setCurrentUser(null);
+    setAuthView('home');
+    setIsViewingPublicHome(false);
   };
 
-  // If not logged in, render the Login portal exclusively
+  // If not logged in, render HomeView or Login portal
   if (!currentUser) {
-    return <Login onLoginSuccess={(user) => setCurrentUser(user)} />;
+    if (authView === 'login') {
+      return (
+        <Login 
+          onLoginSuccess={(user) => {
+            setCurrentUser(user);
+            setUsers(loadUsers());
+          }}
+          onBackToHome={() => setAuthView('home')}
+        />
+      );
+    }
+    return (
+      <HomeView
+        groups={groups}
+        allocations={allocations}
+        categories={categories}
+        currentUser={null}
+        onNavigateToLogin={() => setAuthView('login')}
+      />
+    );
   }
+
+  // If logged in but clicked "Lihat Halaman Depan"
+  if (isViewingPublicHome) {
+    return (
+      <HomeView
+        groups={groups}
+        allocations={allocations}
+        categories={categories}
+        currentUser={currentUser}
+        onNavigateToLogin={() => setIsViewingPublicHome(false)}
+        onNavigateToDashboard={() => setIsViewingPublicHome(false)}
+      />
+    );
+  }
+
 
   // Active selected group object for allocations view
   const activeGroup = groups.find(g => g.id === selectedGroupId) || groups[0] || null;
@@ -224,6 +365,7 @@ export const App: React.FC = () => {
       case 'dashboard': return 'Dashboard';
       case 'groups': return 'Grup IP (Subnet)';
       case 'categories': return 'Kategori Perangkat';
+      case 'users': return 'Manajemen Pengguna';
       case 'backup': return 'Cadangan & Data';
     }
   };
@@ -249,13 +391,19 @@ export const App: React.FC = () => {
         totalGroups={groups.length}
         totalUsedIps={totalUsedIps}
         totalCategories={categories.length}
+        totalUsers={users.length}
       />
 
       {/* 2. Main Work Area with Independent Smooth Scroll */}
       <div className="flex-1 flex flex-col h-screen overflow-y-auto min-w-0 bg-slate-50">
         
         {/* Top Header (Sticky) */}
-        <Header onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)} />
+        <Header 
+          onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)} 
+          title={getTabTitle(currentTab)}
+          onViewHome={() => setIsViewingPublicHome(true)}
+        />
+
 
         {/* Dynamic Page Content */}
         <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 space-y-6 max-w-7xl w-full mx-auto">
@@ -626,25 +774,29 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* TAB 4: CADANGAN & DATA */}
+          {/* TAB 4: PENGGUNA SISTEM */}
+          {currentTab === 'users' && (
+            <UsersView
+              users={users}
+              currentUser={currentUser}
+              onSaveUser={handleSaveUser}
+              onDeleteUser={handleDeleteUser}
+            />
+          )}
+
+          {/* TAB 5: CADANGAN & DATA */}
           {currentTab === 'backup' && (
             <BackupView
               groups={groups}
               allocations={allocations}
-              onImportData={(newGroups, newAllocations) => {
-                setGroups(newGroups);
-                setAllocations(newAllocations);
-                setSelectedGroupId(newGroups[0]?.id || '');
-              }}
-              onResetDemo={() => {
-                const demo = resetDemoData();
-                setGroups(demo.groups);
-                setAllocations(demo.allocations);
-                setCategories(demo.categories);
-                setSelectedGroupId(demo.groups[0]?.id || '');
-              }}
+              categories={categories}
+              users={users}
+              onImportData={handleImportData}
+              onResetDemo={handleResetDemo}
+              onWipeAllData={handleWipeAllData}
             />
           )}
+
 
         </main>
       </div>

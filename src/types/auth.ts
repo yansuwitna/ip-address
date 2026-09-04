@@ -6,9 +6,15 @@ export interface User {
   role: 'admin' | 'operator';
   avatar?: string;
   lastLogin?: string;
+  createdAt?: string;
+}
+
+export interface UserAccount extends User {
+  password: string;
 }
 
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
 }
+
