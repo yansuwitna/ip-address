@@ -17,6 +17,7 @@ import {
   buildDefaultServiceUrl,
   ServicePreset 
 } from '../utils/servicePresets';
+import { showWarning } from '../utils/swal';
 
 interface ServiceModalProps {
   isOpen: boolean;
@@ -122,16 +123,16 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!ip) {
-      alert('Pilih alamat IP target!');
+      showWarning('Alamat IP Kosong', 'Silakan pilih alamat IP host target layanan terlebih dahulu!');
       return;
     }
     if (!name.trim()) {
-      alert('Nama layanan / aplikasi wajib diisi!');
+      showWarning('Nama Layanan Wajib Diisi', 'Silakan masukkan nama layanan atau aplikasi yang berjalan!');
       return;
     }
     const portNum = Number(port);
     if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
-      alert('Nomor port harus berada di antara 1 s/d 65535!');
+      showWarning('Port Tidak Valid', 'Nomor port jaringan harus berada di antara 1 s/d 65535!');
       return;
     }
 

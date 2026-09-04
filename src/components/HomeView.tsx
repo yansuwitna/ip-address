@@ -52,10 +52,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg tracking-tight text-slate-900">IP Address</span>
+                <span className="font-extrabold text-lg tracking-tight text-slate-900">IP & DNS</span>
               </div>
               <p className="text-[10px] text-slate-500 hidden sm:block">
-                Sistem Manajemen Alamat & Grup IP Terintegrasi
+                Sistem Manajemen Alamat IP & Server DNS Terintegrasi
               </p>
             </div>
           </div>
@@ -101,7 +101,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/80 text-xs font-semibold shadow-xs">
           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-          <span>Sistem Manajemen IP Address Terintegrasi</span>
+          <span>Sistem Manajemen IP & DNS Terintegrasi</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight max-w-4xl mx-auto leading-tight sm:leading-tight">
@@ -180,10 +180,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
         
         <div className="text-center space-y-2 max-w-2xl mx-auto mb-8">
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Fitur Utama IP Address
+            Fitur Utama IP & DNS
           </h2>
           <p className="text-xs sm:text-sm text-slate-500">
-            Didesain untuk efisiensi pengelolaan infrastruktur jaringan komputer.
+            Didesain untuk efisiensi pengelolaan infrastruktur jaringan komputer dan nama domain.
           </p>
         </div>
 
@@ -209,7 +209,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               Manajemen Alokasi & Pelacakan Host
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Pencatatan alokasi alamat IP host, hostname, tipe perangkat, MAC Address, departemen, dan pengguna untuk mencegah IP conflict.
+              Pencatatan alokasi alamat IP host, hostname, tipe perangkat, MAC Address, departemen, dan proteksi hapus jika ada layanan aktif.
             </p>
           </div>
 
@@ -218,10 +218,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <Database className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-slate-900 text-base">
-              Cadangan Lengkap & Ekspor XLSX
+              Server DNS & Cadangan Lengkap
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Dukungan ekspor inventaris jaringan ke Excel (.xlsx) per subnet dan backup lengkap format JSON yang aman dengan penguncian data.
+              Pencatatan direktori DNS (A, AAAA, CNAME, MX, TXT), simulasi resolusi nama, cetak dokumen A4, dan ekspor XLSX & JSON.
             </p>
           </div>
 
@@ -235,10 +235,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
           
           <div className="relative z-10 max-w-2xl mx-auto space-y-3">
             <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
-              Siap Mengelola Infrastruktur Jaringan Anda?
+              Siap Mengelola Infrastruktur Jaringan & DNS Anda?
             </h2>
             <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-              Masuk sekarang dengan akun pengguna untuk mengalokasikan host baru, membuat grup subnet, atau mengunduh laporan.
+              Masuk sekarang dengan akun pengguna untuk mengalokasikan host baru, mengelola server DNS, atau mencetak laporan.
             </p>
 
             <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
@@ -255,7 +255,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   onClick={onNavigateToDashboard}
                   className="px-6 py-3.5 bg-white hover:bg-blue-50 text-blue-700 font-bold rounded-xl text-sm shadow-lg active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <span>Buka Dashboard IP Address</span>
+                  <span>Buka Dashboard IP & DNS</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               )}
@@ -269,9 +269,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <footer className="border-t border-slate-200/80 bg-white/70 py-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-800">IP Address</span>
+            <span className="font-bold text-slate-800">IP & DNS</span>
             <span>•</span>
-            <span>Sistem Manajemen Alamat & Grup IP Terintegrasi</span>
+            <span>Sistem Manajemen Jaringan, IP Host & DNS Server Terpadu</span>
           </div>
 
           <div className="flex items-center gap-3 text-slate-400">

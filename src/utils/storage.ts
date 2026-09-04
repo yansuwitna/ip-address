@@ -1,10 +1,11 @@
-import { IPGroup, IPAllocation, DeviceCategory, IPService } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord } from '../types/ipam';
 
 const STORAGE_KEYS = {
   GROUPS: 'netipam_groups_v1',
   ALLOCATIONS: 'netipam_allocations_v1',
   DEVICE_CATEGORIES: 'netipam_device_categories_v1',
-  SERVICES: 'netipam_services_v1'
+  SERVICES: 'netipam_services_v1',
+  DNS_RECORDS: 'netipam_dns_records_v1'
 };
 
 export const INITIAL_GROUPS: IPGroup[] = [
@@ -763,20 +764,175 @@ export function saveServices(services: IPService[]): void {
   }
 }
 
+export const INITIAL_DNS_RECORDS: DnsRecord[] = [
+  {
+    id: 'dns-1',
+    domain: 'gateway.office.lan',
+    type: 'A',
+    value: '192.168.10.1',
+    ip: '192.168.10.1',
+    groupId: 'grp-lan-office',
+    ttl: 3600,
+    status: 'active',
+    description: 'Mikrotik Gateway LAN Lantai 1',
+    createdAt: '2026-01-10T08:00:00Z',
+    updatedAt: '2026-01-10T08:00:00Z'
+  },
+  {
+    id: 'dns-2',
+    domain: 'printer.finance.lan',
+    type: 'A',
+    value: '192.168.10.10',
+    ip: '192.168.10.10',
+    groupId: 'grp-lan-office',
+    ttl: 3600,
+    status: 'active',
+    description: 'HP LaserJet Printer Keuangan',
+    createdAt: '2026-01-18T08:00:00Z',
+    updatedAt: '2026-01-18T08:00:00Z'
+  },
+  {
+    id: 'dns-3',
+    domain: 'fw-dmz.corp.lan',
+    type: 'A',
+    value: '10.10.20.1',
+    ip: '10.10.20.1',
+    groupId: 'grp-server-dmz',
+    ttl: 3600,
+    status: 'active',
+    description: 'FortiGate 100F Firewall Core',
+    createdAt: '2026-01-12T08:00:00Z',
+    updatedAt: '2026-01-12T08:00:00Z'
+  },
+  {
+    id: 'dns-4',
+    domain: 'db-primary.corp.lan',
+    type: 'A',
+    value: '10.10.20.10',
+    ip: '10.10.20.10',
+    groupId: 'grp-server-dmz',
+    ttl: 1800,
+    status: 'active',
+    description: 'PostgreSQL 16 Primary Database',
+    createdAt: '2026-01-12T08:00:00Z',
+    updatedAt: '2026-01-12T08:00:00Z'
+  },
+  {
+    id: 'dns-5',
+    domain: 'db-replica.corp.lan',
+    type: 'A',
+    value: '10.10.20.11',
+    ip: '10.10.20.11',
+    groupId: 'grp-server-dmz',
+    ttl: 1800,
+    status: 'active',
+    description: 'PostgreSQL Standby Read-Only Replica',
+    createdAt: '2026-01-12T08:00:00Z',
+    updatedAt: '2026-01-12T08:00:00Z'
+  },
+  {
+    id: 'dns-6',
+    domain: 'portal.corp.lan',
+    type: 'A',
+    value: '10.10.20.20',
+    ip: '10.10.20.20',
+    groupId: 'grp-server-dmz',
+    ttl: 300,
+    status: 'active',
+    description: 'Aplikasi Web Portal Utama Karyawan',
+    createdAt: '2026-01-15T08:00:00Z',
+    updatedAt: '2026-01-15T08:00:00Z'
+  },
+  {
+    id: 'dns-7',
+    domain: 'www.corp.lan',
+    type: 'CNAME',
+    value: 'portal.corp.lan',
+    ttl: 300,
+    status: 'active',
+    description: 'Alias canonical name untuk portal internal',
+    createdAt: '2026-01-15T08:00:00Z',
+    updatedAt: '2026-01-15T08:00:00Z'
+  },
+  {
+    id: 'dns-8',
+    domain: 'cctv-nvr.security.lan',
+    type: 'A',
+    value: '172.16.50.10',
+    ip: '172.16.50.10',
+    groupId: 'grp-cctv-iot',
+    ttl: 3600,
+    status: 'active',
+    description: 'Hikvision NVR Central Server',
+    createdAt: '2026-01-15T08:00:00Z',
+    updatedAt: '2026-01-15T08:00:00Z'
+  },
+  {
+    id: 'dns-9',
+    domain: 'corp.lan',
+    type: 'MX',
+    value: 'portal.corp.lan',
+    priority: 10,
+    ttl: 3600,
+    status: 'active',
+    description: 'Primary Internal Mail Exchange Server',
+    createdAt: '2026-01-15T08:00:00Z',
+    updatedAt: '2026-01-15T08:00:00Z'
+  },
+  {
+    id: 'dns-10',
+    domain: 'ns1.corp.lan',
+    type: 'A',
+    value: '192.168.10.1',
+    ip: '192.168.10.1',
+    groupId: 'grp-lan-office',
+    ttl: 86400,
+    status: 'active',
+    description: 'Primary DNS Resolver / Nameserver',
+    createdAt: '2026-01-10T08:00:00Z',
+    updatedAt: '2026-01-10T08:00:00Z'
+  }
+];
+
+export function loadDnsRecords(): DnsRecord[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.DNS_RECORDS);
+    if (!raw) {
+      saveDnsRecords(INITIAL_DNS_RECORDS);
+      return INITIAL_DNS_RECORDS;
+    }
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error('Error loading DNS records:', err);
+    return INITIAL_DNS_RECORDS;
+  }
+}
+
+export function saveDnsRecords(records: DnsRecord[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.DNS_RECORDS, JSON.stringify(records));
+  } catch (err) {
+    console.error('Error saving DNS records:', err);
+  }
+}
+
 export function resetDemoData(): { 
   groups: IPGroup[]; 
   allocations: IPAllocation[]; 
   categories: DeviceCategory[];
   services: IPService[];
+  dnsRecords: DnsRecord[];
 } {
   saveGroups(INITIAL_GROUPS);
   saveAllocations(INITIAL_ALLOCATIONS);
   saveDeviceCategories(DEFAULT_DEVICE_CATEGORIES);
   saveServices(INITIAL_SERVICES);
+  saveDnsRecords(INITIAL_DNS_RECORDS);
   return { 
     groups: INITIAL_GROUPS, 
     allocations: INITIAL_ALLOCATIONS, 
     categories: DEFAULT_DEVICE_CATEGORIES,
-    services: INITIAL_SERVICES
+    services: INITIAL_SERVICES,
+    dnsRecords: INITIAL_DNS_RECORDS
   };
 }

@@ -133,16 +133,18 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
       {/* Main Login / Register Card */}
       <div className="w-full max-w-md relative z-10">
 
-        {/* Back to Home Button */}
+        {/* Back to Home Button (Centered) */}
         {onBackToHome && !hasNoUsers && (
-          <button
-            type="button"
-            onClick={onBackToHome}
-            className="mb-3 inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-xs transition-all cursor-pointer group"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-            <span>Kembali ke Halaman Beranda (Home)</span>
-          </button>
+          <div className="flex justify-center mb-3">
+            <button
+              type="button"
+              onClick={onBackToHome}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-xs transition-all cursor-pointer group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Kembali ke Halaman Beranda (Home)</span>
+            </button>
+          </div>
         )}
         
         {/* Card Body */}
@@ -281,7 +283,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
                   Selamat Datang
                 </h1>
                 <p className="text-xs text-slate-500 mt-1">
-                  Silakan login untuk mengakses sistem manajemen IP Address
+                  Silakan login untuk mengakses sistem manajemen IP & DNS
                 </p>
               </div>
 

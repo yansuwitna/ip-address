@@ -11,11 +11,13 @@ import {
   Layers,
   ArrowUpDown,
   Cpu,
-  ServerCog
+  ServerCog,
+  Printer
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceType, IPService, DeviceCategory } from '../types/ipam';
 import { ipToInt, findNextAvailableIp } from '../utils/ipCalculator';
 import { getCategoryIconComponent } from './CategoriesView';
+import { showConfirm, showWarning, showSuccess } from '../utils/swal';
 
 interface IPTableProps {
   group: IPGroup;
@@ -28,6 +30,7 @@ interface IPTableProps {
   onBatchReserve: () => void;
   onPingAllocation: (allocation: IPAllocation) => void;
   onManageServices: (allocation: IPAllocation) => void;
+  onOpenPrint?: () => void;
 }
 
 export const IPTable: React.FC<IPTableProps> = ({
@@ -40,7 +43,8 @@ export const IPTable: React.FC<IPTableProps> = ({
   onDeleteAllocation,
   onBatchReserve,
   onPingAllocation,
-  onManageServices
+  onManageServices,
+  onOpenPrint
 }) => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -202,6 +206,18 @@ export const IPTable: React.FC<IPTableProps> = ({
             <Layers className="w-3.5 h-3.5 text-purple-600" />
             <span>Reservasi Rentang</span>
           </button>
+
+          {/* Cetak Button */}
+          {onOpenPrint && (
+            <button
+              onClick={onOpenPrint}
+              title="Cetak Laporan Alokasi Host Subnet Ini (A4)"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-slate-200"
+            >
+              <Printer className="w-3.5 h-3.5 text-slate-600" />
+              <span>Cetak</span>
+            </button>
+          )}
 
           {/* Add Allocation Button */}
           <button
@@ -438,17 +454,52 @@ export const IPTable: React.FC<IPTableProps> = ({
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button
-                          onClick={() => {
-                            if (window.confirm(`Lepaskan / hapus IP ${item.ip} (${item.hostname}) dari sistem?`)) {
-                              onDeleteAllocation(item.id);
-                            }
-                          }}
-                          title="Lepaskan IP Ini"
-                          className="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        {(() => {
+                          const hasServices = itemServices.length > 0;
+                          if (hasServices) {
+                            return (
+                              <button
+                                type="button"
+                                disabled={true}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  showWarning(
+                                    'IP Tidak Dapat Dihapus',
+                                    `Alamat IP ${item.ip} (${item.hostname}) tidak dapat dihapus karena masih memiliki ${itemServices.length} data layanan atau port aktif. Silakan hapus seluruh data layanan terlebih dahulu.`
+                                  );
+                                }}
+                                title={`Tidak dapat dihapus: masih ada ${itemServices.length} data layanan atau port aktif pada IP ini.`}
+                                className="p-1.5 text-slate-300 dark:text-slate-600 cursor-not-allowed rounded-lg transition-colors border border-transparent"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            );
+                          }
+
+                          return (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const confirmed = await showConfirm({
+                                  title: 'Hapus Alokasi IP?',
+                                  text: `Apakah Anda yakin ingin melepaskan alokasi IP ${item.ip} (${item.hostname}) dari subnet ${group.name}?`,
+                                  confirmButtonText: 'Ya, Hapus',
+                                  cancelButtonText: 'Batal',
+                                  isDanger: true
+                                });
+                                if (confirmed) {
+                                  onDeleteAllocation(item.id);
+                                  showSuccess('Alokasi IP Dihapus', `IP ${item.ip} berhasil dilepaskan.`);
+                                }
+                              }}
+                              title="Lepaskan IP Ini"
+                              className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          );
+                        })()}
                       </div>
                     </td>
                   </tr>

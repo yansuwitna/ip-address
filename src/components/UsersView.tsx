@@ -119,7 +119,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
               Manajemen Akun Pengguna
             </h2>
             <p className="text-xs text-slate-500">
-              Kelola kredensial login, nama profil, email, dan kata sandi akun sistem IP Address.
+              Kelola kredensial login, nama profil, email, dan kata sandi akun sistem IP & DNS.
             </p>
 
           </div>
@@ -241,7 +241,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
           <div className="p-4 bg-blue-50/60 rounded-2xl border border-blue-100 text-xs text-blue-900 flex items-start gap-3">
             <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="leading-relaxed">
-              <strong>Sistem Akun Tunggal (Single User):</strong> Sistem IP Address dikonfigurasi untuk menggunakan 1 akun utama terpusat. Anda dapat memperbarui nama, username, email, dan kata sandi kapan saja melalui tombol ubah di atas.
+              <strong>Sistem Akun Tunggal (Single User):</strong> Sistem IP & DNS dikonfigurasi untuk menggunakan 1 akun utama terpusat. Anda dapat memperbarui nama, username, email, dan kata sandi kapan saja melalui tombol ubah di atas.
             </div>
           </div>
 
@@ -263,7 +263,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
                     {singleUser ? 'Ubah Profil & Kata Sandi' : 'Buat Akun Pengguna'}
                   </h3>
                   <p className="text-[11px] text-slate-500">
-                    Perbarui informasi akun sistem IP Address
+                    Perbarui informasi akun sistem IP & DNS
                   </p>
                 </div>
               </div>

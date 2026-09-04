@@ -3,6 +3,7 @@ import { X, Server, Sparkles, AlertTriangle } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceType, IPStatus, DeviceCategory } from '../types/ipam';
 import { isValidIpv4, isIpInCidr, isValidMac, findNextAvailableIp } from '../utils/ipCalculator';
 import { DEFAULT_DEVICE_CATEGORIES } from '../utils/storage';
+import { showWarning } from '../utils/swal';
 
 interface IPAllocationModalProps {
   isOpen: boolean;
@@ -95,7 +96,7 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
     if (nextFree) {
       setIp(nextFree);
     } else {
-      alert('Tidak ada IP kosong tersisa di subnet ini!');
+      showWarning('Subnet Penuh', 'Tidak ada alamat IP kosong tersisa di subnet ini!');
     }
   };
 
