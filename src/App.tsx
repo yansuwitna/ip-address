@@ -30,7 +30,6 @@ import { Header } from './components/Header';
 import { DashboardView } from './components/DashboardView';
 import { IPMatrixGrid } from './components/IPMatrixGrid';
 import { IPTable } from './components/IPTable';
-import { PingView } from './components/PingView';
 import { BackupView } from './components/BackupView';
 import { GroupModal } from './components/GroupModal';
 import { IPAllocationModal } from './components/IPAllocationModal';
@@ -200,7 +199,6 @@ export const App: React.FC = () => {
       case 'dashboard': return 'Dashboard';
       case 'groups': return 'Grup IP (Subnet)';
       case 'allocations': return 'Alokasi IP Host';
-      case 'ping': return 'Diagnostik Ping';
       case 'backup': return 'Cadangan & Data';
     }
   };
@@ -563,13 +561,7 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 4: DIAGNOSTIK PING */}
-          {currentTab === 'ping' && (
-            <PingView
-              allocations={allocations}
-              onUpdateStatus={handleUpdatePingStatus}
-            />
-          )}
+
 
           {/* TAB 5: CADANGAN & DATA */}
           {currentTab === 'backup' && (

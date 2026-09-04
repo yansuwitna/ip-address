@@ -4,16 +4,15 @@ import {
   LayoutDashboard, 
   Layers, 
   Server, 
-  Activity, 
   Database, 
   LogOut, 
   ShieldCheck, 
-  X,
+  X, 
   ChevronRight
 } from 'lucide-react';
 import { User } from '../types/auth';
 
-export type NavTab = 'dashboard' | 'groups' | 'allocations' | 'ping' | 'backup';
+export type NavTab = 'dashboard' | 'groups' | 'allocations' | 'backup';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -59,12 +58,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200'
     },
     {
-      id: 'ping' as NavTab,
-      label: 'Diagnostik Ping',
-      icon: Activity,
-      description: 'Uji Konektivitas ICMP'
-    },
-    {
       id: 'backup' as NavTab,
       label: 'Cadangan & Data',
       icon: Database,
@@ -93,7 +86,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }`}>
         
         {/* Brand Header (Static Top) */}
-        <div className="h-14 px-5 border-b border-slate-200/80 flex items-center justify-between flex-shrink-0 bg-white">
+        <div className="h-16 px-5 border-b border-slate-200/80 flex items-center justify-between flex-shrink-0 bg-white">
           <div className="flex items-center space-x-3">
             <div className="p-2.5 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
               <Network className="w-5 h-5" />
