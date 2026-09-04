@@ -23,7 +23,7 @@ import {
   saveAllocations, 
   resetDemoData 
 } from './utils/storage';
-import { exportToCsv } from './utils/exportImport';
+import { exportToXlsx } from './utils/exportImport';
 import { parseCidr } from './utils/ipCalculator';
 
 import { Login } from './components/Login';
@@ -284,61 +284,26 @@ export const App: React.FC = () => {
                 /* Sub-tampilan: Kelola Alokasi IP Host untuk Subnet Terpilih */
                 <div className="space-y-4">
                   {/* Top Bar: Tombol Kembali & Tambah Alokasi */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center justify-between gap-3">
                     <button
                       onClick={() => setIsViewingGroupAllocations(false)}
-                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer w-fit"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold shadow-xs transition-all cursor-pointer group"
                     >
-                      <ArrowLeft className="w-4 h-4" />
-                      <span>Kembali ke Daftar Subnet</span>
+                      <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-slate-500 group-hover:text-slate-900" />
+                      <span>Kembali</span>
                     </button>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingAlloc(null);
-                          setPresetIp(undefined);
-                          setIsAllocModalOpen(true);
-                        }}
-                        className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Alokasikan IP Host</span>
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* Subnet Selector Pills Bar */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xs flex items-center gap-2 overflow-x-auto">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2 flex-shrink-0 flex items-center gap-1.5">
-                      <Layers className="w-4 h-4 text-blue-600" />
-                      <span>Pilih Subnet:</span>
-                    </span>
-                    {groups.map(g => {
-                      const isSel = g.id === activeGroup.id;
-                      const gUsed = allocations.filter(a => a.groupId === g.id && a.status === 'used').length;
-                      return (
-                        <button
-                          key={g.id}
-                          onClick={() => setSelectedGroupId(g.id)}
-                          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                            isSel
-                              ? 'bg-blue-600 text-white shadow-xs font-bold'
-                              : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
-                          }`}
-                        >
-                          <span 
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: isSel ? '#ffffff' : g.color || '#3b82f6' }}
-                          />
-                          <span>{g.name}</span>
-                          <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                            isSel ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-600'
-                          }`}>
-                            {gUsed}
-                          </span>
-                        </button>
-                      );
-                    })}
+                    <button
+                      onClick={() => {
+                        setEditingAlloc(null);
+                        setPresetIp(undefined);
+                        setIsAllocModalOpen(true);
+                      }}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Alokasikan IP Host</span>
+                    </button>
                   </div>
 
                   {/* Active Group Header Card */}
@@ -388,7 +353,7 @@ export const App: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* View Mode Toggle & CSV Export */}
+                      {/* View Mode Toggle & XLSX Export */}
                       <div className="flex items-center gap-2 self-start sm:self-center">
                         <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
                           <button
@@ -418,11 +383,12 @@ export const App: React.FC = () => {
                         </div>
 
                         <button
-                          onClick={() => exportToCsv(activeGroup, allocations.filter(a => a.groupId === activeGroup.id))}
-                          title="Ekspor CSV Grup Ini"
-                          className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-colors cursor-pointer"
+                          onClick={() => exportToXlsx(activeGroup, allocations.filter(a => a.groupId === activeGroup.id))}
+                          title="Ekspor Laporan Excel (.xlsx)"
+                          className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs"
                         >
-                          <Download className="w-4 h-4" />
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Ekspor (.xlsx)</span>
                         </button>
                       </div>
 
@@ -634,21 +600,6 @@ export const App: React.FC = () => {
           )}
 
         </main>
-
-        {/* Footer */}
-        <footer className="border-t border-slate-200 bg-white py-4 mt-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2 font-medium">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-800">NetIPAM Pro</span>
-              <span>•</span>
-              <span>Sistem Manajemen Alamat & Grup IP Terintegrasi</span>
-            </div>
-            <div>
-              Masuk sebagai: <strong className="text-blue-600 font-bold">{currentUser.name}</strong> ({currentUser.role})
-            </div>
-          </div>
-        </footer>
-
       </div>
 
       {/* Modals */}

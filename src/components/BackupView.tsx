@@ -10,7 +10,7 @@ import {
   AlertTriangle 
 } from 'lucide-react';
 import { IPGroup, IPAllocation } from '../types/ipam';
-import { exportBackupJson, parseImportJson, exportToCsv } from '../utils/exportImport';
+import { exportBackupJson, parseImportJson, exportToXlsx } from '../utils/exportImport';
 
 interface BackupViewProps {
   groups: IPGroup[];
@@ -138,7 +138,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
 
       </div>
 
-      {/* CSV Export by Group */}
+      {/* Excel (.xlsx) Export by Group */}
       <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
         <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
           <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
@@ -146,10 +146,10 @@ export const BackupView: React.FC<BackupViewProps> = ({
           </div>
           <div>
             <h3 className="font-bold text-slate-900 text-sm">
-              Ekspor Laporan Spreadsheet (CSV)
+              Ekspor Laporan Excel (.xlsx)
             </h3>
             <p className="text-xs text-slate-500">
-              Unduh data inventaris IP per grup subnet untuk dibuka di Microsoft Excel
+              Unduh data inventaris IP per grup subnet dalam format Microsoft Excel (.xlsx)
             </p>
           </div>
         </div>
@@ -172,8 +172,8 @@ export const BackupView: React.FC<BackupViewProps> = ({
                 </div>
 
                 <button
-                  onClick={() => exportToCsv(group, groupAllocs)}
-                  title={`Unduh CSV ${group.name}`}
+                  onClick={() => exportToXlsx(group, groupAllocs)}
+                  title={`Unduh Excel (.xlsx) ${group.name}`}
                   className="p-2 bg-white hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200 rounded-xl transition-all cursor-pointer"
                 >
                   <Download className="w-4 h-4" />
