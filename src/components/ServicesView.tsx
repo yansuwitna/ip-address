@@ -574,7 +574,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40/80 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
+                <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
                   <th className="py-3 px-4">Status Port</th>
                   <th className="py-3 px-4">Port / Protokol</th>
                   <th className="py-3 px-4">Nama Layanan & Kategori</th>

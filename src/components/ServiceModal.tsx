@@ -216,7 +216,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           
           {/* Target IP Address & Host Info */}
-          <div className="bg-blue-50 dark:bg-blue-900/40/70 border border-blue-200 dark:border-blue-800/80 rounded-2xl p-3.5">
+          <div className="bg-blue-50 dark:bg-blue-900/70 border border-blue-200 dark:border-blue-800/80 rounded-2xl p-3.5">
             <label className="block text-xs font-bold text-blue-900 mb-1.5">
               Alamat IP Target *
             </label>

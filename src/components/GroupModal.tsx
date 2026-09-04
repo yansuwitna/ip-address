@@ -188,7 +188,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
 
           {/* Subnet Preview Box */}
           {subnetInfo && (
-            <div className="bg-blue-50 dark:bg-blue-900/40/60 border border-blue-200 dark:border-blue-800/80 rounded-xl p-3 text-xs space-y-1 font-mono text-slate-700 dark:text-slate-300">
+            <div className="bg-blue-50 dark:bg-blue-900/60 border border-blue-200 dark:border-blue-800/80 rounded-xl p-3 text-xs space-y-1 font-mono text-slate-700 dark:text-slate-300">
               <div className="text-[11px] text-blue-800 font-sans font-bold flex items-center gap-1">
                 <Info className="w-3.5 h-3.5 text-blue-600" />
                 <span>Kalkulasi Otomatis:</span>

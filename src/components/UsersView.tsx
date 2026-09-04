@@ -205,7 +205,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
           {/* Details Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/40/80 rounded-2xl border border-slate-100 space-y-1">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-100 space-y-1">
               <div className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-slate-400" />
                 <span>Alamat Email</span>
@@ -215,7 +215,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/40/80 rounded-2xl border border-slate-100 space-y-1">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-100 space-y-1">
               <div className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-slate-400" />
                 <span>Sesi Terakhir Login</span>
@@ -225,7 +225,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/40/80 rounded-2xl border border-slate-100 space-y-1">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-100 space-y-1">
               <div className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-slate-400" />
                 <span>Tanggal Terdaftar</span>
@@ -238,7 +238,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
           </div>
 
           {/* Single User Architecture Notice */}
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/40/60 rounded-2xl border border-blue-100 dark:border-blue-800/60 text-xs text-blue-900 flex items-start gap-3">
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/60 rounded-2xl border border-blue-100 dark:border-blue-800/60 text-xs text-blue-900 flex items-start gap-3">
             <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="leading-relaxed">
               <strong>Sistem Akun Tunggal (Single User):</strong> Sistem IP & DNS dikonfigurasi untuk menggunakan 1 akun utama terpusat. Anda dapat memperbarui nama, username, email, dan kata sandi kapan saja melalui tombol ubah di atas.

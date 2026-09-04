@@ -55,7 +55,7 @@ export const GroupList: React.FC<GroupListProps> = ({
       </div>
 
       {/* "All Groups" Filter item */}
-      <div className="p-2 border-b border-slate-100 bg-slate-50 dark:bg-slate-800/40/50">
+      <div className="p-2 border-b border-slate-100 bg-slate-50 dark:bg-slate-800/50">
         <button
           onClick={() => onSelectGroup(null)}
           className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-between cursor-pointer ${
@@ -100,7 +100,7 @@ export const GroupList: React.FC<GroupListProps> = ({
                 onClick={() => onSelectGroup(group.id)}
                 className={`group relative p-3 rounded-xl cursor-pointer transition-all border ${
                   isSelected
-                    ? 'bg-blue-50 dark:bg-blue-900/40/70 border-blue-300 shadow-xs ring-1 ring-blue-400/20'
+                    ? 'bg-blue-50 dark:bg-blue-900/70 border-blue-300 shadow-xs ring-1 ring-blue-400/20'
                     : 'bg-white dark:bg-slate-900 border-slate-200/80 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:border-slate-300 dark:border-slate-600'
                 }`}
               >

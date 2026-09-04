@@ -218,7 +218,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
 
           {/* Summary Preview */}
           {ipListPreview.length > 0 && (
-            <div className="bg-purple-50 dark:bg-purple-900/40/60 border border-purple-200 dark:border-purple-800 rounded-xl p-3.5 text-xs space-y-1">
+            <div className="bg-purple-50 dark:bg-purple-900/60 border border-purple-200 dark:border-purple-800 rounded-xl p-3.5 text-xs space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-slate-600 dark:text-slate-400 font-medium">Total IP baru yang akan dibuat:</span>
                 <strong className="text-purple-700 font-mono text-sm">{ipListPreview.length - conflictCount} IP baru</strong>

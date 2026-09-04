@@ -58,7 +58,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-5xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[95vh]">
         
         {/* Top Action Bar (Hidden when printing via .no-print) */}
-        <div className="no-print p-4 sm:px-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/40/80 dark:bg-slate-800/80 flex-shrink-0">
+        <div className="no-print p-4 sm:px-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/80 flex-shrink-0">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-blue-600 text-white rounded-xl shadow-xs">
               <Printer className="w-4 h-4" />
@@ -179,7 +179,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                       allocations.map((a, idx) => {
                         const itemServices = services.filter(s => s.allocationId === a.id || s.ip === a.ip);
                         return (
-                          <tr key={a.id} className={idx % 2 === 1 ? 'bg-slate-50 dark:bg-slate-800/40/70' : 'bg-white dark:bg-slate-900'}>
+                          <tr key={a.id} className={idx % 2 === 1 ? 'bg-slate-50 dark:bg-slate-800/70' : 'bg-white dark:bg-slate-900'}>
                             <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center text-slate-500 dark:text-slate-400">
                               {idx + 1}
                             </td>
@@ -239,7 +239,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                       </tr>
                     ) : (
                       dnsRecords.map((r, idx) => (
-                        <tr key={r.id} className={idx % 2 === 1 ? 'bg-slate-50 dark:bg-slate-800/40/70' : 'bg-white dark:bg-slate-900'}>
+                        <tr key={r.id} className={idx % 2 === 1 ? 'bg-slate-50 dark:bg-slate-800/70' : 'bg-white dark:bg-slate-900'}>
                           <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center text-slate-500 dark:text-slate-400">
                             {idx + 1}
                           </td>

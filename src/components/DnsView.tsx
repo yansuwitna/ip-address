@@ -420,7 +420,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40/80 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
+              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
                 <th className="py-3 px-4">Nama Host / FQDN</th>
                 <th className="py-3 px-4 text-center">Tipe</th>
                 <th className="py-3 px-4">Target Nilai (IP / Domain)</th>
