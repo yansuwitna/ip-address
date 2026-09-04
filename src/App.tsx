@@ -483,7 +483,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className={`h-screen w-screen overflow-hidden flex bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-poppins antialiased selection:bg-blue-600 selection:text-white`}>
+    <div className={`h-screen w-screen overflow-hidden flex bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-poppins antialiased selection:bg-blue-600 selection:text-white ${theme === 'dark' ? 'dark' : 'light'}`}>
       
       {/* 1. Left STATIC Dedicated Sidebar (Permanently anchored & pinned) */}
       <Sidebar

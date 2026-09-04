@@ -138,7 +138,7 @@ export const DnsModal: React.FC<DnsModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:items-center sm:pt-4 overflow-y-auto p-4 bg-slate-900/50 backdrop-blur-xs">
       <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
         
         {/* Header */}

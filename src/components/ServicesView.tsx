@@ -250,7 +250,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
         </div>
 
         {/* Action Button: Tambah Layanan */}
-        <div className="flex items-center gap-2 self-start sm:self-center">
+        <div className="flex items-center gap-2 self-center">
           <button
             onClick={handleTestAllPorts}
             disabled={isTestingAll || filteredServices.length === 0}
@@ -285,13 +285,13 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
           
           {/* Host Info Context */}
           <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Fokus Host IP:
               </span>
 
               {activeAllocation ? (
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                   <span className="font-mono text-base font-black text-slate-900 dark:text-slate-100 bg-blue-50 dark:bg-blue-900/40 px-2.5 py-0.5 rounded-xl border border-blue-200 dark:border-blue-800">
                     {activeAllocation.ip}
                   </span>
@@ -491,7 +491,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
           </div>
 
           {/* Filters Group */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
             
             {/* Subnet Filter (if viewing all) */}
             {selectedIp === 'all' && (

@@ -73,7 +73,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
   return (
     <div className="space-y-4">
       {/* 4 Stat Cards in Bright Theme */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
         {/* Card 1: Total Kapasitas IP */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
@@ -167,7 +167,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
       </div>
 
       {/* Device Breakdown Tags */}
-      <div className="flex flex-wrap items-center gap-2 text-xs bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
+      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
         <span className="text-slate-500 dark:text-slate-400 font-medium mr-1 flex items-center gap-1">
           Distribusi Perangkat:
         </span>

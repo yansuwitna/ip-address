@@ -128,7 +128,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
         {singleUser && (
           <button
             onClick={openEditModal}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer flex-shrink-0"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer w-fit mx-auto sm:mx-0 flex-shrink-0"
           >
             <Edit3 className="w-4 h-4" />
             <span>Edit Profil & Kata Sandi</span>
@@ -250,7 +250,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
 
       {/* Edit / Create User Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:items-center sm:pt-4 overflow-y-auto p-4 bg-slate-900/40 backdrop-blur-xs">
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
             
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">

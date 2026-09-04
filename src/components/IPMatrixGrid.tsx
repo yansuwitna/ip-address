@@ -194,7 +194,7 @@ export const IPMatrixGrid: React.FC<IPMatrixGridProps> = ({
             const isGateway = ip === group.gateway;
             const lastOctet = ip.split('.').pop();
 
-            let tileClasses = "border cursor-pointer transition-all duration-150 flex flex-col items-center justify-center rounded-xl p-1 select-none relative shadow-2xs ";
+            let tileClasses = "aspect-square border cursor-pointer transition-all duration-150 flex flex-col items-center justify-center rounded-xl p-1 select-none relative shadow-2xs ";
             
             if (isGateway) {
               tileClasses += "bg-sky-100 dark:bg-sky-900/60 border-sky-400 dark:border-sky-500/60 text-sky-900 dark:text-sky-100 hover:bg-sky-200 dark:hover:bg-sky-800/80 hover:scale-105 font-bold";

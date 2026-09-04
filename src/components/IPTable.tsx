@@ -146,7 +146,7 @@ export const IPTable: React.FC<IPTableProps> = ({
       <div className="p-4 border-b border-slate-200/80 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
         
         {/* Search & Filters */}
-        <div className="flex flex-wrap items-center gap-2 flex-1">
+        <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 flex-1">
           {/* Search Box */}
           <div className="relative min-w-[200px] flex-1 sm:flex-none">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -185,7 +185,7 @@ export const IPTable: React.FC<IPTableProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2">
           {/* Next Free IP Button */}
           {nextFreeIp && (
             <button

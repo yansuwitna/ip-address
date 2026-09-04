@@ -161,7 +161,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
           {/* Uji Resolusi Simulator Button */}
           <button
             onClick={() => {
@@ -368,7 +368,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
         {/* Search & Filter Header */}
         <div className="p-4 border-b border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           
-          <div className="flex flex-wrap items-center gap-2 flex-1">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 flex-1">
             {/* Search Input */}
             <div className="relative min-w-[200px] flex-1 sm:flex-none">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />

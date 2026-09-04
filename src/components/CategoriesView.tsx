@@ -183,7 +183,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
 
         <button
           onClick={openAddModal}
-          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer w-fit"
+          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer w-fit mx-auto sm:mx-0"
         >
           <Plus className="w-4 h-4" />
           <span>Tambah Kategori Baru</span>
