@@ -255,17 +255,23 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                           </button>
 
                           <button
+                            disabled={usageCount > 0}
                             onClick={() => {
-                              if (window.confirm(
-                                usageCount > 0
-                                  ? `Kategori "${cat.name}" saat ini digunakan oleh ${usageCount} alamat IP. Anda yakin ingin menghapus kategori ini?`
-                                  : `Hapus kategori "${cat.name}"?`
-                              )) {
+                              if (usageCount > 0) return;
+                              if (window.confirm(`Hapus kategori "${cat.name}"?`)) {
                                 onDeleteCategory(cat.id);
                               }
                             }}
-                            title="Hapus Kategori (Kurangi)"
-                            className="p-2 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-xl transition-all cursor-pointer"
+                            title={
+                              usageCount > 0
+                                ? `Tidak dapat dihapus: kategori ini sedang digunakan oleh ${usageCount} IP`
+                                : "Hapus Kategori (Kurangi)"
+                            }
+                            className={`p-2 rounded-xl transition-all ${
+                              usageCount > 0
+                                ? 'bg-slate-100 text-slate-300 cursor-not-allowed border border-slate-200/70'
+                                : 'bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white cursor-pointer'
+                            }`}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
