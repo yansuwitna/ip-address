@@ -79,7 +79,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Host Usable</span>
-            <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
+            <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/60">
               <Activity className="w-4 h-4" />
             </div>
           </div>
@@ -100,7 +100,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">IP Terpakai</span>
-            <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+            <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/60">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
@@ -108,7 +108,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
             <span className="text-2xl sm:text-3xl font-extrabold text-emerald-600 tracking-tight">
               {usedCount}
             </span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
               {totalUsable > 0 ? ((usedCount / totalUsable) * 100).toFixed(1) : 0}%
             </span>
           </div>
@@ -121,7 +121,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Reservasi & DHCP</span>
-            <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
+            <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-800/60">
               <Clock className="w-4 h-4" />
             </div>
           </div>
@@ -142,7 +142,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">IP Bebas / Siap</span>
-            <div className="p-2.5 rounded-xl bg-sky-50 text-sky-600 border border-sky-100">
+            <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-800/60">
               <AlertCircle className="w-4 h-4" />
             </div>
           </div>
@@ -173,42 +173,42 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
         </span>
         
         {deviceCounts.server > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 font-medium">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-medium">
             <Server className="w-3.5 h-3.5" />
             <span>Server: <strong>{deviceCounts.server}</strong></span>
           </span>
         )}
 
         {(deviceCounts.router > 0 || deviceCounts.switch > 0) && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-medium">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-medium">
             <Router className="w-3.5 h-3.5" />
             <span>Network SW/RT: <strong>{deviceCounts.router + deviceCounts.switch}</strong></span>
           </span>
         )}
 
         {deviceCounts.access_point > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200 font-medium">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-cyan-50 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 font-medium">
             <Wifi className="w-3.5 h-3.5" />
             <span>AP WiFi: <strong>{deviceCounts.access_point}</strong></span>
           </span>
         )}
 
         {deviceCounts.pc_workstation > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 font-medium">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-medium">
             <Monitor className="w-3.5 h-3.5" />
             <span>Workstation: <strong>{deviceCounts.pc_workstation}</strong></span>
           </span>
         )}
 
         {deviceCounts.cctv > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-medium">
             <Video className="w-3.5 h-3.5" />
             <span>CCTV: <strong>{deviceCounts.cctv}</strong></span>
           </span>
         )}
 
         {deviceCounts.printer > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 font-medium">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-medium">
             <Printer className="w-3.5 h-3.5" />
             <span>Printer: <strong>{deviceCounts.printer}</strong></span>
           </span>

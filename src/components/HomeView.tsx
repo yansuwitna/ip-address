@@ -62,7 +62,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
           {/* Center Badges (Desktop) */}
           <div className="hidden md:flex items-center gap-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Sistem Aktif</span>
             </span>
@@ -99,7 +99,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* 2. HERO SECTION */}
       <section className="relative pt-12 pb-8 sm:pt-16 sm:pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
         
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/80 text-xs font-semibold shadow-xs">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/80 text-xs font-semibold shadow-xs">
           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
           <span>Sistem Manajemen IP & DNS Terintegrasi</span>
         </div>
@@ -190,7 +190,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all space-y-3">
-            <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl w-fit">
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-2xl w-fit">
               <Layers className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
@@ -202,7 +202,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all space-y-3">
-            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl w-fit">
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-2xl w-fit">
               <Activity className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
@@ -214,7 +214,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all space-y-3">
-            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl w-fit">
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-2xl w-fit">
               <Database className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">

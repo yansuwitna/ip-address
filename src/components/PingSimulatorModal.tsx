@@ -89,7 +89,7 @@ export const PingSimulatorModal: React.FC<PingSimulatorModalProps> = ({
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+            <div className="p-2 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800/60">
               <Activity className="w-5 h-5" />
             </div>
             <div>
@@ -168,8 +168,8 @@ export const PingSimulatorModal: React.FC<PingSimulatorModalProps> = ({
           {resultStatus && (
             <div className={`p-3.5 rounded-2xl border flex items-center gap-2.5 text-xs font-medium ${
               resultStatus === 'online'
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                : 'bg-rose-50 border-rose-200 text-rose-800'
+                ? 'bg-emerald-50 dark:bg-emerald-900/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                : 'bg-rose-50 dark:bg-rose-900/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
             }`}>
               {resultStatus === 'online' ? (
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />

@@ -48,7 +48,7 @@ export const GroupList: React.FC<GroupListProps> = ({
         <button
           onClick={onAddGroup}
           title="Tambah Subnet / Grup IP Baru"
-          className="p-1.5 bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white rounded-lg transition-all cursor-pointer"
+          className="p-1.5 bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white rounded-lg transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4" />
         </button>
@@ -100,7 +100,7 @@ export const GroupList: React.FC<GroupListProps> = ({
                 onClick={() => onSelectGroup(group.id)}
                 className={`group relative p-3 rounded-xl cursor-pointer transition-all border ${
                   isSelected
-                    ? 'bg-blue-50/70 border-blue-300 shadow-xs ring-1 ring-blue-400/20'
+                    ? 'bg-blue-50 dark:bg-blue-900/40/70 border-blue-300 shadow-xs ring-1 ring-blue-400/20'
                     : 'bg-white dark:bg-slate-900 border-slate-200/80 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:border-slate-300 dark:border-slate-600'
                 }`}
               >
@@ -154,7 +154,7 @@ export const GroupList: React.FC<GroupListProps> = ({
                           }
                         }}
                         title="Hapus Grup"
-                        className="p-1 hover:bg-rose-100 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                        className="p-1 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -167,7 +167,7 @@ export const GroupList: React.FC<GroupListProps> = ({
                       {group.cidr}
                     </span>
                     {group.vlanId && (
-                      <span className="bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded text-[11px] font-medium border border-purple-200">
+                      <span className="bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded text-[11px] font-medium border border-purple-200 dark:border-purple-800">
                         VLAN {group.vlanId}
                       </span>
                     )}

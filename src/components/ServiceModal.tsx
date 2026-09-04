@@ -216,7 +216,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           
           {/* Target IP Address & Host Info */}
-          <div className="bg-blue-50/70 border border-blue-200/80 rounded-2xl p-3.5">
+          <div className="bg-blue-50 dark:bg-blue-900/40/70 border border-blue-200 dark:border-blue-800/80 rounded-2xl p-3.5">
             <label className="block text-xs font-bold text-blue-900 mb-1.5">
               Alamat IP Target *
             </label>
@@ -257,7 +257,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                   <div className="font-semibold flex items-center gap-1.5">
                     <span className="truncate">{currentAlloc.hostname}</span>
                     {currentGroup && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-medium">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 font-medium">
                         {currentGroup.name}
                       </span>
                     )}
@@ -272,7 +272,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
 
           {/* Port Conflict Warning */}
           {conflictService && (
-            <div className="p-3 bg-amber-50 border border-amber-300 rounded-2xl flex items-start gap-2.5 text-xs text-amber-900 animate-in fade-in duration-200">
+            <div className="p-3 bg-amber-50 dark:bg-amber-900/40 border border-amber-300 rounded-2xl flex items-start gap-2.5 text-xs text-amber-900 animate-in fade-in duration-200">
               <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
                 <strong>Peringatan Potensi Bentrok Port:</strong> Port <code>{port}/{protocol}</code> sudah terdaftar pada IP ini untuk layanan "<strong>{conflictService.name}</strong>".
@@ -293,7 +293,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                 placeholder="Contoh: Nginx Web Server, PostgreSQL DB, OpenSSH"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               />
             </div>
 
@@ -311,12 +311,12 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                   placeholder="80, 443, 22..."
                   value={port}
                   onChange={(e) => handlePortChange(e.target.value ? parseInt(e.target.value, 10) : '')}
-                  className="w-2/3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  className="w-2/3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                 />
                 <select
                   value={protocol}
                   onChange={(e) => setProtocol(e.target.value as ServiceProtocol)}
-                  className="w-1/3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  className="w-1/3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 >
                   <option value="TCP">TCP</option>
                   <option value="UDP">UDP</option>
@@ -333,7 +333,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ServiceCategory)}
-                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 {SERVICE_CATEGORIES.map(cat => (
                   <option key={cat.id} value={cat.id}>
@@ -351,7 +351,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as ServiceStatus)}
-                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 <option value="active">🟢 Aktif / Terbuka (Listening / Open)</option>
                 <option value="inactive">🔴 Nonaktif (Closed / Disabled)</option>
@@ -369,7 +369,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                 placeholder="Contoh: v1.24.0, 16.1-alpine, OpenSSH 9.6"
                 value={version}
                 onChange={(e) => setVersion(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               />
             </div>
 
@@ -387,7 +387,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                     setUrl(e.target.value);
                     setIsCustomUrl(true);
                   }}
-                  className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl pl-3 pr-8 py-2 text-xs font-mono text-blue-700 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl pl-3 pr-8 py-2 text-xs font-mono text-blue-700 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                 />
                 {url && (
                   <a
@@ -414,7 +414,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
               placeholder="Contoh: Server database produksi utama transaksi e-commerce"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+              className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
             />
           </div>
 

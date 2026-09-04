@@ -223,7 +223,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* User Profile & Logout */}
         <div className="p-3 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40/70 dark:bg-slate-900/60 flex-shrink-0">
-          <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl hover:bg-white dark:bg-slate-900 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200/60 dark:hover:border-slate-700">
+          <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200/60 dark:hover:border-slate-700">
             <div className="flex items-center gap-2.5 truncate">
               {currentUser.avatar ? (
                 <img

@@ -276,17 +276,17 @@ export const COMMON_SERVICE_PRESETS: ServicePreset[] = [
 ];
 
 export const SERVICE_CATEGORIES: { id: ServiceCategory; label: string; color: string; badgeBg: string; badgeText: string }[] = [
-  { id: 'web', label: 'Web & API', color: '#2563eb', badgeBg: 'bg-blue-50 border-blue-200', badgeText: 'text-blue-700' },
-  { id: 'database', label: 'Basis Data (DB)', color: '#7c3aed', badgeBg: 'bg-purple-50 border-purple-200', badgeText: 'text-purple-700' },
-  { id: 'remote', label: 'Akses Remote / SSH', color: '#0284c7', badgeBg: 'bg-sky-50 border-sky-200', badgeText: 'text-sky-700' },
-  { id: 'network', label: 'Jaringan & Routing', color: '#059669', badgeBg: 'bg-emerald-50 border-emerald-200', badgeText: 'text-emerald-700' },
-  { id: 'security', label: 'Keamanan & VPN', color: '#dc2626', badgeBg: 'bg-rose-50 border-rose-200', badgeText: 'text-rose-700' },
-  { id: 'file', label: 'File & Storage', color: '#d97706', badgeBg: 'bg-amber-50 border-amber-200', badgeText: 'text-amber-700' },
-  { id: 'monitoring', label: 'Monitoring & Log', color: '#4f46e5', badgeBg: 'bg-indigo-50 border-indigo-200', badgeText: 'text-indigo-700' },
-  { id: 'streaming', label: 'Video & Streaming', color: '#0d9488', badgeBg: 'bg-teal-50 border-teal-200', badgeText: 'text-teal-700' },
-  { id: 'iot', label: 'IoT & Sensor', color: '#ea580c', badgeBg: 'bg-orange-50 border-orange-200', badgeText: 'text-orange-700' },
-  { id: 'mail', label: 'Email Service', color: '#9333ea', badgeBg: 'bg-fuchsia-50 border-fuchsia-200', badgeText: 'text-fuchsia-700' },
-  { id: 'other', label: 'Lainnya', color: '#64748b', badgeBg: 'bg-slate-50 border-slate-200', badgeText: 'text-slate-700' }
+  { id: 'web', label: 'Web & API', color: '#2563eb', badgeBg: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800', badgeText: 'text-blue-700 dark:text-blue-400' },
+  { id: 'database', label: 'Basis Data (DB)', color: '#7c3aed', badgeBg: 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800', badgeText: 'text-purple-700 dark:text-purple-400' },
+  { id: 'remote', label: 'Akses Remote / SSH', color: '#0284c7', badgeBg: 'bg-sky-50 dark:bg-sky-900/30 border-sky-200 dark:border-sky-800', badgeText: 'text-sky-700 dark:text-sky-400' },
+  { id: 'network', label: 'Jaringan & Routing', color: '#059669', badgeBg: 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800', badgeText: 'text-emerald-700 dark:text-emerald-400' },
+  { id: 'security', label: 'Keamanan & VPN', color: '#dc2626', badgeBg: 'bg-rose-50 dark:bg-rose-900/30 border-rose-200 dark:border-rose-800', badgeText: 'text-rose-700 dark:text-rose-400' },
+  { id: 'file', label: 'File & Storage', color: '#d97706', badgeBg: 'bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800', badgeText: 'text-amber-700 dark:text-amber-400' },
+  { id: 'monitoring', label: 'Monitoring & Log', color: '#4f46e5', badgeBg: 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800', badgeText: 'text-indigo-700 dark:text-indigo-400' },
+  { id: 'streaming', label: 'Video & Streaming', color: '#0d9488', badgeBg: 'bg-teal-50 dark:bg-teal-900/30 border-teal-200 dark:border-teal-800', badgeText: 'text-teal-700 dark:text-teal-400' },
+  { id: 'iot', label: 'IoT & Sensor', color: '#ea580c', badgeBg: 'bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800', badgeText: 'text-orange-700 dark:text-orange-400' },
+  { id: 'mail', label: 'Email Service', color: '#9333ea', badgeBg: 'bg-fuchsia-50 dark:bg-fuchsia-900/30 border-fuchsia-200 dark:border-fuchsia-800', badgeText: 'text-fuchsia-700 dark:text-fuchsia-400' },
+  { id: 'other', label: 'Lainnya', color: '#64748b', badgeBg: 'bg-slate-50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800', badgeText: 'text-slate-700 dark:text-slate-300' }
 ];
 
 export function getCategoryMeta(cat: ServiceCategory) {

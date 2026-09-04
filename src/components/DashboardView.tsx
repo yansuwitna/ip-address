@@ -50,7 +50,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-2xl border border-blue-100 dark:border-blue-800/60">
                 <Layers className="w-7 h-7" />
               </div>
               <div>
@@ -62,7 +62,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </h2>
               </div>
             </div>
-            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
               Subnet Aktif
             </span>
           </div>
@@ -85,7 +85,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100">
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-2xl border border-emerald-100 dark:border-emerald-800/60">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <div>
@@ -97,7 +97,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </h2>
               </div>
             </div>
-            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
               {overallUsedPct}% Terpakai
             </span>
           </div>
@@ -120,7 +120,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100">
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-100 dark:border-indigo-800/60">
                 <Cpu className="w-7 h-7" />
               </div>
               <div>
@@ -132,7 +132,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </h2>
               </div>
             </div>
-            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
               {categories.length} Tipe
             </span>
           </div>
@@ -177,15 +177,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               return (
                 <div 
                   key={cat.id}
-                  className="p-3.5 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40/60 hover:bg-white dark:bg-slate-900 hover:border-blue-300 hover:shadow-xs transition-all flex flex-col justify-between"
+                  className="p-3.5 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-300 hover:shadow-xs transition-all flex flex-col justify-between"
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="p-2 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
+                    <div className="p-2 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-800/60">
                       <IconComp className="w-4 h-4" />
                     </div>
                     <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
                       count > 0 
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200' 
+                        ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800' 
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
                     }`}>
                       {count} IP

@@ -113,7 +113,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-purple-50 text-purple-600 rounded-xl border border-purple-100">
+            <div className="p-2 bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-xl border border-purple-100 dark:border-purple-800/60">
               <Layers className="w-5 h-5" />
             </div>
             <div>
@@ -136,7 +136,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-900/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs">
               {error}
             </div>
           )}
@@ -153,7 +153,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
                 value={startIp}
                 onChange={(e) => setStartIp(e.target.value)}
                 placeholder="Contoh: 192.168.10.100"
-                className="w-full font-mono font-medium bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                className="w-full font-mono font-medium bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
               />
             </div>
 
@@ -167,7 +167,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
                 value={endIp}
                 onChange={(e) => setEndIp(e.target.value)}
                 placeholder="Contoh: 192.168.10.150"
-                className="w-full font-mono font-medium bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                className="w-full font-mono font-medium bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
               />
             </div>
           </div>
@@ -181,7 +181,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as IPStatus)}
-                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 font-medium"
+                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 font-medium"
               >
                 <option value="dhcp">DHCP Pool Range</option>
                 <option value="reserved">Reserved (Dicadangkan Khusus)</option>
@@ -197,7 +197,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
                 value={hostnamePrefix}
                 onChange={(e) => setHostnamePrefix(e.target.value)}
                 placeholder="dhcp-pool / resv-host"
-                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
               />
             </div>
           </div>
@@ -212,13 +212,13 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Contoh: Rentang alokasi otomatis DHCP router"
-              className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+              className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
             />
           </div>
 
           {/* Summary Preview */}
           {ipListPreview.length > 0 && (
-            <div className="bg-purple-50/60 border border-purple-200 rounded-xl p-3.5 text-xs space-y-1">
+            <div className="bg-purple-50 dark:bg-purple-900/40/60 border border-purple-200 dark:border-purple-800 rounded-xl p-3.5 text-xs space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-slate-600 dark:text-slate-400 font-medium">Total IP baru yang akan dibuat:</span>
                 <strong className="text-purple-700 font-mono text-sm">{ipListPreview.length - conflictCount} IP baru</strong>

@@ -172,7 +172,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
         <div>
           <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2.5">
             <span>Kategori Perangkat</span>
-            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
               {categories.length} Kategori
             </span>
           </h2>
@@ -199,7 +199,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Cari kategori atau kode ID..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/80 focus:bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/80 focus:bg-white dark:focus:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
           />
         </div>
 
@@ -246,13 +246,13 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                   }).length;
 
                   return (
-                    <tr key={cat.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60/60 transition-colors">
+                    <tr key={cat.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                       <td className="py-3.5 px-4 text-center text-slate-400 font-mono">
                         {idx + 1}
                       </td>
                       <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-slate-100">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex-shrink-0">
+                          <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/60 flex-shrink-0">
                             <IconComp className="w-4 h-4" />
                           </div>
                           <div>
@@ -271,7 +271,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                       <td className="py-3.5 px-4 text-center">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold ${
                           usageCount > 0 
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                            ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${usageCount > 0 ? 'bg-blue-600' : 'bg-slate-400'}`} />
@@ -312,7 +312,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                             className={`p-2 rounded-xl transition-all ${
                               usageCount > 0
                                 ? 'bg-slate-100 dark:bg-slate-800 text-slate-300 cursor-not-allowed border border-slate-200/70'
-                                : 'bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white cursor-pointer'
+                                : 'bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white cursor-pointer'
                             }`}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -336,7 +336,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 dark:bg-slate-800/40/50">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
+                <div className="p-2 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-800/60">
                   <Layers className="w-4 h-4" />
                 </div>
                 <div>
@@ -359,7 +359,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
             {/* Modal Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {formError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs flex items-center gap-2">
+                <div className="p-3 bg-rose-50 dark:bg-rose-900/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 rounded-xl text-xs flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-rose-600 flex-shrink-0" />
                   <span>{formError}</span>
                 </div>
@@ -376,7 +376,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                   value={name}
                   onChange={(e) => handleNameChange(e.target.value)}
                   placeholder="Contoh: Mesin Absensi Fingerprint"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:focus:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 />
               </div>
 
@@ -395,7 +395,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                   className={`w-full px-3.5 py-2.5 border rounded-xl text-xs font-mono transition-all ${
                     editingCategory 
                       ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 cursor-not-allowed'
-                      : 'bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500'
+                      : 'bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:focus:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500'
                   }`}
                 />
                 <p className="text-[10px] text-slate-400 mt-1">
@@ -442,7 +442,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Keterangan mengenai peruntukan kategori perangkat ini..."
-                  className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                  className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:focus:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
                 />
               </div>
 
