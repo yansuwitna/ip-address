@@ -65,13 +65,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       {/* Main Login Card */}
       <div className="w-full max-w-md relative z-10">
         
-        {/* Top Floating Badge */}
-        <div className="flex justify-center mb-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-blue-200/80 text-blue-700 text-xs font-medium shadow-sm backdrop-blur-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>NetIPAM • Network Address Management</span>
-          </div>
-        </div>
+
 
         {/* Card Body */}
         <div className="bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-3xl p-7 sm:p-9 shadow-2xl shadow-blue-500/10 transition-all">
