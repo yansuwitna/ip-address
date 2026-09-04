@@ -79,23 +79,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Backdrop */}
+      {/* Mobile Overlay Backdrop */}
       {isOpen && (
         <div 
           onClick={onCloseMobile}
-          className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden"
         />
       )}
 
-      {/* Sidebar Container */}
-      <aside className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-white border-r border-slate-200/90 flex flex-col transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 ${
+      {/* Static Fixed Sidebar on Desktop (h-screen sticky top-0) */}
+      <aside className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-white border-r border-slate-200/90 flex flex-col flex-shrink-0 h-screen transition-transform duration-200 ease-in-out lg:static lg:sticky lg:top-0 lg:translate-x-0 ${
         isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
       }`}>
         
-        {/* Brand Header */}
-        <div className="h-16 px-5 border-b border-slate-200/80 flex items-center justify-between">
+        {/* Brand Header (Static Top) */}
+        <div className="h-16 px-5 border-b border-slate-200/80 flex items-center justify-between flex-shrink-0 bg-white">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
+            <div className="p-2.5 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
               <Network className="w-5 h-5" />
             </div>
             <div>
@@ -105,25 +105,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   Pro
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-slate-400 font-medium">
                 IP Address Management
               </p>
             </div>
           </div>
 
-          {/* Close on Mobile */}
+          {/* Close Button on Mobile */}
           <button 
             onClick={onCloseMobile}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg lg:hidden"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg lg:hidden cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Navigation Menu */}
+        {/* Navigation Menu (Scrolls internally if viewport is small) */}
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
           <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            Menu Utama
+            Navigasi Menu
           </div>
 
           {navItems.map(item => {
@@ -168,19 +168,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Quick System Status Card */}
-        <div className="p-3 mx-3 mb-3 bg-gradient-to-br from-blue-50/70 to-indigo-50/50 border border-blue-100 rounded-2xl">
-          <div className="flex items-center gap-2 mb-1.5">
+        <div className="p-3 mx-3 mb-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex-shrink-0">
+          <div className="flex items-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-[11px] font-bold text-slate-800">Status Gateway</span>
+            <span className="text-[11px] font-bold text-slate-800">Sistem Online</span>
           </div>
-          <p className="text-[11px] text-slate-600 leading-snug">
-            Sistem IPAM aktif memantau <strong>{totalGroups}</strong> grup subnet jaringan.
+          <p className="text-[11px] text-slate-500 leading-snug">
+            Memantau <strong>{totalGroups}</strong> grup subnet & <strong>{totalUsedIps}</strong> IP aktif.
           </p>
         </div>
 
-        {/* Bottom User Profile & Logout */}
-        <div className="p-3 border-t border-slate-200/80 bg-slate-50/60">
-          <div className="flex items-center justify-between gap-2 p-2 rounded-xl hover:bg-white transition-all border border-transparent hover:border-slate-200/60">
+        {/* User Profile & Logout (Static Bottom) */}
+        <div className="p-3 border-t border-slate-200/80 bg-slate-50/70 flex-shrink-0">
+          <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl hover:bg-white transition-all border border-transparent hover:border-slate-200/60">
             <div className="flex items-center gap-2.5 truncate">
               {currentUser.avatar ? (
                 <img

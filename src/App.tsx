@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Network, 
   Grid, 
@@ -22,7 +22,7 @@ import {
   resetDemoData 
 } from './utils/storage';
 import { exportToCsv } from './utils/exportImport';
-import { parseCidr, findNextAvailableIp } from './utils/ipCalculator';
+import { parseCidr } from './utils/ipCalculator';
 
 import { Login } from './components/Login';
 import { Sidebar, NavTab } from './components/Sidebar';
@@ -206,9 +206,9 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex font-poppins antialiased selection:bg-blue-600 selection:text-white">
+    <div className="h-screen w-screen overflow-hidden flex bg-slate-50 text-slate-800 font-poppins antialiased selection:bg-blue-600 selection:text-white">
       
-      {/* 1. Left Dedicated Sidebar */}
+      {/* 1. Left STATIC Dedicated Sidebar (Permanently anchored & pinned) */}
       <Sidebar
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
@@ -220,10 +220,10 @@ export const App: React.FC = () => {
         totalUsedIps={totalUsedIps}
       />
 
-      {/* 2. Main Work Area with Header */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+      {/* 2. Main Work Area with Independent Smooth Scroll */}
+      <div className="flex-1 flex flex-col h-screen overflow-y-auto min-w-0 bg-slate-50">
         
-        {/* Top Header */}
+        {/* Top Header (Sticky) */}
         <Header
           groups={groups}
           allocations={allocations}
