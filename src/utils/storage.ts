@@ -1,4 +1,4 @@
-import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from '../types/ipam';
 
 const STORAGE_KEYS = {
   GROUPS: 'netipam_groups_v1',
@@ -935,4 +935,25 @@ export function resetDemoData(): {
     services: INITIAL_SERVICES,
     dnsRecords: INITIAL_DNS_RECORDS
   };
+}
+
+export const STORAGE_KEY_SUBDOMAINS = 'netipam_subdomains';
+
+export function loadSubDomains(): SubDomainRecord[] {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY_SUBDOMAINS);
+    if (!data) return [];
+    return JSON.parse(data);
+  } catch (e) {
+    console.error('Failed to load subdomains', e);
+    return [];
+  }
+}
+
+export function saveSubDomains(records: SubDomainRecord[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEY_SUBDOMAINS, JSON.stringify(records));
+  } catch (e) {
+    console.error('Failed to save subdomains', e);
+  }
 }
