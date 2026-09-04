@@ -32,8 +32,7 @@ import {
   loadAllocations, 
   saveAllocations, 
   loadDeviceCategories,
-  saveDeviceCategories,
-  resetDemoData 
+  saveDeviceCategories
 } from './utils/storage';
 import { exportToXlsx } from './utils/exportImport';
 import { parseCidr } from './utils/ipCalculator';
@@ -189,15 +188,6 @@ export const App: React.FC = () => {
     setCurrentUser(null);
     setAuthView('home');
     setIsViewingPublicHome(false);
-  };
-
-  const handleResetDemo = () => {
-    const demo = resetDemoData();
-    setGroups(demo.groups);
-    setAllocations(demo.allocations);
-    setCategories(demo.categories);
-    setSelectedGroupId(demo.groups[0]?.id || '');
-    setUsers(loadUsers());
   };
 
   const handleImportData = (data: {
@@ -802,7 +792,6 @@ export const App: React.FC = () => {
               categories={categories}
               users={users}
               onImportData={handleImportData}
-              onResetDemo={handleResetDemo}
               onWipeAllData={handleWipeAllData}
             />
           )}
