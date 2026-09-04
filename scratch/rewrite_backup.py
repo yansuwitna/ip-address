@@ -1,4 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
+import os
+
+filepath = 'src/components/BackupView.tsx'
+
+content = """import React, { useRef, useState, useEffect } from 'react';
 import { 
   Database, 
   Download, 
@@ -408,3 +412,8 @@ export const BackupView: React.FC<BackupViewProps> = ({
     </div>
   );
 };
+"""
+
+with open(filepath, 'w') as f:
+    f.write(content)
+print("BackupView rewritten with Restore Modal.")

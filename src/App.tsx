@@ -16,7 +16,7 @@ import {
   LayoutGrid,
   Table as TableIcon
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord } from './types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from './types/ipam';
 import { User, UserAccount } from './types/auth';
 import { 
   getCurrentUser, 
@@ -240,6 +240,7 @@ export const App: React.FC = () => {
     saveServices([]);
     saveDeviceCategories([]);
     saveDnsRecords([]);
+    saveSubDomains([]);
     wipeAllUsers();
     setUsers([]);
     setCurrentUser(null);

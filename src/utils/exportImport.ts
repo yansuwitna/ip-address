@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from '../types/ipam';
 import { UserAccount } from '../types/auth';
 
 export function exportToXlsx(
@@ -103,7 +103,8 @@ export function exportBackupJson(
   categories?: DeviceCategory[],
   users?: UserAccount[],
   services?: IPService[],
-  dnsRecords?: DnsRecord[]
+  dnsRecords?: DnsRecord[],
+  subDomains?: SubDomainRecord[]
 ): void {
   const backupData = {
     appName: 'IP & DNS',
@@ -115,14 +116,16 @@ export function exportBackupJson(
       categories: categories?.length || 0,
       users: users?.length || 0,
       services: services?.length || 0,
-      dnsRecords: dnsRecords?.length || 0
+      dnsRecords: dnsRecords?.length || 0,
+      subDomains: subDomains?.length || 0
     },
     groups,
     allocations,
     categories: categories || [],
     users: users || [],
     services: services || [],
-    dnsRecords: dnsRecords || []
+    dnsRecords: dnsRecords || [],
+    subDomains: subDomains || []
   };
 
   const jsonStr = JSON.stringify(backupData, null, 2);
