@@ -224,38 +224,7 @@ export const App: React.FC = () => {
       <div className="flex-1 flex flex-col h-screen overflow-y-auto min-w-0 bg-slate-50">
         
         {/* Top Header (Sticky) */}
-        <Header
-          groups={groups}
-          allocations={allocations}
-          currentUser={currentUser}
-          onLogout={handleLogout}
-          onAddGroup={() => {
-            setEditingGroup(null);
-            setIsGroupModalOpen(true);
-          }}
-          onAddAllocation={() => {
-            setEditingAlloc(null);
-            setPresetIp(undefined);
-            setIsAllocModalOpen(true);
-          }}
-          onResetDemo={() => {
-            if (window.confirm('Reset database ke sampel data awal? Seluruh perubahan kustom akan ditimpa.')) {
-              const demo = resetDemoData();
-              setGroups(demo.groups);
-              setAllocations(demo.allocations);
-              setSelectedGroupId(demo.groups[0]?.id || '');
-            }
-          }}
-          onImportData={(newGroups, newAllocations) => {
-            setGroups(newGroups);
-            setAllocations(newAllocations);
-            setSelectedGroupId(newGroups[0]?.id || '');
-          }}
-          globalSearch={globalSearch}
-          setGlobalSearch={setGlobalSearch}
-          onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-          currentTabTitle={getTabTitle(currentTab)}
-        />
+        <Header onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)} />
 
         {/* Dynamic Page Content */}
         <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 space-y-6 max-w-7xl w-full mx-auto">
