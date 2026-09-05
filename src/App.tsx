@@ -1450,6 +1450,7 @@ export const App: React.FC = () => {
                     groupId: recordData.groupId,
                     status: recordData.status || 'active',
                     description: recordData.description || '',
+                    protocol: recordData.protocol || 'http',
                     createdAt: now,
                     updatedAt: now
                   };
@@ -1587,6 +1588,7 @@ export const App: React.FC = () => {
                 groupId: recordData.groupId,
                 status: recordData.status || 'active',
                 description: recordData.description || '',
+                protocol: recordData.protocol || 'http',
                 createdAt: now,
                 updatedAt: now
               };
