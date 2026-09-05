@@ -270,8 +270,8 @@ export const PrintModal: React.FC<PrintModalProps> = ({
             )}
 
             {/* Bagian Pengesahan / Tanda Tangan */}
-            <div className="pt-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-12 text-center text-xs break-inside-avoid">
-              <div>
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-700 flex justify-end text-center text-xs break-inside-avoid">
+              <div className="w-56">
                 <p className="text-slate-600 dark:text-slate-400 mb-16">
                   Dibuat Oleh,<br />
                   <span className="font-semibold text-slate-800 dark:text-slate-200">Administrator Jaringan</span>
@@ -279,17 +279,6 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                 <div className="w-44 mx-auto border-b border-slate-400"></div>
                 <p className="font-bold text-slate-800 dark:text-slate-200 mt-1">
                   {currentUser ? currentUser.name : '(............................................)'}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-slate-600 dark:text-slate-400 mb-16">
-                  Mengetahui,<br />
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">Kepala Bagian IT & Infrastruktur</span>
-                </p>
-                <div className="w-44 mx-auto border-b border-slate-400"></div>
-                <p className="font-bold text-slate-800 dark:text-slate-200 mt-1">
-                  (............................................)
                 </p>
               </div>
             </div>
