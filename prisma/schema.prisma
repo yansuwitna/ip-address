@@ -88,6 +88,7 @@ model DnsRecord {
   groupId     String?
   status      String   @default("active")
   description String?
+  protocol    String?  @default("http")
   createdAt   String
   updatedAt   String
 }
@@ -101,5 +102,6 @@ model SubDomainRecord {
   folder         String?
   database       String?
   description    String?
+  protocol       String?  @default("http")
   createdAt      String
 }

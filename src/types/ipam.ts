@@ -110,6 +110,7 @@ export interface DnsRecord {
   groupId?: string;
   status: DnsRecordStatus;
   description?: string;
+  protocol?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -126,5 +127,6 @@ export interface SubDomainRecord {
   folder?: string;
   database?: string;
   description?: string;
+  protocol?: string;
   createdAt: string;
 }

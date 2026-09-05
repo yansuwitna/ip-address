@@ -554,10 +554,10 @@ export const DnsView: React.FC<DnsViewProps> = ({
                       <td className="py-3.5 px-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end space-x-1">
                           <a
-                            href={`http://${item.domain}`}
+                            href={`${item.protocol || 'http'}://${item.domain}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            title={`Buka http://${item.domain} di tab baru`}
+                            title={`Buka ${item.protocol || 'http'}://${item.domain} di tab baru`}
                             className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-slate-400 hover:text-emerald-600 rounded-lg transition-colors cursor-pointer"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
