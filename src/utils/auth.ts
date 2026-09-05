@@ -8,7 +8,7 @@ export const DEFAULT_USERS: UserAccount[] = [
   {
     id: 'usr-1',
     username: 'admin',
-    password: 'admin123',
+    password: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', // SHA-256 for 'admin123'
     name: 'Budi Hartono, S.Kom',
     email: 'admin@ipaddress.lan',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',

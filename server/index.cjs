@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const path = require('path');
+const crypto = require('crypto');
 
 async function startServer() {
   const prisma = new PrismaClient();
@@ -67,7 +68,16 @@ async function startServer() {
     try {
       switch (key) {
         case 'netipam_users_list_v1':
-          await replaceTable(prisma.user, data);
+          const encryptedUsers = data.map(u => {
+            if (u.password && !/^[a-f0-9]{64}$/i.test(u.password)) {
+              return {
+                ...u,
+                password: crypto.createHash('sha256').update(u.password).digest('hex')
+              };
+            }
+            return u;
+          });
+          await replaceTable(prisma.user, encryptedUsers);
           break;
         case 'netipam_groups_v1':
           await replaceTable(prisma.iPGroup, data);
