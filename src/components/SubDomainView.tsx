@@ -306,10 +306,21 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
                     >
                       <option value="http">http://</option>
                       <option value="https">https://</option>
+                      <option value="postgresql">postgresql://</option>
+                      <option value="mysql">mysql://</option>
+                      <option value="mongodb">mongodb://</option>
+                      <option value="redis">redis://</option>
                       <option value="ssh">ssh://</option>
+                      <option value="sftp">sftp://</option>
                       <option value="ftp">ftp://</option>
                       <option value="telnet">telnet://</option>
                       <option value="rdp">rdp://</option>
+                      <option value="vnc">vnc://</option>
+                      <option value="ws">ws://</option>
+                      <option value="wss">wss://</option>
+                      <option value="grpc">grpc://</option>
+                      <option value="tcp">tcp://</option>
+                      <option value="udp">udp://</option>
                     </select>
                   </div>
 
