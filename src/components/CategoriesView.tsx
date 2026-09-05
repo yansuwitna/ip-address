@@ -7,6 +7,9 @@ import {
   Monitor, 
   Computer,
   PcCase,
+  Cloud,
+  ServerCog,
+  Boxes,
   Video, 
   Printer, 
   Smartphone, 
@@ -32,11 +35,13 @@ import { DeviceCategory, IPAllocation } from '../types/ipam';
 import { showConfirm, showSuccess } from '../utils/swal';
 
 export const AVAILABLE_ICONS: { name: string; label: string; icon: React.FC<{ className?: string }> }[] = [
+  { name: 'VPS', label: 'VPS / Cloud Server', icon: ServerCog },
+  { name: 'Cloud', label: 'Cloud / Hosting', icon: Cloud },
   { name: 'PC', label: 'PC / Komputer Desktop', icon: Computer },
   { name: 'PcCase', label: 'CPU / PC Case', icon: PcCase },
+  { name: 'Server', label: 'Server Fisik / VM', icon: Server },
   { name: 'Monitor', label: 'Monitor / Display', icon: Monitor },
   { name: 'Laptop', label: 'Laptop', icon: Laptop },
-  { name: 'Server', label: 'Server / VM', icon: Server },
   { name: 'Router', label: 'Router', icon: Router },
   { name: 'Network', label: 'Switch / Hub', icon: Network },
   { name: 'Wifi', label: 'Access Point', icon: Wifi },
@@ -55,6 +60,8 @@ export const AVAILABLE_ICONS: { name: string; label: string; icon: React.FC<{ cl
 
 export const getCategoryIconComponent = (iconName: string): React.FC<{ className?: string }> => {
   const clean = (iconName || '').toLowerCase();
+  if (clean === 'vps' || clean === 'vps-server' || clean === 'cloud-server' || clean === 'servercog') return ServerCog;
+  if (clean === 'cloud' || clean === 'hosting') return Cloud;
   if (clean === 'pc' || clean === 'computer' || clean === 'desktop') return Computer;
   if (clean === 'pccase' || clean === 'pc-case') return PcCase;
   const found = AVAILABLE_ICONS.find(i => i.name.toLowerCase() === clean);
