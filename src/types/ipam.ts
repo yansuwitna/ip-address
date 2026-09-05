@@ -128,5 +128,6 @@ export interface SubDomainRecord {
   database?: string;
   description?: string;
   protocol?: string;
+  forward?: string;
   createdAt: string;
 }

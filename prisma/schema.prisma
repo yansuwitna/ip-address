@@ -103,5 +103,6 @@ model SubDomainRecord {
   database       String?
   description    String?
   protocol       String?  @default("http")
+  forward        String?
   createdAt      String
 }

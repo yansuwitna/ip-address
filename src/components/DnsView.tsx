@@ -81,7 +81,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
         if (!matchDomain && !matchValue && !matchDesc && !matchIp) return false;
       }
       return true;
-    });
+    }).sort((a, b) => a.domain.localeCompare(b.domain, undefined, { numeric: true, sensitivity: 'base' }));
   }, [dnsRecords, typeFilter, statusFilter, search]);
 
   // Statistics
