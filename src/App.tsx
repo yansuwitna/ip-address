@@ -69,16 +69,113 @@ import { BatchReserveModal } from './components/BatchReserveModal';
 import { PingSimulatorModal } from './components/PingSimulatorModal';
 
 export const App: React.FC = () => {
-  // Authentication State
-  const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser);
-  const [authView, setAuthView] = useState<'home' | 'login'>('home');
-  const [users, setUsers] = useState<UserAccount[]>([]);
-  const [isViewingPublicHome, setIsViewingPublicHome] = useState(false);
+  // Map pathname to internal tab
+  const getTabFromPath = (path: string): NavTab => {
+    const clean = path.replace(/\/+$/, '').toLowerCase();
+    if (clean === '/admin/ip' || clean === '/admin/groups') return 'groups';
+    if (clean === '/admin/dns') return 'dns';
+    if (clean === '/admin/services') return 'services';
+    if (clean === '/admin/categories') return 'categories';
+    if (clean === '/admin/users') return 'users';
+    if (clean === '/admin/backup') return 'backup';
+    return 'dashboard';
+  };
 
-  // Navigation & UI State
-  const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
+  // Map internal tab to pathname
+  const getPathFromTab = (tab: NavTab): string => {
+    switch (tab) {
+      case 'dashboard': return '/admin';
+      case 'groups': return '/admin/ip';
+      case 'dns': return '/admin/dns';
+      case 'services': return '/admin/services';
+      case 'categories': return '/admin/categories';
+      case 'users': return '/admin/users';
+      case 'backup': return '/admin/backup';
+      default: return '/admin';
+    }
+  };
+
+  // Navigation & UI State initialized from URL
+  const initialPath = window.location.pathname.replace(/\/+$/, '') || '/';
+  const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser);
+  const [authView, setAuthView] = useState<'home' | 'login'>(initialPath === '/login' ? 'login' : 'home');
+  const [users, setUsers] = useState<UserAccount[]>([]);
+  const [isViewingPublicHome, setIsViewingPublicHome] = useState(initialPath === '/' || initialPath === '');
+  const [currentTab, setCurrentTab] = useState<NavTab>(getTabFromPath(initialPath));
   const [isViewingGroupAllocations, setIsViewingGroupAllocations] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  // Sync URL address bar based on app state
+  const syncBrowserUrl = (newPath: string) => {
+    if (window.location.pathname !== newPath) {
+      window.history.pushState({}, '', newPath);
+    }
+  };
+
+  // Handle auto-routing rules:
+  // 1. If at /login and already logged in, redirect directly to /admin
+  useEffect(() => {
+    if (currentUser) {
+      const path = window.location.pathname.replace(/\/+$/, '') || '/';
+      if (path === '/login') {
+        setIsViewingPublicHome(false);
+        setAuthView('home');
+        syncBrowserUrl('/admin');
+      }
+    }
+  }, [currentUser]);
+
+  // Keep URL updated when view/tab/auth changes
+  useEffect(() => {
+    if (!currentUser) {
+      if (authView === 'login') {
+        syncBrowserUrl('/login');
+      } else {
+        syncBrowserUrl('/');
+      }
+    } else {
+      if (isViewingPublicHome) {
+        syncBrowserUrl('/');
+      } else {
+        syncBrowserUrl(getPathFromTab(currentTab));
+      }
+    }
+  }, [currentUser, authView, isViewingPublicHome, currentTab]);
+
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.replace(/\/+$/, '') || '/';
+      if (path === '/login') {
+        if (currentUser) {
+          setIsViewingPublicHome(false);
+          setAuthView('home');
+          syncBrowserUrl('/admin');
+        } else {
+          setAuthView('login');
+          setIsViewingPublicHome(false);
+        }
+      } else if (path === '/' || path === '') {
+        if (!currentUser) {
+          setAuthView('home');
+        } else {
+          setIsViewingPublicHome(true);
+        }
+      } else if (path.startsWith('/admin')) {
+        if (!currentUser) {
+          setAuthView('login');
+          setIsViewingPublicHome(false);
+        } else {
+          setIsViewingPublicHome(false);
+          setAuthView('home');
+          setCurrentTab(getTabFromPath(path));
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentUser]);
 
   // Data State
   const [groups, setGroups] = useState<IPGroup[]>([]);
@@ -274,12 +371,7 @@ export const App: React.FC = () => {
     }
   }, [subDomains, isSyncing]);
 
-  // Saat terbaca di tabel user tidak ada, otomatis membuka halaman daftar user
-  useEffect(() => {
-    if (users.length === 0 && !currentUser) {
-      setAuthView('login');
-    }
-  }, [users, currentUser]);
+
 
 
   const handleSaveCategory = (cat: DeviceCategory) => {
