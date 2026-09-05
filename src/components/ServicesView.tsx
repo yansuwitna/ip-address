@@ -41,10 +41,8 @@ import {
   DeviceCategory 
 } from '../types/ipam';
 import { 
-  COMMON_SERVICE_PRESETS, 
   SERVICE_CATEGORIES, 
   getCategoryMeta, 
-  ServicePreset 
 } from '../utils/servicePresets';
 import { ServiceModal } from './ServiceModal';
 import { showConfirm, showSuccess } from '../utils/swal';
@@ -84,7 +82,6 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<IPService | null>(null);
-  const [presetForNew, setPresetForNew] = useState<ServicePreset | null>(null);
 
   // Port testing simulator state
   const [testingServiceId, setTestingServiceId] = useState<string | null>(null);
@@ -268,8 +265,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
           <button
             onClick={() => {
               setEditingService(null);
-              setPresetForNew(null);
-              setIsModalOpen(true);
+                            setIsModalOpen(true);
             }}
             className="flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
           >
@@ -436,39 +432,6 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
           </div>
           <div className="text-2xl font-black text-amber-600 mt-1">{filteredCount}</div>
           <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Akses Dibatasi Firewall</div>
-        </div>
-      </div>
-
-      {/* 4. QUICK PRESET STRIP */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-2.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span>Katalog Template Cepat (Klik untuk Menambahkan ke Host):</span>
-          </div>
-          <span className="text-[11px] text-slate-400 hidden sm:inline">
-            Pintasan port aplikasi populer
-          </span>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-1.5">
-          {COMMON_SERVICE_PRESETS.slice(0, 12).map(preset => (
-            <button
-              key={`${preset.port}-${preset.protocol}-${preset.name}`}
-              onClick={() => {
-                setEditingService(null);
-                setPresetForNew(preset);
-                setIsModalOpen(true);
-              }}
-              className="text-xs px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 hover:bg-blue-50 text-slate-700 dark:text-slate-300 hover:text-blue-700 border border-slate-200/80 hover:border-blue-300 font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-            >
-              <Plus className="w-3 h-3 text-blue-600" />
-              <span>{preset.name.split(' ')[0]}</span>
-              <span className="font-mono text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-1 py-0.2 rounded">
-                {preset.port}/{preset.protocol}
-              </span>
-            </button>
-          ))}
         </div>
       </div>
 
@@ -752,8 +715,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                             <button
                               onClick={() => {
                                 setEditingService(svc);
-                                setPresetForNew(null);
-                                setIsModalOpen(true);
+                                                                setIsModalOpen(true);
                               }}
                               title="Edit Layanan & Port"
                               className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/40 dark:bg-blue-900/40 text-slate-400 hover:text-blue-600 dark:text-blue-400 rounded-lg transition-colors cursor-pointer"
@@ -921,8 +883,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
           onClose={() => {
             setIsModalOpen(false);
             setEditingService(null);
-            setPresetForNew(null);
-          }}
+                      }}
           onSave={onSaveService}
           editService={editingService}
           presetIp={selectedIp !== 'all' ? selectedIp : allocations[0]?.ip}

@@ -12,10 +12,8 @@ import {
 } from 'lucide-react';
 import { IPService, IPAllocation, IPGroup, ServiceCategory, ServiceProtocol, ServiceStatus, DeviceCategory } from '../types/ipam';
 import { 
-  COMMON_SERVICE_PRESETS, 
   SERVICE_CATEGORIES, 
   buildDefaultServiceUrl,
-  ServicePreset 
 } from '../utils/servicePresets';
 import { showWarning } from '../utils/swal';
 
@@ -95,22 +93,6 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
     return s.ip === ip && s.port === Number(port) && (s.protocol === protocol || protocol === 'TCP/UDP' || s.protocol === 'TCP/UDP');
   });
 
-  const handleApplyPreset = (preset: ServicePreset) => {
-    setName(preset.name);
-    setPort(preset.port);
-    setProtocol(preset.protocol);
-    setCategory(preset.category);
-    setDescription(preset.description);
-    if (preset.typicalVersion) setVersion(preset.typicalVersion);
-
-    if (ip) {
-      const autoUrl = buildDefaultServiceUrl(ip, preset.port, preset.protocol, preset.category);
-      if (autoUrl) {
-        setUrl(autoUrl);
-        setIsCustomUrl(true);
-      }
-    }
-  };
 
   const handlePortChange = (val: number | '') => {
     setPort(val);
@@ -182,34 +164,6 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
           >
             <X className="w-5 h-5" />
           </button>
-        </div>
-
-        {/* Quick Presets Catalog Bar */}
-        <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 rounded-2xl p-3">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span>Pilih Cepat dari Template Layanan Populer:</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-1">
-            {COMMON_SERVICE_PRESETS.map(preset => {
-              const isSelected = port === preset.port && protocol === preset.protocol;
-              return (
-                <button
-                  key={`${preset.port}-${preset.protocol}-${preset.name}`}
-                  type="button"
-                  onClick={() => handleApplyPreset(preset)}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 cursor-pointer border ${
-                    isSelected
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                      : 'bg-white dark:bg-slate-900 hover:bg-blue-50 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-blue-300'
-                  }`}
-                >
-                  <span>{preset.name.split(' ')[0]}</span>
-                  <span className="font-mono text-[10px] opacity-80">({preset.port}/{preset.protocol})</span>
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         {/* Form Body */}

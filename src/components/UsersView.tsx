@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 import { 
   User as UserIcon, 
   UserCheck, 
@@ -11,7 +12,11 @@ import {
   Calendar,
   Shield,
   CheckCircle2,
-  Lock
+  Lock,
+  Link2,
+  Copy,
+  RefreshCw,
+  Download
 } from 'lucide-react';
 import { User, UserAccount } from '../types/auth';
 
@@ -103,6 +108,93 @@ export const UsersView: React.FC<UsersViewProps> = ({
     setIsModalOpen(false);
     setIsSuccessToast(true);
     setTimeout(() => setIsSuccessToast(false), 3000);
+  };
+
+  const handleInstallPWA = async () => {
+    const promptEvent = (window as any).deferredPrompt;
+    if (!promptEvent) {
+      const isIos = /ipad|iphone|ipod|macintosh/.test(navigator.userAgent.toLowerCase());
+      const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+
+      let htmlContent = '';
+      if (isIos) {
+        htmlContent = `
+          <div class="text-sm text-slate-600 dark:text-slate-300 text-left space-y-3">
+            <p>Perangkat <b>Apple (iPhone/iPad/Mac)</b> memerlukan langkah manual untuk instalasi:</p>
+            <ol class="list-decimal pl-5 space-y-2">
+              <li>Ketuk ikon <b>Bagikan (Share)</b> <svg class="inline w-4 h-4 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> di menu Safari bagian bawah atau atas.</li>
+              <li>Gulir ke bawah dan ketuk opsi <b>Tambah ke Layar Utama (Add to Home Screen)</b> <svg class="inline w-4 h-4 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>.</li>
+              <li>Ketuk <b>Tambah (Add)</b> di sudut kanan atas.</li>
+            </ol>
+          </div>
+        `;
+      } else if (isAndroid) {
+        htmlContent = `
+          <div class="text-sm text-slate-600 dark:text-slate-300 text-left space-y-3">
+            <p>Sepertinya aplikasi sudah terinstal, atau peramban Chrome/Android Anda memblokir *popup*. Lakukan langkah manual ini:</p>
+            <ol class="list-decimal pl-5 space-y-2">
+              <li>Ketuk menu <b>Titik Tiga</b> di pojok kanan atas layar peramban Anda.</li>
+              <li>Pilih menu <b>Tambahkan ke Layar Utama (Add to Home screen)</b> atau <b>Instal Aplikasi</b>.</li>
+            </ol>
+          </div>
+        `;
+      } else {
+        htmlContent = `
+          <div class="text-sm text-slate-600 dark:text-slate-300 text-left space-y-3">
+            <p>Sepertinya aplikasi sudah terinstal di PC Anda, atau peramban (browser) tidak menampilkan *prompt*.</p>
+            <ol class="list-decimal pl-5 space-y-2">
+              <li>Periksa <b>Bilah Alamat (Address Bar)</b> di Chrome/Edge bagian kanan.</li>
+              <li>Cari ikon "Layar Komputer dengan tanda Plus" atau panah ke bawah, lalu klik untuk menginstal.</li>
+              <li>Atau buka menu titik tiga browser dan cari opsi <b>Install app / Install NetIPAM</b>.</li>
+            </ol>
+          </div>
+        `;
+      }
+
+      Swal.fire({
+        title: 'Petunjuk Instalasi',
+        html: htmlContent,
+        icon: 'info',
+        confirmButtonText: 'Saya Mengerti',
+        confirmButtonColor: '#2563eb',
+        background: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
+        color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#0f172a'
+      });
+      return;
+    }
+    promptEvent.prompt();
+    const result = await promptEvent.userChoice;
+    if (result.outcome === 'accepted') {
+      (window as any).deferredPrompt = null;
+    }
+  };
+
+  const generateMagicToken = () => {
+    if (!singleUser) return;
+    
+    // Generate 100 char alphanumeric string
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let token = '';
+    const array = new Uint8Array(100);
+    crypto.getRandomValues(array);
+    for (let i = 0; i < 100; i++) {
+      token += chars[array[i] % chars.length];
+    }
+    
+    onSaveUser({
+      ...singleUser,
+      password: undefined, // ensure password isn't overridden with empty
+      magicToken: token
+    } as any);
+  };
+  
+  const copyMagicLink = () => {
+    if (singleUser?.magicToken) {
+      const url = `${window.location.origin}${window.location.pathname}?token=${singleUser.magicToken}`;
+      navigator.clipboard.writeText(url);
+      setIsSuccessToast(true);
+      setTimeout(() => setIsSuccessToast(false), 3000);
+    }
   };
 
   return (
@@ -243,6 +335,73 @@ export const UsersView: React.FC<UsersViewProps> = ({
             <div className="leading-relaxed">
               <strong>Sistem Akun Tunggal (Single User):</strong> Sistem IP & DNS dikonfigurasi untuk menggunakan 1 akun utama terpusat. Anda dapat memperbarui nama, username, email, dan kata sandi kapan saja melalui tombol ubah di atas.
             </div>
+          </div>
+
+          {/* PWA Install Section */}
+          <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl border border-blue-500 shadow-lg text-white space-y-4 relative overflow-hidden">
+            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-white/10 rounded-xl">
+                  <Download className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-base">Instal Aplikasi (PWA)</h4>
+                  <p className="text-[11px] text-blue-100 max-w-sm">Jadikan sistem ini sebagai aplikasi desktop/mobile independen di perangkat Anda untuk akses cepat dan layar penuh.</p>
+                </div>
+              </div>
+              <button
+                onClick={handleInstallPWA}
+                className="px-5 py-2.5 bg-white text-blue-700 hover:bg-blue-50 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer w-full sm:w-auto flex-shrink-0"
+              >
+                Instal Sekarang
+              </button>
+            </div>
+            {/* Decorative background shapes */}
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+            <div className="absolute -bottom-10 right-20 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+          </div>
+
+          {/* Magic Link Section */}
+          <div className="p-5 bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-4">
+            <div className="flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                  <Link2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Akses Login Instan (Magic Link)</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Gunakan URL token untuk masuk tanpa username & sandi selamanya.</p>
+                </div>
+              </div>
+              <button
+                onClick={generateMagicToken}
+                className="flex items-center gap-1.5 px-3 py-2 bg-indigo-100 dark:bg-indigo-900/40 hover:bg-indigo-200 dark:hover:bg-indigo-800 text-indigo-700 dark:text-indigo-300 rounded-xl text-[11px] font-bold transition-all cursor-pointer w-full sm:w-auto justify-center"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>{singleUser.magicToken ? 'Generate Ulang Token' : 'Buat Token Sekarang'}</span>
+              </button>
+            </div>
+            
+            {singleUser.magicToken ? (
+              <div className="flex items-center gap-2 w-full">
+                <div className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 overflow-hidden">
+                  <code className="text-[10px] text-slate-600 dark:text-slate-400 break-all select-all block whitespace-pre-wrap">
+                    {`${window.location.origin}${window.location.pathname}?token=${singleUser.magicToken}`}
+                  </code>
+                </div>
+                <button
+                  onClick={copyMagicLink}
+                  className="p-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm transition-all cursor-pointer flex-shrink-0"
+                  title="Salin URL"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl text-center text-xs text-slate-400 border border-dashed border-slate-200 dark:border-slate-700">
+                Token login instan belum dibuat untuk akun ini.
+              </div>
+            )}
           </div>
 
         </div>

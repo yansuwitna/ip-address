@@ -131,6 +131,7 @@ export const App: React.FC = () => {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [printType, setPrintType] = useState<'allocations' | 'dns' | 'services'>('allocations');
 
+
   // Sync with LocalStorage
   useEffect(() => {
     saveGroups(groups);
@@ -301,6 +302,7 @@ export const App: React.FC = () => {
     setAuthView('home');
     setIsViewingPublicHome(false);
   };
+
 
   // If not logged in, render HomeView or Login portal
   if (!currentUser) {
@@ -530,7 +532,7 @@ export const App: React.FC = () => {
       />
 
       {/* 2. Main Work Area with Independent Smooth Scroll */}
-      <div className={`flex-1 flex flex-col h-screen overflow-y-auto min-w-0 bg-slate-50 dark:bg-slate-950`}>
+      <div className={`flex-1 flex flex-col h-screen overflow-y-auto min-w-0 bg-slate-50 dark:bg-slate-950 print:hidden`}>
         
         {/* Top Header (Sticky) */}
         <Header 
@@ -1343,6 +1345,8 @@ export const App: React.FC = () => {
         />
       )}
 
+
+
       {isPrintModalOpen && (
         <PrintModal
           isOpen={isPrintModalOpen}
@@ -1356,7 +1360,6 @@ export const App: React.FC = () => {
           currentUser={currentUser}
         />
       )}
-
     </div>
   );
 };
