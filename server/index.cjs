@@ -110,8 +110,8 @@ async function startServer() {
         id: startUrl,
         display: "standalone",
         orientation: "any",
-        background_color: "#ffffff",
-        theme_color: "#2563eb",
+        background_color: "#10b981",
+        theme_color: "#10b981",
         shortcuts: [
           {
             name: "Buka NetIPAM",
@@ -147,8 +147,8 @@ async function startServer() {
         start_url: "/",
         scope: "/",
         display: "standalone",
-        background_color: "#ffffff",
-        theme_color: "#2563eb",
+        background_color: "#10b981",
+        theme_color: "#10b981",
         icons: [
           { src: "/logo192.png", sizes: "192x192", type: "image/png" },
           { src: "/logo512.png", sizes: "512x512", type: "image/png" }
