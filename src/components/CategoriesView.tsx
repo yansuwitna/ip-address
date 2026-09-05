@@ -5,6 +5,8 @@ import {
   Network, 
   Wifi, 
   Monitor, 
+  Computer,
+  PcCase,
   Video, 
   Printer, 
   Smartphone, 
@@ -30,17 +32,19 @@ import { DeviceCategory, IPAllocation } from '../types/ipam';
 import { showConfirm, showSuccess } from '../utils/swal';
 
 export const AVAILABLE_ICONS: { name: string; label: string; icon: React.FC<{ className?: string }> }[] = [
-  { name: 'Cctv', label: 'CCTV Kamera', icon: Cctv },
-  { name: 'Video', label: 'CCTV / NVR', icon: Video },
-  { name: 'Camera', label: 'Kamera', icon: Camera },
-  { name: 'Webcam', label: 'Webcam', icon: Webcam },
-  { name: 'Monitor', label: 'PC / Monitor', icon: Monitor },
+  { name: 'PC', label: 'PC / Komputer Desktop', icon: Computer },
+  { name: 'PcCase', label: 'CPU / PC Case', icon: PcCase },
+  { name: 'Monitor', label: 'Monitor / Display', icon: Monitor },
   { name: 'Laptop', label: 'Laptop', icon: Laptop },
   { name: 'Server', label: 'Server / VM', icon: Server },
   { name: 'Router', label: 'Router', icon: Router },
   { name: 'Network', label: 'Switch / Hub', icon: Network },
   { name: 'Wifi', label: 'Access Point', icon: Wifi },
   { name: 'Printer', label: 'Printer / Scanner', icon: Printer },
+  { name: 'Cctv', label: 'CCTV Kamera', icon: Cctv },
+  { name: 'Video', label: 'CCTV / NVR', icon: Video },
+  { name: 'Camera', label: 'Kamera', icon: Camera },
+  { name: 'Webcam', label: 'Webcam', icon: Webcam },
   { name: 'Smartphone', label: 'Smartphone', icon: Smartphone },
   { name: 'Tablet', label: 'Tablet', icon: Tablet },
   { name: 'Cpu', label: 'IoT / Processor', icon: Cpu },
@@ -50,7 +54,10 @@ export const AVAILABLE_ICONS: { name: string; label: string; icon: React.FC<{ cl
 ];
 
 export const getCategoryIconComponent = (iconName: string): React.FC<{ className?: string }> => {
-  const found = AVAILABLE_ICONS.find(i => i.name.toLowerCase() === iconName.toLowerCase());
+  const clean = (iconName || '').toLowerCase();
+  if (clean === 'pc' || clean === 'computer' || clean === 'desktop') return Computer;
+  if (clean === 'pccase' || clean === 'pc-case') return PcCase;
+  const found = AVAILABLE_ICONS.find(i => i.name.toLowerCase() === clean);
   return found ? found.icon : Cpu;
 };
 
