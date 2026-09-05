@@ -525,8 +525,12 @@ export const App: React.FC = () => {
       setSelectedGroupId(data.groups[0].id);
     }
     
-    setAuthView('home');
+    // Automatically log out upon data import/restore
+    logoutUser();
+    setCurrentUser(null);
+    setAuthView('login');
     setIsViewingPublicHome(false);
+    syncBrowserUrl('/login');
   };
 
   const handleLogout = () => {

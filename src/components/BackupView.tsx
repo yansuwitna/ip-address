@@ -129,7 +129,10 @@ export const BackupView: React.FC<BackupViewProps> = ({
     onImportData(dataToRestore);
     setIsRestoreModalOpen(false);
     setPendingRestoreData(null);
-    showSuccess('Pemulihan Sukses', 'Data pilihan Anda berhasil dipulihkan dari berkas cadangan!');
+    showSuccess(
+      'Pemulihan Sukses',
+      'Data pilihan Anda berhasil dipulihkan. Anda akan otomatis dialihkan ke halaman login untuk memperbarui sesi.'
+    );
   };
 
   const handleWipeAll = async () => {
