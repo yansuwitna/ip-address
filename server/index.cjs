@@ -267,7 +267,7 @@ async function startServer() {
   if (process.env.NODE_ENV === 'production') {
     // Serve static files in production
     app.use(express.static(path.resolve(__dirname, '../dist')));
-    app.get('*', (req, res) => {
+    app.get('{*path}', (req, res) => {
       res.sendFile(path.resolve(__dirname, '../dist/index.html'));
     });
   } else {
