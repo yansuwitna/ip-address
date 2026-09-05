@@ -205,11 +205,16 @@ export const UsersView: React.FC<UsersViewProps> = ({
           // @ts-ignore
           setFormError(res.error || 'Gagal menyimpan token ke database!');
         } else {
+          // Immediately update document manifest link so browser omnibox picks it up right away
+          const link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement;
+          if (link) {
+            link.href = `/manifest.json?token=${encodeURIComponent(token)}`;
+          }
           Swal.fire({
             title: 'Berhasil!',
-            text: 'Token baru telah aktif dan tersimpan ke database.',
+            text: 'Token baru telah aktif dan tersimpan ke database. Ikon instalasi desktop sekarang otomatis menggunakan token ini.',
             icon: 'success',
-            timer: 2000,
+            timer: 2500,
             showConfirmButton: false
           });
         }

@@ -205,29 +205,9 @@ export const App: React.FC = () => {
       document.head.appendChild(link);
     }
 
-    // Always provide a valid manifest so Chrome's PWA engine doesn't break,
-    // but we inject the magic token ONLY if on the users tab.
-    // If on other tabs, we set display to 'browser' which disables the Omnibox install prompt natively!
-    const manifest = {
-      name: "IP & DNS Manager",
-      short_name: "NetIPAM",
-      description: "Sistem Manajemen Alamat IP dan DNS Terintegrasi",
-      start_url: currentUser?.magicToken ? `/?token=${currentUser.magicToken}` : `/`,
-      display: "standalone", 
-      background_color: "#ffffff",
-      theme_color: "#2563eb",
-      icons: [
-        { src: "/favicon.ico", sizes: "64x64 32x32 24x24 16x16", type: "image/x-icon" },
-        { src: "/logo.svg", type: "image/svg+xml", sizes: "192x192" },
-        { src: "/logo.svg", type: "image/svg+xml", sizes: "512x512" }
-      ]
-    };
-    
-    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-
-    return () => URL.revokeObjectURL(url);
+    // Point manifest directly to standard URL endpoint with token if available
+    const tokenParam = currentUser?.magicToken ? `?token=${encodeURIComponent(currentUser.magicToken)}` : '';
+    link.href = `/manifest.json${tokenParam}`;
   }, [currentUser?.magicToken, currentTab]);
 
   const handleToggleTheme = () => {
@@ -709,6 +689,7 @@ export const App: React.FC = () => {
           onViewHome={() => setIsViewingPublicHome(true)}
           theme={theme}
           onToggleTheme={handleToggleTheme}
+          showInstallPwa={currentTab === 'users'}
         />
 
 

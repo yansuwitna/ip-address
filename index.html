@@ -20,6 +20,16 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      window.deferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Do NOT call e.preventDefault() so Chrome/Edge desktop omnibox immediately displays the install button!
+        window.deferredPrompt = e;
+        window.dispatchEvent(new CustomEvent('pwa-installable', { detail: e }));
+      });
+      window.addEventListener('appinstalled', () => {
+        window.deferredPrompt = null;
+        window.dispatchEvent(new CustomEvent('pwa-installed'));
+      });
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker.register("/sw.js");

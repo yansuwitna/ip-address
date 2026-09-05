@@ -84,6 +84,79 @@ async function startServer() {
     }
   });
 
+  // Dynamic PWA Manifest Route with application/manifest+json
+  app.get('/manifest.json', async (req, res) => {
+    try {
+      const token = req.query.token;
+      let startUrl = '/';
+      if (token) {
+        startUrl = `/?token=${encodeURIComponent(token)}`;
+      } else {
+        const userWithToken = await prisma.user.findFirst({
+          where: { magicToken: { not: null } }
+        });
+        if (userWithToken && userWithToken.magicToken) {
+          startUrl = `/?token=${encodeURIComponent(userWithToken.magicToken)}`;
+        }
+      }
+
+      res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+      res.json({
+        name: "IP & DNS Manager",
+        short_name: "NetIPAM",
+        description: "Sistem Manajemen Alamat IP dan DNS Terintegrasi",
+        start_url: startUrl,
+        scope: "/",
+        id: startUrl,
+        display: "standalone",
+        orientation: "any",
+        background_color: "#ffffff",
+        theme_color: "#2563eb",
+        shortcuts: [
+          {
+            name: "Buka NetIPAM",
+            url: startUrl,
+            icons: [{ src: "/logo192.png", sizes: "192x192" }]
+          }
+        ],
+        icons: [
+          {
+            src: "/logo192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any maskable"
+          },
+          {
+            src: "/logo512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any maskable"
+          },
+          {
+            src: "/logo.svg",
+            sizes: "192x192 512x512",
+            type: "image/svg+xml"
+          }
+        ]
+      });
+    } catch (e) {
+      res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+      res.json({
+        name: "IP & DNS Manager",
+        short_name: "NetIPAM",
+        start_url: "/",
+        scope: "/",
+        display: "standalone",
+        background_color: "#ffffff",
+        theme_color: "#2563eb",
+        icons: [
+          { src: "/logo192.png", sizes: "192x192", type: "image/png" },
+          { src: "/logo512.png", sizes: "512x512", type: "image/png" }
+        ]
+      });
+    }
+  });
+
   // GET all data
   app.get('/api/store/all', async (req, res) => {
     try {
