@@ -6,3 +6,5 @@ dist-ssr
 .DS_Store
 prisma/*.db
 pesan-git.txt
+.env
+package-lock.json

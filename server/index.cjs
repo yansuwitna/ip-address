@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
@@ -206,9 +207,10 @@ async function startServer() {
     app.use(vite.middlewares);
   }
 
-  const PORT = process.env.PORT || 5173;
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server (Frontend + Backend) running on http://localhost:${PORT}`);
+  const PORT = process.env.PORT || 3000;
+  const HOST = process.env.HOST || '0.0.0.0';
+  app.listen(PORT, HOST, () => {
+    console.log(`🚀 Server (Frontend + Backend) running on http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
   });
 }
 

@@ -42,16 +42,95 @@ cd /path/ke/proyek
 # 2. Pasang dependensi
 npm install
 
-# 3. Jalankan development server
+# 3. Salin file environment jika belum ada
+cp .env.example .env
+
+# 4. Generate Prisma Client & Database (default SQLite)
+npx prisma generate
+npx prisma db push
+
+# 5. Jalankan development server
 npm run dev
 ```
-Buka browser di: **`http://localhost:5173`**
+Buka browser di: **`http://localhost:3000`**
 
 ### Uji Build Produksi Lokal:
 ```bash
 npm run build
 npm run preview
 ```
+
+---
+
+## 🗄️ Panduan Konfigurasi Database (SQLite, PostgreSQL, MySQL)
+
+Aplikasi ini menggunakan **Prisma ORM** yang fleksibel dan mendukung berbagai jenis database relasional. Data tersimpan murni di database (tanpa cache browser / localStorage).
+
+### 1. SQLite (Bawaan / Default)
+Tidak memerlukan instalasi server database terpisah, sangat cocok untuk VPS berkapasitas hemat atau deployment mandiri cepat.
+- **File `.env`**:
+  ```bash
+  DATABASE_URL="file:./dev.db"
+  ```
+- **File `prisma/schema.prisma`**:
+  ```prisma
+  datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+  }
+  ```
+
+---
+
+### 2. PostgreSQL
+Cocok untuk infrastruktur perusahaan dengan keandalan tinggi dan konkurensi besar.
+1. Buat database di PostgreSQL:
+   ```sql
+   CREATE DATABASE netipam;
+   ```
+2. Ubah `provider` di file `prisma/schema.prisma`:
+   ```prisma
+   datasource db {
+     provider = "postgresql"
+     url      = env("DATABASE_URL")
+   }
+   ```
+3. Atur string koneksi di file `.env`:
+   ```bash
+   # Format: postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA
+   DATABASE_URL="postgresql://postgres:password123@localhost:5432/netipam?schema=public"
+   ```
+4. Terapkan tabel ke PostgreSQL:
+   ```bash
+   npx prisma db push
+   npx prisma generate
+   ```
+
+---
+
+### 3. MySQL / MariaDB
+Pilihan populer yang banyak digunakan di berbagai server Linux.
+1. Buat database di MySQL:
+   ```sql
+   CREATE DATABASE netipam CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+2. Ubah `provider` di file `prisma/schema.prisma`:
+   ```prisma
+   datasource db {
+     provider = "mysql"
+     url      = env("DATABASE_URL")
+   }
+   ```
+3. Atur string koneksi di file `.env`:
+   ```bash
+   # Format: mysql://USER:PASSWORD@HOST:PORT/DATABASE
+   DATABASE_URL="mysql://root:password123@localhost:3306/netipam"
+   ```
+4. Terapkan tabel ke MySQL:
+   ```bash
+   npx prisma db push
+   npx prisma generate
+   ```
 
 ---
 
