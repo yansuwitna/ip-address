@@ -1,3 +1,4 @@
+import { syncToServer } from './api';
 import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from '../types/ipam';
 
 const STORAGE_KEYS = {

@@ -1,3 +1,4 @@
+import { syncToServer, wipeServer } from './api';
 import { User, UserAccount } from '../types/auth';
 
 const AUTH_STORAGE_KEY = 'netipam_auth_session';
@@ -40,6 +41,7 @@ export function loadUsers(): UserAccount[] {
 export function saveUsers(users: UserAccount[]): void {
   try {
     localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+    syncToServer(USERS_STORAGE_KEY, users);
   } catch (e) {
     console.error('Failed to save users:', e);
   }
@@ -208,6 +210,7 @@ export function wipeAllUsers(): void {
   try {
     localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify([]));
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    wipeServer();
   } catch (e) {
     console.error('Failed to wipe users:', e);
   }
