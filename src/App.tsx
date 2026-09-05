@@ -249,9 +249,11 @@ export const App: React.FC = () => {
         setCurrentUserSession(safeUser);
         setCurrentUser(safeUser);
         setAuthView('home');
+        setIsViewingPublicHome(false);
+        setCurrentTab('dashboard');
         
-        // Ensure URL is cleaned completely of query params
-        window.history.replaceState({}, document.title, window.location.pathname);
+        // Ensure URL is updated to /admin and query params are removed
+        window.history.replaceState({}, document.title, '/admin');
         
         setTimeout(() => {
           Swal.fire({
