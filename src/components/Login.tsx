@@ -14,22 +14,30 @@ import {
   AlertCircle, 
   CheckCircle2 
 } from 'lucide-react';
-import { loginUser, loadUsers, createUser } from '../utils/auth';
-import { User } from '../types/auth';
+import { loginUser } from '../utils/auth';
+import { User, UserAccount } from '../types/auth';
 
 interface LoginProps {
-  onLoginSuccess: (user: User) => void;
-  onBackToHome?: () => void;
+  users?: UserAccount[];
   hasNoUsers?: boolean;
+  onLoginSuccess: (user: User) => void;
+  onRegisterUser?: (userData: { username: string; name: string; email: string; password: string }) => Promise<{ success: boolean; error?: string; user?: UserAccount }>;
+  onBackToHome?: () => void;
 }
 
-export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasNoUsers: propHasNoUsers }) => {
+export const Login: React.FC<LoginProps> = ({ 
+  users = [],
+  onLoginSuccess, 
+  onRegisterUser,
+  onBackToHome, 
+  hasNoUsers: propHasNoUsers 
+}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasNoUsers, setHasNoUsers] = useState(propHasNoUsers ?? false);
+  const [hasNoUsers, setHasNoUsers] = useState(propHasNoUsers ?? (users.length === 0));
 
   // Register Form State
   const [regName, setRegName] = useState('');
@@ -43,10 +51,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
     if (propHasNoUsers !== undefined) {
       setHasNoUsers(propHasNoUsers);
     } else {
-      const existing = loadUsers();
-      setHasNoUsers(existing.length === 0);
+      setHasNoUsers(users.length === 0);
     }
-  }, [propHasNoUsers]);
+  }, [propHasNoUsers, users.length]);
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,31 +93,32 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
       return;
     }
 
-    const res = await createUser({
-      name: regName,
-      username: regUsername,
-      email: regEmail,
-      password: regPassword
-    });
+    if (onRegisterUser) {
+      const res = await onRegisterUser({
+        name: regName,
+        username: regUsername,
+        email: regEmail,
+        password: regPassword
+      });
 
-    if (!res.success || !res.user) {
-      setRegError(res.error || 'Gagal membuat pengguna baru!');
-      return;
-    }
-
-    setRegSuccess(`Pengguna "${res.user.username}" berhasil dibuat! Masuk otomatis...`);
-    setHasNoUsers(false);
-
-    // Automatically log in
-    setTimeout(async () => {
-      const loginRes = await loginUser(res.user!.username, regPassword);
-      if (loginRes.success && loginRes.user) {
-        onLoginSuccess(loginRes.user);
-      } else {
-        setUsername(res.user!.username);
-        setPassword(regPassword);
+      if (!res.success || !res.user) {
+        setRegError(res.error || 'Gagal membuat pengguna baru!');
+        return;
       }
-    }, 500);
+
+      setRegSuccess(`Pengguna "${res.user.username}" berhasil dibuat! Masuk otomatis...`);
+      setHasNoUsers(false);
+
+      setTimeout(async () => {
+        const loginRes = await loginUser(res.user!.username, regPassword);
+        if (loginRes.success && loginRes.user) {
+          onLoginSuccess(loginRes.user);
+        } else {
+          setUsername(res.user!.username);
+          setPassword(regPassword);
+        }
+      }, 500);
+    }
   };
 
   return (

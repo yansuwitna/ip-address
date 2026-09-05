@@ -22,6 +22,7 @@ import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainR
 import { User, UserAccount } from './types/auth';
 import { 
   getCurrentUser, 
+  setCurrentUserSession,
   logoutUser, 
   loadUsers, 
   saveUsers,
@@ -71,7 +72,7 @@ export const App: React.FC = () => {
   // Authentication State
   const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser);
   const [authView, setAuthView] = useState<'home' | 'login'>('home');
-  const [users, setUsers] = useState<UserAccount[]>(loadUsers);
+  const [users, setUsers] = useState<UserAccount[]>([]);
   const [isViewingPublicHome, setIsViewingPublicHome] = useState(false);
 
   // Navigation & UI State
@@ -80,14 +81,13 @@ export const App: React.FC = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Data State
-  
-
-  const [groups, setGroups] = useState<IPGroup[]>(loadGroups);
-  const [allocations, setAllocations] = useState<IPAllocation[]>(loadAllocations);
-  const [services, setServices] = useState<IPService[]>(loadServices);
-  const [categories, setCategories] = useState<DeviceCategory[]>(loadDeviceCategories);
-  const [dnsRecords, setDnsRecords] = useState<DnsRecord[]>(loadDnsRecords);
-  const [selectedGroupId, setSelectedGroupId] = useState<string>(groups[0]?.id || '');
+  const [groups, setGroups] = useState<IPGroup[]>([]);
+  const [allocations, setAllocations] = useState<IPAllocation[]>([]);
+  const [services, setServices] = useState<IPService[]>([]);
+  const [categories, setCategories] = useState<DeviceCategory[]>([]);
+  const [dnsRecords, setDnsRecords] = useState<DnsRecord[]>([]);
+  const [subDomains, setSubDomains] = useState<SubDomainRecord[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState<string>('');
   const [selectedServiceIp, setSelectedServiceIp] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'matrix' | 'table'>('matrix');
   const [subnetListViewMode, setSubnetListViewMode] = useState<'cards' | 'table'>('cards');
@@ -98,28 +98,37 @@ export const App: React.FC = () => {
   useEffect(() => {
     fetchFromServer().then((data: any) => {
       if (data) {
-        if (data['netipam_groups_v1']) setGroups(data['netipam_groups_v1']);
+        if (data['netipam_groups_v1']) {
+          setGroups(data['netipam_groups_v1']);
+          if (data['netipam_groups_v1'].length > 0) {
+            setSelectedGroupId(data['netipam_groups_v1'][0].id);
+          }
+        }
         if (data['netipam_allocations_v1']) setAllocations(data['netipam_allocations_v1']);
         if (data['netipam_services_v1']) setServices(data['netipam_services_v1']);
         if (data['netipam_device_categories_v1']) setCategories(data['netipam_device_categories_v1']);
         if (data['netipam_dns_records_v1']) setDnsRecords(data['netipam_dns_records_v1']);
-        // Subdomains are not part of App.tsx state directly (they are loaded in SubDomainView if needed, or if it doesn't exist we ignore it).
+        if (data['netipam_sub_domains_v1']) setSubDomains(data['netipam_sub_domains_v1']);
         
-        if (data['netipam_users_list_v1'] && data['netipam_users_list_v1'].length > 0) {
-          setUsers(data['netipam_users_list_v1']);
-          localStorage.setItem('netipam_users_list_v1', JSON.stringify(data['netipam_users_list_v1']));
+        const serverUsers: UserAccount[] = data['netipam_users_list_v1'] || [];
+        setUsers(serverUsers);
+        
+        // If no users exist in database, wipe any active session
+        if (serverUsers.length === 0) {
+          setCurrentUser(null);
+          logoutUser();
+        } else if (currentUser) {
+          // If logged in, verify user still exists in DB
+          const currentExists = serverUsers.find(u => u.id === currentUser.id || u.username.toLowerCase() === currentUser.username.toLowerCase());
+          if (!currentExists) {
+            setCurrentUser(null);
+            logoutUser();
+          }
         }
-        
-        Object.keys(data).forEach(key => {
-          localStorage.setItem(key, JSON.stringify(data[key]));
-        });
       }
       setIsSyncing(false);
     });
   }, []);
-
-
-
 
   // Magic Link Auto Login
   useEffect(() => {
@@ -128,13 +137,10 @@ export const App: React.FC = () => {
     const token = urlParams.get('token');
     if (token) {
       const cleanToken = token.trim();
-      const allUsers = loadUsers();
-      
-      // Strict match ONLY
-      let matchedUser = allUsers.find(u => u.magicToken && u.magicToken.trim() === cleanToken);
+      let matchedUser = users.find((u: UserAccount) => u.magicToken && u.magicToken.trim() === cleanToken);
 
       if (matchedUser) {
-        localStorage.setItem('netipam_auth_session', JSON.stringify({
+        const safeUser: User = {
           id: matchedUser.id,
           username: matchedUser.username,
           name: matchedUser.name,
@@ -142,8 +148,9 @@ export const App: React.FC = () => {
           role: matchedUser.role,
           avatar: matchedUser.avatar,
           magicToken: matchedUser.magicToken
-        }));
-        setCurrentUser(matchedUser);
+        };
+        setCurrentUserSession(safeUser);
+        setCurrentUser(safeUser);
         setAuthView('home');
         
         // Ensure URL is cleaned completely of query params
@@ -159,16 +166,9 @@ export const App: React.FC = () => {
           });
         }, 100);
       } else {
-        // Token invalid - Debugging what is wrong!
-        const storedToken = allUsers.length > 0 ? allUsers[0].magicToken : 'NO_USER';
-        const userObjStr = allUsers.length > 0 ? JSON.stringify(allUsers[0]) : 'NONE';
         Swal.fire({
-          title: 'Akses Ditolak (Debug)',
-          html: `<div class="text-xs text-left overflow-hidden" style="max-height: 300px; overflow-y: auto;">
-            <p><b>Token URL:</b> <br/>${token}</p>
-            <p class="mt-2"><b>Token DB:</b> <br/>${storedToken}</p>
-            <p class="mt-2"><b>Full User Object:</b> <br/>${userObjStr}</p>
-          </div>`,
+          title: 'Akses Ditolak',
+          text: 'Token login tidak ditemukan di database.',
           icon: 'error',
           confirmButtonText: 'Kembali'
         }).then(() => {
@@ -177,7 +177,7 @@ export const App: React.FC = () => {
         });
       }
     }
-  }, []);
+  }, [isSyncing, users]);
 
   // Theme State
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -257,26 +257,42 @@ export const App: React.FC = () => {
   const [printType, setPrintType] = useState<'allocations' | 'dns' | 'services'>('allocations');
 
 
-  // Sync with LocalStorage
+  // Sync with Database via Server API
   useEffect(() => {
-    saveGroups(groups);
-  }, [groups]);
+    if (!isSyncing) {
+      saveGroups(groups);
+    }
+  }, [groups, isSyncing]);
 
   useEffect(() => {
-    saveAllocations(allocations);
-  }, [allocations]);
+    if (!isSyncing) {
+      saveAllocations(allocations);
+    }
+  }, [allocations, isSyncing]);
 
   useEffect(() => {
-    saveServices(services);
-  }, [services]);
+    if (!isSyncing) {
+      saveServices(services);
+    }
+  }, [services, isSyncing]);
 
   useEffect(() => {
-    saveDeviceCategories(categories);
-  }, [categories]);
+    if (!isSyncing) {
+      saveDeviceCategories(categories);
+    }
+  }, [categories, isSyncing]);
 
   useEffect(() => {
-    saveDnsRecords(dnsRecords);
-  }, [dnsRecords]);
+    if (!isSyncing) {
+      saveDnsRecords(dnsRecords);
+    }
+  }, [dnsRecords, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveSubDomains(subDomains);
+    }
+  }, [subDomains, isSyncing]);
 
   // Saat terbaca di tabel user tidak ada, otomatis membuka halaman daftar user
   useEffect(() => {
@@ -318,36 +334,46 @@ export const App: React.FC = () => {
     magicToken?: string;
   }) => {
     if (userData.id) {
-      const res = await updateUser(userData.id, userData);
-      if (res.success) {
-        setUsers(loadUsers());
-        if (currentUser && currentUser.id === userData.id) {
-          const updated = getCurrentUser();
-          if (updated) setCurrentUser(updated);
+      const res = await updateUser(users, userData.id, userData);
+      if (res.success && res.updatedUsers) {
+        setUsers(res.updatedUsers);
+        if (currentUser && currentUser.id === userData.id && res.user) {
+          const safeUser: User = {
+            id: res.user.id,
+            username: res.user.username,
+            name: res.user.name,
+            email: res.user.email,
+            role: res.user.role,
+            avatar: res.user.avatar,
+            magicToken: res.user.magicToken
+          };
+          setCurrentUserSession(safeUser);
+          setCurrentUser(safeUser);
         }
       }
       return res;
     } else {
-      const res = await createUser({
+      const res = await createUser(users, {
         username: userData.username,
         name: userData.name,
         email: userData.email,
         password: userData.password || '123456',
         avatar: userData.avatar
       });
-      if (res.success) {
-        setUsers(loadUsers());
+      if (res.success && res.updatedUsers) {
+        setUsers(res.updatedUsers);
       }
       return res;
     }
   };
 
 
-  const handleDeleteUser = (userId: string) => {
-    const res = deleteUser(userId);
-    if (res.success) {
-      setUsers(loadUsers());
+  const handleDeleteUser = async (userId: string) => {
+    const res = await deleteUser(users, userId);
+    if (res.success && res.updatedUsers) {
+      setUsers(res.updatedUsers);
       if (currentUser && currentUser.id === userId) {
+        logoutUser();
         setCurrentUser(null);
         setAuthView('home');
       }
@@ -355,12 +381,13 @@ export const App: React.FC = () => {
     return res;
   };
 
-  const handleWipeAllData = () => {
+  const handleWipeAllData = async () => {
     setGroups([]);
     setAllocations([]);
     setServices([]);
     setCategories([]);
     setDnsRecords([]);
+    setSubDomains([]);
     setSelectedGroupId('');
     setSelectedServiceIp(null);
     saveGroups([]);
@@ -369,7 +396,7 @@ export const App: React.FC = () => {
     saveDeviceCategories([]);
     saveDnsRecords([]);
     saveSubDomains([]);
-    wipeAllUsers();
+    await wipeAllUsers();
     setUsers([]);
     setCurrentUser(null);
     setAuthView('home');
@@ -399,7 +426,6 @@ export const App: React.FC = () => {
     }
     if (data.users && data.users.length > 0) {
       setUsers(data.users);
-      wipeAllUsers();
       saveUsers(data.users);
     }
     if (data.services) {
@@ -411,6 +437,7 @@ export const App: React.FC = () => {
       saveDnsRecords(data.dnsRecords);
     }
     if (data.subDomains) {
+      setSubDomains(data.subDomains);
       saveSubDomains(data.subDomains);
     }
     
@@ -435,10 +462,23 @@ export const App: React.FC = () => {
     if (authView === 'login') {
       return (
         <Login 
+          users={users}
           hasNoUsers={users.length === 0}
           onLoginSuccess={(user) => {
+            setCurrentUserSession(user);
             setCurrentUser(user);
-            setUsers(loadUsers());
+          }}
+          onRegisterUser={async (userData) => {
+            const res = await createUser(users, {
+              username: userData.username,
+              name: userData.name,
+              email: userData.email,
+              password: userData.password
+            });
+            if (res.success && res.updatedUsers) {
+              setUsers(res.updatedUsers);
+            }
+            return res;
           }}
           onBackToHome={() => setAuthView('home')}
         />
@@ -450,6 +490,7 @@ export const App: React.FC = () => {
         allocations={allocations}
         categories={categories}
         dnsRecords={dnsRecords}
+        subDomains={subDomains}
         currentUser={null}
         onNavigateToLogin={() => setAuthView('login')}
         theme={theme}
@@ -466,6 +507,7 @@ export const App: React.FC = () => {
         allocations={allocations}
         categories={categories}
         dnsRecords={dnsRecords}
+        subDomains={subDomains}
         currentUser={currentUser}
         onNavigateToLogin={() => setIsViewingPublicHome(false)}
         onNavigateToDashboard={() => setIsViewingPublicHome(false)}
@@ -1304,8 +1346,10 @@ export const App: React.FC = () => {
           {currentTab === 'dns' && (
             <DnsView
               dnsRecords={dnsRecords}
+              subDomains={subDomains}
               groups={groups}
               allocations={allocations}
+              onSaveSubDomains={(records) => setSubDomains(records)}
               onSaveRecord={(recordData) => {
                 const now = new Date().toISOString();
                 if (recordData.id) {
@@ -1374,6 +1418,7 @@ export const App: React.FC = () => {
               users={users}
               services={services}
               dnsRecords={dnsRecords}
+              subDomains={subDomains}
               onImportData={handleImportData}
               onWipeAllData={handleWipeAllData}
             />

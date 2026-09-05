@@ -13,8 +13,7 @@ import {
   HardDrive,
   Globe
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceCategory, DnsRecord } from '../types/ipam';
-import { loadSubDomains } from '../utils/storage';
+import { IPGroup, IPAllocation, DeviceCategory, DnsRecord, SubDomainRecord } from '../types/ipam';
 import { User } from '../types/auth';
 
 interface HomeViewProps {
@@ -22,6 +21,7 @@ interface HomeViewProps {
   allocations: IPAllocation[];
   categories: DeviceCategory[];
   dnsRecords?: DnsRecord[];
+  subDomains?: SubDomainRecord[];
   currentUser: User | null;
   onNavigateToLogin: () => void;
   onNavigateToDashboard?: () => void;
@@ -34,13 +34,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
   allocations,
   categories,
   dnsRecords = [],
+  subDomains = [],
   currentUser,
   onNavigateToLogin,
   onNavigateToDashboard,
   theme = 'light',
   onToggleTheme
 }) => {
-  const subDomains = loadSubDomains();
   // Global statistics
   const totalUsedAll = allocations.filter(a => a.status === 'used').length;
   const totalReservedAll = allocations.filter(a => a.status === 'reserved' || a.status === 'dhcp').length;

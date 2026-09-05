@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, Plus, Search, Edit2, Trash2, Globe, Check, Database, Folder, Hash, Server } from 'lucide-react';
 import { DnsRecord, SubDomainRecord } from '../types/ipam';
-import { loadSubDomains, saveSubDomains } from '../utils/storage';
 import Swal from 'sweetalert2';
 
 interface SubDomainViewProps {
   parentDomain: DnsRecord;
+  subDomains: SubDomainRecord[];
+  onSaveSubDomains: (records: SubDomainRecord[]) => void;
   onBack: () => void;
 }
 
-export const SubDomainView: React.FC<SubDomainViewProps> = ({ parentDomain, onBack }) => {
-  const [subDomains, setSubDomains] = useState<SubDomainRecord[]>([]);
+export const SubDomainView: React.FC<SubDomainViewProps> = ({ 
+  parentDomain, 
+  subDomains, 
+  onSaveSubDomains, 
+  onBack 
+}) => {
   const [search, setSearch] = useState('');
   
   // Modal State
@@ -24,13 +29,8 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({ parentDomain, onBa
   const [database, setDatabase] = useState('');
   const [description, setDescription] = useState('');
 
-  useEffect(() => {
-    setSubDomains(loadSubDomains());
-  }, []);
-
   const handleSave = (records: SubDomainRecord[]) => {
-    setSubDomains(records);
-    saveSubDomains(records);
+    onSaveSubDomains(records);
   };
 
   const parentSubs = subDomains.filter(s => s.parentDomainId === parentDomain.id);

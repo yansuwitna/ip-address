@@ -20,16 +20,17 @@ import {
   Clock,
   Send
 } from 'lucide-react';
-import { DnsRecord, DnsRecordType, DnsRecordStatus, IPGroup, IPAllocation } from '../types/ipam';
+import { DnsRecord, DnsRecordType, DnsRecordStatus, IPGroup, IPAllocation, SubDomainRecord } from '../types/ipam';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
-import { loadSubDomains } from '../utils/storage';
 
 interface DnsViewProps {
   dnsRecords: DnsRecord[];
+  subDomains?: SubDomainRecord[];
   groups: IPGroup[];
   allocations: IPAllocation[];
   onSaveRecord: (record: Partial<DnsRecord>) => void;
   onDeleteRecord: (id: string) => void;
+  onSaveSubDomains?: (records: SubDomainRecord[]) => void;
   onOpenAddModal: () => void;
   onOpenEditModal: (record: DnsRecord) => void;
   onOpenPrintModal: () => void;
@@ -37,16 +38,17 @@ interface DnsViewProps {
 
 export const DnsView: React.FC<DnsViewProps> = ({
   dnsRecords,
+  subDomains = [],
   groups,
   allocations,
   onSaveRecord,
   onDeleteRecord,
+  onSaveSubDomains,
   onOpenAddModal,
   onOpenEditModal,
   onOpenPrintModal
 }) => {
   const [search, setSearch] = useState('');
-  const subDomains = loadSubDomains();
   const [selectedDomainForSub, setSelectedDomainForSub] = useState<DnsRecord | null>(null);
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -152,6 +154,10 @@ export const DnsView: React.FC<DnsViewProps> = ({
     return (
       <SubDomainView 
         parentDomain={selectedDomainForSub} 
+        subDomains={subDomains}
+        onSaveSubDomains={(records) => {
+          if (onSaveSubDomains) onSaveSubDomains(records);
+        }}
         onBack={() => setSelectedDomainForSub(null)} 
       />
     );

@@ -35,56 +35,71 @@ model IPGroup {
 }
 
 model IPAllocation {
-  id          String   @id
-  ipAddress   String
-  hostname    String?
-  macAddress  String?
-  deviceType  String?
-  categoryId  String?
-  status      String
-  description String?
-  location    String?
-  owner       String?
-  port        String?
-  notes       String?
-  lastSeen    String?
-  isReserved  Boolean  @default(false)
-  history     String   @default("[]") 
+  id              String   @id
+  groupId         String   @default("")
+  ip              String   @default("")
+  hostname        String?
+  deviceType      String?
+  macAddress      String?
+  assignedTo      String?
+  department      String?
+  status          String   @default("used")
+  assignedDate    String?
+  notes           String?
+  lastPingStatus  String?
+  lastPingLatency Float?
 }
 
 model DeviceCategory {
   id          String   @id
   name        String
-  description String?
-  color       String
   icon        String
+  description String?
+  isDefault   Boolean?
 }
 
 model IPService {
-  id          String   @id
-  ipAddress   String
-  port        Int
-  protocol    String
-  serviceName String
-  description String?
-  status      String
-  lastCheck   String?
+  id           String   @id
+  allocationId String   @default("")
+  ip           String   @default("")
+  name         String
+  port         Int
+  protocol     String
+  category     String
+  status       String
+  version      String?
+  url          String?
+  description  String?
+  lastChecked  String?
+  checkStatus  String?
+  checkLatency Float?
+  createdAt    String
+  updatedAt    String
 }
 
 model DnsRecord {
-  id        String   @id
-  domain    String
-  type      String
-  value     String
-  ttl       Int
-  proxied   Boolean  @default(false)
-  notes     String?
+  id          String   @id
+  domain      String
+  type        String
+  value       String
+  ttl         Int
+  priority    Int?
+  ip          String?
+  groupId     String?
+  status      String   @default("active")
+  description String?
+  createdAt   String
+  updatedAt   String
 }
 
 model SubDomainRecord {
-  id          String   @id
-  domain      String
-  targetIp    String
-  status      String
-  description String?
+  id             String   @id
+  parentDomainId String   @default("")
+  subName        String
+  ipAddress      String?
+  port           String?
+  folder         String?
+  database       String?
+  description    String?
+  createdAt      String
 }

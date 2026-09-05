@@ -55,42 +55,42 @@ npm run preview
 
 ---
 
-## 🚀 Panduan Instalasi & Deployment dengan PM2 di Server VPS
+## 🚀 Panduan Instalasi & Deployment dengan PM2 di Server VPS Debian
 
-Panduan ini ditujukan untuk deployment di server **Linux VPS** (Ubuntu 20.04 / 22.04 / 24.04 LTS, Debian 11/12, atau sejenisnya) menggunakan **PM2 Process Manager**.
+Panduan lengkap ini ditujukan untuk deployment di server **Debian Linux (Debian 11 Bullseye / Debian 12 Bookworm)** menggunakan **PM2 Process Manager** dan arsitektur Fullstack (Frontend React + Backend Express + SQLite & Prisma).
 
-### 1. Persiapan Server VPS
+### 1. Persiapan Server VPS Debian
 
-Perbarui paket sistem VPS Anda:
+Perbarui paket repository sistem Debian Anda dan pasang dependensi esensial:
 ```bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y curl git build-essential
+sudo apt install -y curl git build-essential sqlite3 ca-certificates gnupg
 ```
 
-### 2. Instalasi Node.js & npm (LTS v20)
+### 2. Instalasi Node.js (LTS v20) di Debian
 
-Gunakan NodeSource untuk menginstal Node.js versi LTS terbaru:
+Gunakan NodeSource repository resmi untuk memasang Node.js LTS:
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
-# Verifikasi versi
+# Verifikasi instalasi
 node -v   # v20.x.x
 npm -v    # 10.x.x
 ```
 
 ### 3. Instalasi PM2 secara Global
 
-Pasang PM2 sebagai pengelola proses background di VPS:
+Pasang PM2 sebagai pengelola proses background di server Debian:
 ```bash
 sudo npm install -g pm2
 ```
 
 ---
 
-### 4. Clone Repositori & Persiapan Aplikasi
+### 4. Clone Repositori & Setup Aplikasi
 
-Pindahkan / clone repositori proyek ke direktori server (contoh di `/var/www/ip-address` atau di folder user `~/apps/ip-address`):
+Siapkan direktori aplikasi (contoh di `/var/www/ip-address` atau di home directory `~/apps/jaringan`):
 
 ```bash
 # Contoh direktori /var/www/ip-address:
@@ -98,93 +98,87 @@ sudo mkdir -p /var/www/ip-address
 sudo chown -R $USER:$USER /var/www/ip-address
 cd /var/www/ip-address
 
-# Clone repositori Anda (ganti URL dengan URL repositori Anda):
+# Clone repositori Anda:
 git clone <URL_REPOSITORI_ANDA> .
 
-# Pasang seluruh dependensi proyek:
+# Pasang dependensi proyek:
 npm install
 
-# Kompilasi build produksi (menghasilkan folder /dist):
+# Siapkan Prisma Client & migrasi database SQLite:
+npx prisma generate
+npx prisma db push
+
+# Kompilasi build frontend produksi (menghasilkan folder dist/):
 npm run build
 ```
 
 ---
 
-### 5. Menjalankan Aplikasi Menggunakan PM2
+### 5. Menjalankan Aplikasi Menggunakan PM2 (Port 3000)
 
-Ada 2 cara yang direkomendasikan untuk menjalankan aplikasi di server produksi:
+Aplikasi ini menggunakan arsitektur *unified fullstack* di mana backend Express melayani API sekaligus file statis frontend di port **3000**. File konfigurasi [`ecosystem.config.cjs`](ecosystem.config.cjs) sudah disiapkan.
 
-#### Opsi A: Menggunakan `ecosystem.config.cjs` (Sangat Direkomendasikan)
-Proyek ini sudah dilengkapi file konfigurasi PM2 [`ecosystem.config.cjs`](ecosystem.config.cjs). Cukup jalankan perintah:
-
+Jalankan aplikasi dengan PM2:
 ```bash
 pm2 start ecosystem.config.cjs
 ```
 
-#### Opsi B: Menggunakan Static Server (`serve`)
-Jika ingin menggunakan static web server ultra-ringan khusus aplikasi React/Vite:
-```bash
-sudo npm install -g serve
-pm2 start serve --name "ip-address" -- -s dist -l 3000
-```
-
-#### Opsi C: Menggunakan Perintah Langsung Vite Preview
-```bash
-pm2 start "npm run preview -- --host 0.0.0.0 --port 3000" --name "ip-address"
-```
+Aplikasi sekarang aktif di: **`http://IP_SERVER_ANDA:3000`**.
 
 ---
 
 ### 6. Konfigurasi Autostart PM2 Saat Booting Server
 
-Agar aplikasi otomatis menyala kembali saat server VPS di-restart atau mengalami reboot:
+Agar aplikasi otomatis berjalan kembali jika server VPS Debian di-reboot:
 
 ```bash
-# 1. Simpan konfigurasi proses aktif saat ini
+# 1. Simpan daftar proses aktif PM2
 pm2 save
 
-# 2. Buat script startup sistem
+# 2. Aktifkan service startup systemd
 pm2 startup
 ```
-*Salin dan jalankan baris perintah `sudo env PATH=...` yang dimunculkan oleh terminal jika diminta.*
+> *Salin dan jalankan baris perintah `sudo env PATH=...` yang muncul di terminal setelah mengetik `pm2 startup`.*
 
 ---
 
 ### 7. Perintah Pemeliharaan PM2
 
-Berikut daftar perintah berguna untuk memonitor aplikasi:
+Daftar perintah yang sering digunakan untuk memantau aplikasi:
 
 ```bash
-# Melihat daftar aplikasi yang berjalan
+# Melihat status proses
 pm2 list
 pm2 status
 
-# Melihat log output & error secara real-time
+# Melihat log aplikasi secara langsung (real-time)
 pm2 logs ip-address
 
-# Melihat ringkasan resource CPU & RAM
+# Melihat penggunaan CPU dan RAM
 pm2 monit
 
-# Me-restart aplikasi (misalnya setelah ada update build baru)
+# Me-restart aplikasi (misal setelah pull update atau ganti konfigurasi)
 pm2 restart ip-address
 
 # Menghentikan aplikasi
 pm2 stop ip-address
 
-# Menghapus aplikasi dari daftar PM2
+# Menghapus aplikasi dari PM2
 pm2 delete ip-address
 ```
 
 ---
 
-### 8. Alur Pembaruan Aplikasi (Update / CI/CD di VPS)
+### 8. Alur Pembaruan Aplikasi (Update di VPS)
 
-Jika ada perubahan kode baru di repository, perbarui di server dengan langkah berikut:
+Jika ada pembaruan kode di repositori Git, jalankan langkah ini di VPS:
 
 ```bash
 cd /var/www/ip-address
-git pull origin master
+git pull origin main
 npm install
+npx prisma generate
+npx prisma db push
 npm run build
 pm2 restart ip-address
 ```

@@ -19,6 +19,70 @@ async function startServer() {
     ]);
   }
 
+  // Direct login / token endpoint against Prisma database
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { username, password, token } = req.body;
+
+      if (token) {
+        const cleanToken = token.trim();
+        const user = await prisma.user.findFirst({
+          where: { magicToken: cleanToken }
+        });
+
+        if (!user) {
+          return res.status(401).json({ success: false, error: 'Token login tidak valid atau kadaluarsa!' });
+        }
+
+        const now = new Date().toISOString();
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { lastLogin: now }
+        });
+
+        const { password: _, ...safeUser } = user;
+        return res.json({
+          success: true,
+          user: { ...safeUser, lastLogin: now }
+        });
+      }
+
+      if (!username || !password) {
+        return res.status(400).json({ success: false, error: 'Username dan kata sandi wajib diisi!' });
+      }
+
+      const user = await prisma.user.findFirst({
+        where: {
+          username: username.trim().toLowerCase()
+        }
+      });
+
+      if (!user) {
+        return res.status(401).json({ success: false, error: 'Username tidak ditemukan di database!' });
+      }
+
+      const hashedInput = crypto.createHash('sha256').update(password).digest('hex');
+      if (user.password !== hashedInput && user.password !== password) {
+        return res.status(401).json({ success: false, error: 'Kata sandi salah!' });
+      }
+
+      const now = new Date().toISOString();
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { lastLogin: now }
+      });
+
+      const { password: _, ...safeUser } = user;
+      res.json({
+        success: true,
+        user: { ...safeUser, lastLogin: now }
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ success: false, error: 'Terjadi kesalahan pada server saat login.' });
+    }
+  });
+
   // GET all data
   app.get('/api/store/all', async (req, res) => {
     try {
@@ -40,15 +104,10 @@ async function startServer() {
         prisma.subDomainRecord.findMany()
       ]);
       
-      const parsedAllocations = allocations.map(a => ({
-        ...a,
-        history: JSON.parse(a.history || '[]')
-      }));
-
       res.json({
         'netipam_users_list_v1': users,
         'netipam_groups_v1': groups,
-        'netipam_allocations_v1': parsedAllocations,
+        'netipam_allocations_v1': allocations,
         'netipam_device_categories_v1': categories,
         'netipam_services_v1': services,
         'netipam_dns_records_v1': dnsRecords,
@@ -83,11 +142,11 @@ async function startServer() {
           await replaceTable(prisma.iPGroup, data);
           break;
         case 'netipam_allocations_v1':
-          const stringifiedAllocations = data.map(a => ({
-            ...a,
-            history: JSON.stringify(a.history || [])
-          }));
-          await replaceTable(prisma.iPAllocation, stringifiedAllocations);
+          const cleanAllocations = data.map(a => {
+            const { services: _, ...rest } = a;
+            return rest;
+          });
+          await replaceTable(prisma.iPAllocation, cleanAllocations);
           break;
         case 'netipam_device_categories_v1':
           await replaceTable(prisma.deviceCategory, data);

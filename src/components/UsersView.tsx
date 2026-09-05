@@ -33,7 +33,7 @@ interface UsersViewProps {
     avatar?: string;
     magicToken?: string;
   }) => Promise<{ success: boolean; error?: string }>;
-  onDeleteUser: (userId: string) => { success: boolean; error?: string };
+  onDeleteUser?: (userId: string) => Promise<{ success: boolean; error?: string }> | { success: boolean; error?: string };
 }
 
 export const UsersView: React.FC<UsersViewProps> = ({

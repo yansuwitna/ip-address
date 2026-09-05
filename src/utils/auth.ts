@@ -1,20 +1,7 @@
-import { syncToServer, wipeServer } from './api';
 import { User, UserAccount } from '../types/auth';
+import { syncToServer, loginDirectToServer, wipeServer } from './api';
 
-const AUTH_STORAGE_KEY = 'netipam_auth_session';
 const USERS_STORAGE_KEY = 'netipam_users_list_v1';
-
-export const DEFAULT_USERS: UserAccount[] = [
-  {
-    id: 'usr-1',
-    username: 'admin',
-    password: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', // SHA-256 for 'admin123'
-    name: 'Budi Hartono, S.Kom',
-    email: 'admin@ipaddress.lan',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-    createdAt: '2026-01-01T08:00:00.000Z'
-  }
-];
 
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -23,40 +10,11 @@ async function hashPassword(password: string): Promise<string> {
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export function loadUsers(): UserAccount[] {
-  try {
-    const raw = localStorage.getItem(USERS_STORAGE_KEY);
-    if (raw === null) {
-      // First initialization
-      saveUsers(DEFAULT_USERS);
-      return DEFAULT_USERS;
-    }
-    const parsed = JSON.parse(raw);
-    // If more than 1 user existed from previous session, keep only the first user
-    if (Array.isArray(parsed) && parsed.length > 1) {
-      const single = [parsed[0]];
-      saveUsers(single);
-      return single;
-    }
-    return parsed;
-  } catch (e) {
-    console.error('Failed to load users:', e);
-    return DEFAULT_USERS;
-  }
-}
-
-export function saveUsers(users: UserAccount[]): void {
-  try {
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-    syncToServer(USERS_STORAGE_KEY, users);
-  } catch (e) {
-    console.error('Failed to save users:', e);
-  }
-}
-
-export async function createUser(userData: { username: string; name: string; email: string; password: string; role?: string; avatar?: string; }): Promise<{ success: boolean; error?: string; user?: UserAccount }> {
-  const users = loadUsers();
-  if (users.length >= 1) {
+export async function createUser(
+  currentUsers: UserAccount[], 
+  userData: { username: string; name: string; email: string; password: string; role?: string; avatar?: string; }
+): Promise<{ success: boolean; error?: string; user?: UserAccount; updatedUsers?: UserAccount[] }> {
+  if (currentUsers.length >= 1) {
     return { success: false, error: 'Sistem hanya memerlukan 1 pengguna saja. Silakan perbarui akun yang sudah ada.' };
   }
 
@@ -83,134 +41,99 @@ export async function createUser(userData: { username: string; name: string; ema
   };
 
   const updatedUsers = [newUser];
-  saveUsers(updatedUsers);
+  await syncToServer(USERS_STORAGE_KEY, updatedUsers);
 
-  return { success: true, user: newUser };
+  return { success: true, user: newUser, updatedUsers };
 }
 
-
-export async function updateUser(id: string, updates: Partial<Omit<UserAccount, 'id'>>): Promise<{ success: boolean; error?: string; user?: UserAccount }> {
-  const users = loadUsers();
-  const index = users.findIndex(u => u.id === id);
+export async function updateUser(
+  currentUsers: UserAccount[],
+  id: string, 
+  updates: Partial<Omit<UserAccount, 'id'>>
+): Promise<{ success: boolean; error?: string; user?: UserAccount; updatedUsers?: UserAccount[] }> {
+  const index = currentUsers.findIndex(u => u.id === id);
   if (index === -1) {
-    return { success: false, error: 'Pengguna tidak ditemukan!' };
+    return { success: false, error: 'Pengguna tidak ditemukan di database!' };
   }
 
   if (updates.username) {
     const normalizedUsername = updates.username.trim().toLowerCase();
-    const exists = users.some(u => u.id !== id && u.username.toLowerCase() === normalizedUsername);
+    const exists = currentUsers.some(u => u.id !== id && u.username.toLowerCase() === normalizedUsername);
     if (exists) {
       return { success: false, error: `Username "${updates.username}" sudah digunakan!` };
     }
     updates.username = normalizedUsername;
   }
 
-  const current = users[index];
+  const current = currentUsers[index];
   const updatedUser: UserAccount = {
     ...current,
     ...updates,
     password: updates.password && updates.password.trim() ? await hashPassword(updates.password) : current.password
   };
 
-  users[index] = updatedUser;
-  saveUsers(users);
+  const updatedUsers = [...currentUsers];
+  updatedUsers[index] = updatedUser;
+  await syncToServer(USERS_STORAGE_KEY, updatedUsers);
 
-  // If current session is this user, update session as well
-  const currentSession = getCurrentUser();
-  if (currentSession && currentSession.id === id) {
-    const { password: _, ...sessionUser } = updatedUser;
-    try {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionUser));
-    } catch (e) {
-      console.error('Failed to update session:', e);
-    }
-  }
-
-  return { success: true, user: updatedUser };
+  return { success: true, user: updatedUser, updatedUsers };
 }
 
-export function deleteUser(id: string): { success: boolean; error?: string } {
-  const users = loadUsers();
-  const target = users.find(u => u.id === id);
+export async function deleteUser(
+  currentUsers: UserAccount[], 
+  id: string
+): Promise<{ success: boolean; error?: string; updatedUsers?: UserAccount[] }> {
+  const target = currentUsers.find(u => u.id === id);
   if (!target) {
-    return { success: false, error: 'Pengguna tidak ditemukan!' };
+    return { success: false, error: 'Pengguna tidak ditemukan di database!' };
   }
 
-  const updatedUsers = users.filter(u => u.id !== id);
-  saveUsers(updatedUsers);
+  const updatedUsers = currentUsers.filter(u => u.id !== id);
+  await syncToServer(USERS_STORAGE_KEY, updatedUsers);
 
-  const currentSession = getCurrentUser();
-  if (currentSession && currentSession.id === id) {
-    logoutUser();
-  }
-
-  return { success: true };
-}
-
-export async function loginUser(username: string, password: string): Promise<{ success: boolean; user?: User; error?: string }> {
-  const users = loadUsers();
-  const account = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
-  
-  if (!account) {
-    return { success: false, error: 'Username tidak ditemukan!' };
-  }
-
-  const hashedInput = await hashPassword(password);
-  if (account.password !== hashedInput && account.password !== password) {
-    return { success: false, error: 'Password salah!' };
-  }
-
-  const now = new Date().toISOString();
-  // Update lastLogin in storage
-  const updatedUsers = users.map(u => u.id === account.id ? { ...u, lastLogin: now } : u);
-  saveUsers(updatedUsers);
-
-  const authenticatedUser: User = {
-    id: account.id,
-    username: account.username,
-    name: account.name,
-    email: account.email,
-    role: account.role,
-    avatar: account.avatar,
-    lastLogin: now,
-    createdAt: account.createdAt
-  };
-
-  try {
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authenticatedUser));
-  } catch (e) {
-    console.error('Failed to save session:', e);
-  }
-
-  return { success: true, user: authenticatedUser };
+  return { success: true, updatedUsers };
 }
 
 export function getCurrentUser(): User | null {
   try {
-    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) {
-    console.error('Failed to read session:', e);
-    return null;
-  }
+    const raw = sessionStorage.getItem('netipam_session');
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return null;
+}
+
+export function setCurrentUserSession(user: User | null): void {
+  try {
+    if (user) {
+      sessionStorage.setItem('netipam_session', JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem('netipam_session');
+    }
+  } catch (e) {}
 }
 
 export function logoutUser(): void {
   try {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-  } catch (e) {
-    console.error('Failed to remove session:', e);
-  }
+    sessionStorage.removeItem('netipam_session');
+  } catch (e) {}
 }
 
-export function wipeAllUsers(): void {
-  try {
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify([]));
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-    wipeServer();
-  } catch (e) {
-    console.error('Failed to wipe users:', e);
-  }
+export function loadUsers(): UserAccount[] {
+  return [];
 }
 
+export async function saveUsers(users: UserAccount[]): Promise<void> {
+  await syncToServer(USERS_STORAGE_KEY, users);
+}
+
+export async function loginUser(
+  username: string, 
+  password: string
+): Promise<{ success: boolean; user?: User; error?: string }> {
+  return await loginDirectToServer(username, password);
+}
+
+export async function wipeAllUsers(): Promise<void> {
+  logoutUser();
+  await wipeServer();
+}

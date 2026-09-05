@@ -354,51 +354,19 @@ export const INITIAL_ALLOCATIONS: IPAllocation[] = [
 ];
 
 export function loadGroups(): IPGroup[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.GROUPS);
-    if (!raw) {
-      saveGroups(INITIAL_GROUPS);
-      return INITIAL_GROUPS;
-    }
-    return JSON.parse(raw);
-  } catch (err) {
-    console.error('Error loading groups:', err);
-    return INITIAL_GROUPS;
-  }
+  return [];
 }
 
 export function saveGroups(groups: IPGroup[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEYS.GROUPS, JSON.stringify(groups));
-  } catch (err) {
-    console.error('Error saving groups:', err);
-  }
+  syncToServer(STORAGE_KEYS.GROUPS, groups);
 }
 
 export function loadAllocations(): IPAllocation[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.ALLOCATIONS);
-    if (!raw) {
-      saveAllocations(INITIAL_ALLOCATIONS);
-      return INITIAL_ALLOCATIONS;
-    }
-    const parsed: IPAllocation[] = JSON.parse(raw);
-    return parsed.map(a => ({
-      ...a,
-      deviceType: a.deviceType === 'gateway' ? 'router' : a.deviceType
-    }));
-  } catch (err) {
-    console.error('Error loading allocations:', err);
-    return INITIAL_ALLOCATIONS;
-  }
+  return [];
 }
 
 export function saveAllocations(allocations: IPAllocation[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEYS.ALLOCATIONS, JSON.stringify(allocations));
-  } catch (err) {
-    console.error('Error saving allocations:', err);
-  }
+  syncToServer(STORAGE_KEYS.ALLOCATIONS, allocations);
 }
 
 export const DEFAULT_DEVICE_CATEGORIES: DeviceCategory[] = [
@@ -415,31 +383,11 @@ export const DEFAULT_DEVICE_CATEGORIES: DeviceCategory[] = [
 ];
 
 export function loadDeviceCategories(): DeviceCategory[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.DEVICE_CATEGORIES);
-    if (!raw) {
-      saveDeviceCategories(DEFAULT_DEVICE_CATEGORIES);
-      return DEFAULT_DEVICE_CATEGORIES;
-    }
-    const parsed: DeviceCategory[] = JSON.parse(raw);
-    return parsed.map(cat => {
-      if (cat.id === 'cctv' && cat.icon === 'Video') {
-        return { ...cat, icon: 'Cctv' };
-      }
-      return cat;
-    });
-  } catch (err) {
-    console.error('Error loading device categories:', err);
-    return DEFAULT_DEVICE_CATEGORIES;
-  }
+  return [];
 }
 
 export function saveDeviceCategories(categories: DeviceCategory[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEYS.DEVICE_CATEGORIES, JSON.stringify(categories));
-  } catch (err) {
-    console.error('Error saving device categories:', err);
-  }
+  syncToServer(STORAGE_KEYS.DEVICE_CATEGORIES, categories);
 }
 
 export const INITIAL_SERVICES: IPService[] = [
@@ -744,25 +692,11 @@ export const INITIAL_SERVICES: IPService[] = [
 ];
 
 export function loadServices(): IPService[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.SERVICES);
-    if (!raw) {
-      saveServices(INITIAL_SERVICES);
-      return INITIAL_SERVICES;
-    }
-    return JSON.parse(raw);
-  } catch (err) {
-    console.error('Error loading services:', err);
-    return INITIAL_SERVICES;
-  }
+  return [];
 }
 
 export function saveServices(services: IPService[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(services));
-  } catch (err) {
-    console.error('Error saving services:', err);
-  }
+  syncToServer(STORAGE_KEYS.SERVICES, services);
 }
 
 export const INITIAL_DNS_RECORDS: DnsRecord[] = [
@@ -896,25 +830,11 @@ export const INITIAL_DNS_RECORDS: DnsRecord[] = [
 ];
 
 export function loadDnsRecords(): DnsRecord[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.DNS_RECORDS);
-    if (!raw) {
-      saveDnsRecords(INITIAL_DNS_RECORDS);
-      return INITIAL_DNS_RECORDS;
-    }
-    return JSON.parse(raw);
-  } catch (err) {
-    console.error('Error loading DNS records:', err);
-    return INITIAL_DNS_RECORDS;
-  }
+  return [];
 }
 
 export function saveDnsRecords(records: DnsRecord[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEYS.DNS_RECORDS, JSON.stringify(records));
-  } catch (err) {
-    console.error('Error saving DNS records:', err);
-  }
+  syncToServer(STORAGE_KEYS.DNS_RECORDS, records);
 }
 
 export function resetDemoData(): { 
@@ -938,23 +858,13 @@ export function resetDemoData(): {
   };
 }
 
-export const STORAGE_KEY_SUBDOMAINS = 'netipam_subdomains';
+export const STORAGE_KEY_SUBDOMAINS = 'netipam_sub_domains_v1';
 
 export function loadSubDomains(): SubDomainRecord[] {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY_SUBDOMAINS);
-    if (!data) return [];
-    return JSON.parse(data);
-  } catch (e) {
-    console.error('Failed to load subdomains', e);
-    return [];
-  }
+  return [];
 }
 
 export function saveSubDomains(records: SubDomainRecord[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEY_SUBDOMAINS, JSON.stringify(records));
-  } catch (e) {
-    console.error('Failed to save subdomains', e);
-  }
+  syncToServer(STORAGE_KEY_SUBDOMAINS, records);
 }
+

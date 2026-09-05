@@ -18,7 +18,6 @@ import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainR
 import { UserAccount } from '../types/auth';
 import { exportBackupJson, parseImportJson, exportToXlsx } from '../utils/exportImport';
 import { showConfirm, showSuccess, showError, showWarning } from '../utils/swal';
-import { loadSubDomains } from '../utils/storage';
 
 interface BackupViewProps {
   groups: IPGroup[];
@@ -27,6 +26,7 @@ interface BackupViewProps {
   users: UserAccount[];
   services?: IPService[];
   dnsRecords?: DnsRecord[];
+  subDomains?: SubDomainRecord[];
   onImportData: (data: {
     groups?: IPGroup[];
     allocations?: IPAllocation[];
@@ -46,12 +46,12 @@ export const BackupView: React.FC<BackupViewProps> = ({
   users,
   services = [],
   dnsRecords = [],
+  subDomains = [],
   onImportData,
   onWipeAllData
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasBackedUp, setHasBackedUp] = useState(false);
-  const subDomains = loadSubDomains();
 
   // Restore Modal State
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
