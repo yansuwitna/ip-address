@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Search, Edit2, Trash2, Globe, Check, Database, Folder, Hash, Server } from 'lucide-react';
+import { ArrowLeft, Plus, Search, Edit2, Trash2, Globe, Check, Database, Folder, Hash, Server, ExternalLink } from 'lucide-react';
 import { DnsRecord, SubDomainRecord } from '../types/ipam';
 import Swal from 'sweetalert2';
 
@@ -234,6 +234,15 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
                     </td>
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end space-x-1">
+                        <a
+                          href={`http://${item.subName}.${parentDomain.domain}${item.port ? `:${item.port}` : ''}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={`Buka http://${item.subName}.${parentDomain.domain}${item.port ? `:${item.port}` : ''} di tab baru`}
+                          className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-slate-400 hover:text-emerald-600 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
                         <button
                           onClick={() => openEditModal(item)}
                           className="p-1.5 hover:bg-blue-50 dark:hover:bg-slate-800 text-slate-400 hover:text-blue-600 rounded-lg transition-colors cursor-pointer"
