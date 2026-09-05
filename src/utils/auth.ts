@@ -16,6 +16,13 @@ export const DEFAULT_USERS: UserAccount[] = [
   }
 ];
 
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export function loadUsers(): UserAccount[] {
   try {
     const raw = localStorage.getItem(USERS_STORAGE_KEY);
@@ -47,14 +54,7 @@ export function saveUsers(users: UserAccount[]): void {
   }
 }
 
-export function createUser(userData: {
-  username: string;
-  name: string;
-  email: string;
-  password: string;
-  role?: string;
-  avatar?: string;
-}): { success: boolean; error?: string; user?: UserAccount } {
+export async function createUser(userData: { username: string; name: string; email: string; password: string; role?: string; avatar?: string; }): Promise<{ success: boolean; error?: string; user?: UserAccount }> {
   const users = loadUsers();
   if (users.length >= 1) {
     return { success: false, error: 'Sistem hanya memerlukan 1 pengguna saja. Silakan perbarui akun yang sudah ada.' };
@@ -77,7 +77,7 @@ export function createUser(userData: {
     username: normalizedUsername,
     name: userData.name.trim(),
     email: userData.email.trim(),
-    password: userData.password,
+    password: await hashPassword(userData.password),
     avatar: userData.avatar || undefined,
     createdAt: new Date().toISOString()
   };
@@ -89,10 +89,7 @@ export function createUser(userData: {
 }
 
 
-export function updateUser(
-  id: string,
-  updates: Partial<Omit<UserAccount, 'id'>>
-): { success: boolean; error?: string; user?: UserAccount } {
+export async function updateUser(id: string, updates: Partial<Omit<UserAccount, 'id'>>): Promise<{ success: boolean; error?: string; user?: UserAccount }> {
   const users = loadUsers();
   const index = users.findIndex(u => u.id === id);
   if (index === -1) {
@@ -112,7 +109,7 @@ export function updateUser(
   const updatedUser: UserAccount = {
     ...current,
     ...updates,
-    password: updates.password && updates.password.trim() ? updates.password : current.password
+    password: updates.password && updates.password.trim() ? await hashPassword(updates.password) : current.password
   };
 
   users[index] = updatedUser;
@@ -150,7 +147,7 @@ export function deleteUser(id: string): { success: boolean; error?: string } {
   return { success: true };
 }
 
-export function loginUser(username: string, password: string): { success: boolean; user?: User; error?: string } {
+export async function loginUser(username: string, password: string): Promise<{ success: boolean; user?: User; error?: string }> {
   const users = loadUsers();
   const account = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
   
@@ -158,7 +155,8 @@ export function loginUser(username: string, password: string): { success: boolea
     return { success: false, error: 'Username tidak ditemukan!' };
   }
 
-  if (account.password !== password) {
+  const hashedInput = await hashPassword(password);
+  if (account.password !== hashedInput && account.password !== password) {
     return { success: false, error: 'Password salah!' };
   }
 

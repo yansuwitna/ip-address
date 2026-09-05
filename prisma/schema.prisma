@@ -1,0 +1,90 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id         String   @id
+  username   String   @unique
+  name       String
+  email      String
+  password   String
+  role       String?
+  avatar     String?
+  lastLogin  String?
+  createdAt  String
+  magicToken String?
+}
+
+model IPGroup {
+  id          String   @id
+  name        String
+  cidr        String
+  gateway     String
+  vlanId      Int?
+  description String?
+  location    String?
+  pic         String?
+  color       String?
+  createdAt   String
+  updatedAt   String
+}
+
+model IPAllocation {
+  id          String   @id
+  ipAddress   String
+  hostname    String?
+  macAddress  String?
+  deviceType  String?
+  categoryId  String?
+  status      String
+  description String?
+  location    String?
+  owner       String?
+  port        String?
+  notes       String?
+  lastSeen    String?
+  isReserved  Boolean  @default(false)
+  history     String   @default("[]") 
+}
+
+model DeviceCategory {
+  id          String   @id
+  name        String
+  description String?
+  color       String
+  icon        String
+}
+
+model IPService {
+  id          String   @id
+  ipAddress   String
+  port        Int
+  protocol    String
+  serviceName String
+  description String?
+  status      String
+  lastCheck   String?
+}
+
+model DnsRecord {
+  id        String   @id
+  domain    String
+  type      String
+  value     String
+  ttl       Int
+  proxied   Boolean  @default(false)
+  notes     String?
+}
+
+model SubDomainRecord {
+  id          String   @id
+  domain      String
+  targetIp    String
+  status      String
+  description String?
+}

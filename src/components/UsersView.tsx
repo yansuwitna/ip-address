@@ -32,7 +32,7 @@ interface UsersViewProps {
     role?: string;
     avatar?: string;
     magicToken?: string;
-  }) => { success: boolean; error?: string };
+  }) => Promise<{ success: boolean; error?: string }>;
   onDeleteUser: (userId: string) => { success: boolean; error?: string };
 }
 
@@ -72,7 +72,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
     setIsModalOpen(true);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
 
@@ -93,7 +93,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
       return;
     }
 
-    const res = onSaveUser({
+    const res = await onSaveUser({
       id: singleUser?.id,
       name,
       username,
@@ -183,7 +183,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
       showCancelButton: true,
       confirmButtonText: 'Ya, Buat Token',
       cancelButtonText: 'Batal'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
         // Generate 100 char alphanumeric string
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -194,7 +194,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
           token += chars[array[i] % chars.length];
         }
         
-        const res = onSaveUser({
+        const res = await onSaveUser({
           ...singleUser,
           password: undefined, // ensure password isn't overridden with empty
           magicToken: token

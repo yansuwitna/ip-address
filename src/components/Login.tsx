@@ -58,8 +58,8 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
     setError(null);
     setIsLoading(true);
 
-    setTimeout(() => {
-      const res = loginUser(username, password);
+    setTimeout(async () => {
+      const res = await loginUser(username, password);
       setIsLoading(false);
       if (res.success && res.user) {
         onLoginSuccess(res.user);
@@ -69,7 +69,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
     }, 300);
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegError(null);
 
@@ -86,7 +86,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
       return;
     }
 
-    const res = createUser({
+    const res = await createUser({
       name: regName,
       username: regUsername,
       email: regEmail,
@@ -102,8 +102,8 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBackToHome, hasN
     setHasNoUsers(false);
 
     // Automatically log in
-    setTimeout(() => {
-      const loginRes = loginUser(res.user!.username, regPassword);
+    setTimeout(async () => {
+      const loginRes = await loginUser(res.user!.username, regPassword);
       if (loginRes.success && loginRes.user) {
         onLoginSuccess(loginRes.user);
       } else {

@@ -1,3 +1,4 @@
+import { fetchFromServer } from "./utils/api";
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { 
@@ -79,6 +80,8 @@ export const App: React.FC = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Data State
+  
+
   const [groups, setGroups] = useState<IPGroup[]>(loadGroups);
   const [allocations, setAllocations] = useState<IPAllocation[]>(loadAllocations);
   const [services, setServices] = useState<IPService[]>(loadServices);
@@ -89,10 +92,38 @@ export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'matrix' | 'table'>('matrix');
   const [subnetListViewMode, setSubnetListViewMode] = useState<'cards' | 'table'>('cards');
   const [globalSearch, setGlobalSearch] = useState('');
+  const [isSyncing, setIsSyncing] = useState(true);
+
+  // Sync from backend server
+  useEffect(() => {
+    fetchFromServer().then((data: any) => {
+      if (data) {
+        if (data['netipam_groups_v1']) setGroups(data['netipam_groups_v1']);
+        if (data['netipam_allocations_v1']) setAllocations(data['netipam_allocations_v1']);
+        if (data['netipam_services_v1']) setServices(data['netipam_services_v1']);
+        if (data['netipam_device_categories_v1']) setCategories(data['netipam_device_categories_v1']);
+        if (data['netipam_dns_records_v1']) setDnsRecords(data['netipam_dns_records_v1']);
+        // Subdomains are not part of App.tsx state directly (they are loaded in SubDomainView if needed, or if it doesn't exist we ignore it).
+        
+        if (data['netipam_users_list_v1'] && data['netipam_users_list_v1'].length > 0) {
+          setUsers(data['netipam_users_list_v1']);
+          localStorage.setItem('netipam_users_list_v1', JSON.stringify(data['netipam_users_list_v1']));
+        }
+        
+        Object.keys(data).forEach(key => {
+          localStorage.setItem(key, JSON.stringify(data[key]));
+        });
+      }
+      setIsSyncing(false);
+    });
+  }, []);
+
+
 
 
   // Magic Link Auto Login
   useEffect(() => {
+    if (isSyncing) return; // Wait for backend sync to finish first
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     if (token) {
@@ -181,14 +212,12 @@ export const App: React.FC = () => {
     // Always provide a valid manifest so Chrome's PWA engine doesn't break,
     // but we inject the magic token ONLY if on the users tab.
     // If on other tabs, we set display to 'browser' which disables the Omnibox install prompt natively!
-    const isUsersTab = currentTab === 'users';
-    
     const manifest = {
       name: "IP & DNS Manager",
       short_name: "NetIPAM",
       description: "Sistem Manajemen Alamat IP dan DNS Terintegrasi",
-      start_url: (isUsersTab && currentUser?.magicToken) ? `/?token=${currentUser.magicToken}` : `/`,
-      display: isUsersTab ? "standalone" : "browser",
+      start_url: currentUser?.magicToken ? `/?token=${currentUser.magicToken}` : `/`,
+      display: "standalone", 
       background_color: "#ffffff",
       theme_color: "#2563eb",
       icons: [
@@ -282,7 +311,7 @@ export const App: React.FC = () => {
     }
   }, [groups, selectedGroupId]);
 
-  const handleSaveUser = (userData: {
+  const handleSaveUser = async (userData: {
     id?: string;
     username: string;
     name: string;
@@ -293,7 +322,7 @@ export const App: React.FC = () => {
     magicToken?: string;
   }) => {
     if (userData.id) {
-      const res = updateUser(userData.id, userData);
+      const res = await updateUser(userData.id, userData);
       if (res.success) {
         setUsers(loadUsers());
         if (currentUser && currentUser.id === userData.id) {
@@ -303,7 +332,7 @@ export const App: React.FC = () => {
       }
       return res;
     } else {
-      const res = createUser({
+      const res = await createUser({
         username: userData.username,
         name: userData.name,
         email: userData.email,
