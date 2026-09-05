@@ -147,6 +147,7 @@ export function parseImportJson(fileContent: string): {
   users?: UserAccount[];
   services?: IPService[];
   dnsRecords?: DnsRecord[];
+  subDomains?: SubDomainRecord[];
 } {
   const parsed = JSON.parse(fileContent);
   if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.allocations)) {
@@ -158,6 +159,7 @@ export function parseImportJson(fileContent: string): {
     categories: Array.isArray(parsed.categories) ? parsed.categories : undefined,
     users: Array.isArray(parsed.users) ? parsed.users : undefined,
     services: Array.isArray(parsed.services) ? parsed.services : undefined,
-    dnsRecords: Array.isArray(parsed.dnsRecords) ? parsed.dnsRecords : undefined
+    dnsRecords: Array.isArray(parsed.dnsRecords) ? parsed.dnsRecords : undefined,
+    subDomains: Array.isArray(parsed.subDomains) ? parsed.subDomains : undefined
   };
 }

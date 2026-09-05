@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { 
   Network, 
   Grid, 
@@ -89,6 +90,63 @@ export const App: React.FC = () => {
   const [subnetListViewMode, setSubnetListViewMode] = useState<'cards' | 'table'>('cards');
   const [globalSearch, setGlobalSearch] = useState('');
 
+
+  // Magic Link Auto Login
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    if (token) {
+      const cleanToken = token.trim();
+      const allUsers = loadUsers();
+      
+      // Strict match
+      let matchedUser = allUsers.find(u => u.magicToken && u.magicToken.trim() === cleanToken);
+      
+      // Fallback loose match if somehow URL encoding messed up a character
+      if (!matchedUser) {
+         matchedUser = allUsers.find(u => u.magicToken && (cleanToken.includes(u.magicToken.trim()) || u.magicToken.trim().includes(cleanToken)));
+      }
+
+      if (matchedUser) {
+        localStorage.setItem('currentUser', JSON.stringify({
+          id: matchedUser.id,
+          username: matchedUser.username,
+          name: matchedUser.name,
+          email: matchedUser.email,
+          role: matchedUser.role,
+          avatar: matchedUser.avatar,
+          magicToken: matchedUser.magicToken
+        }));
+        setCurrentUser(matchedUser);
+        setAuthView('home');
+        
+        // Use a tiny timeout to ensure React state updates before we replace the URL and show alert
+        setTimeout(() => {
+          Swal.fire({
+            title: 'Berhasil Masuk!',
+            text: `Selamat datang, ${matchedUser.name}. Anda masuk via Token.`,
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          window.history.replaceState({}, '', window.location.pathname);
+        }, 100);
+      } else {
+        // Token invalid - Debugging what is wrong!
+        const storedToken = allUsers.length > 0 ? allUsers[0].magicToken : 'NO_USER';
+        Swal.fire({
+          title: 'Akses Ditolak (Debug)',
+          html: `<div class="text-xs text-left overflow-hidden"><p><b>Token URL:</b> <br/>${token}</p><p class="mt-2"><b>Token DB:</b> <br/>${storedToken}</p></div>`,
+          icon: 'error',
+          confirmButtonText: 'Kembali'
+        }).then(() => {
+          window.history.replaceState({}, '', window.location.pathname);
+          setAuthView('home');
+        });
+      }
+    }
+  }, []);
+
   // Theme State
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('netipam_theme');
@@ -104,6 +162,43 @@ export const App: React.FC = () => {
     }
     localStorage.setItem('netipam_theme', theme);
   }, [theme]);
+
+
+  // Update manifest dynamically for PWA shortcut URL
+  useEffect(() => {
+    let link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'manifest';
+      document.head.appendChild(link);
+    }
+
+    // Always provide a valid manifest so Chrome's PWA engine doesn't break,
+    // but we inject the magic token ONLY if on the users tab.
+    // If on other tabs, we set display to 'browser' which disables the Omnibox install prompt natively!
+    const isUsersTab = currentTab === 'users';
+    
+    const manifest = {
+      name: "IP & DNS Manager",
+      short_name: "NetIPAM",
+      description: "Sistem Manajemen Alamat IP dan DNS Terintegrasi",
+      start_url: (isUsersTab && currentUser?.magicToken) ? `/?token=${currentUser.magicToken}` : `/`,
+      display: isUsersTab ? "standalone" : "browser",
+      background_color: "#ffffff",
+      theme_color: "#2563eb",
+      icons: [
+        { src: "/favicon.ico", sizes: "64x64 32x32 24x24 16x16", type: "image/x-icon" },
+        { src: "/logo.svg", type: "image/svg+xml", sizes: "192x192" },
+        { src: "/logo.svg", type: "image/svg+xml", sizes: "512x512" }
+      ]
+    };
+    
+    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+
+    return () => URL.revokeObjectURL(url);
+  }, [currentUser?.magicToken, currentTab]);
 
   const handleToggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
@@ -190,6 +285,7 @@ export const App: React.FC = () => {
     password?: string;
     role?: string;
     avatar?: string;
+    magicToken?: string;
   }) => {
     if (userData.id) {
       const res = updateUser(userData.id, userData);

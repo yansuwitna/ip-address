@@ -52,6 +52,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
   const [formError, setFormError] = useState<string | null>(null);
   const [isSuccessToast, setIsSuccessToast] = useState(false);
 
+
   const openEditModal = () => {
     if (singleUser) {
       setName(singleUser.name);

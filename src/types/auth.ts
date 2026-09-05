@@ -7,6 +7,7 @@ export interface User {
   avatar?: string;
   lastLogin?: string;
   createdAt?: string;
+  magicToken?: string;
 }
 
 
