@@ -136,6 +136,8 @@ export const DnsView: React.FC<DnsViewProps> = ({
       case 'A':
       case 'AAAA':
         return 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800';
+      case 'FORWARD':
+        return 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800';
       case 'CNAME':
         return 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800';
       case 'MX':
@@ -265,6 +267,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
                 className="w-full px-3 py-2 bg-indigo-950/70 border border-indigo-700/60 rounded-xl text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
               >
                 <option value="A">A (IPv4)</option>
+                <option value="FORWARD">Forward</option>
                 <option value="AAAA">AAAA (IPv6)</option>
                 <option value="CNAME">CNAME</option>
                 <option value="MX">MX</option>
@@ -490,7 +493,11 @@ export const DnsView: React.FC<DnsViewProps> = ({
                       {/* Target Value Column */}
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="flex items-center justify-center gap-1.5 font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
-                          <span>{item.value}</span>
+                          {item.value ? (
+                            <span>{item.value}</span>
+                          ) : (
+                            <span className="text-slate-400 font-normal italic">-</span>
+                          )}
                           {item.priority !== undefined && (
                             <span className="text-[10px] font-sans font-semibold text-slate-400">
                               (Prio: {item.priority})

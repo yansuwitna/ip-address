@@ -96,7 +96,7 @@ export interface GroupStats {
   utilizationPercentage: number;
 }
 
-export type DnsRecordType = 'A' | 'AAAA' | 'CNAME' | 'PTR' | 'MX' | 'TXT' | 'NS' | 'SRV' | 'SOA';
+export type DnsRecordType = 'A' | 'AAAA' | 'CNAME' | 'FORWARD' | 'PTR' | 'MX' | 'TXT' | 'NS' | 'SRV' | 'SOA';
 export type DnsRecordStatus = 'active' | 'inactive';
 
 export interface DnsRecord {
