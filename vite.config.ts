@@ -7,5 +7,19 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          xlsx: ['xlsx'],
+          icons: ['lucide-react'],
+          utils: ['sweetalert2', 'clsx', 'tailwind-merge']
+        }
+      }
+    }
   }
 })
+
