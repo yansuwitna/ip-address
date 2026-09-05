@@ -201,8 +201,15 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
                 filteredSubs.map(item => (
                   <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                     <td className="py-3.5 px-4 whitespace-nowrap font-mono font-bold text-slate-900 dark:text-slate-100">
-                      <span className="text-blue-600 dark:text-blue-400">{item.subName}</span>
-                      <span className="text-slate-400 dark:text-slate-500">.{parentDomain.domain}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-sans font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 lowercase">
+                          {item.protocol || 'http'}://
+                        </span>
+                        <span>
+                          <span className="text-blue-600 dark:text-blue-400">{item.subName}</span>
+                          <span className="text-slate-400 dark:text-slate-500">.{parentDomain.domain}</span>
+                        </span>
+                      </div>
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <div className="flex flex-col gap-1">

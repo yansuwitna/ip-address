@@ -477,9 +477,14 @@ export const DnsView: React.FC<DnsViewProps> = ({
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <Globe className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-                          <span className="font-mono font-bold text-slate-900 dark:text-slate-100 text-sm">
-                            {item.domain}
-                          </span>
+                          <div className="flex items-center gap-1.5 font-mono text-sm">
+                            <span className="text-[10px] font-sans font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 lowercase">
+                              {item.protocol || 'http'}://
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-slate-100">
+                              {item.domain}
+                            </span>
+                          </div>
                         </div>
                       </td>
 
