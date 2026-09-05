@@ -130,13 +130,8 @@ export const App: React.FC = () => {
       const cleanToken = token.trim();
       const allUsers = loadUsers();
       
-      // Strict match
+      // Strict match ONLY
       let matchedUser = allUsers.find(u => u.magicToken && u.magicToken.trim() === cleanToken);
-      
-      // Fallback loose match if somehow URL encoding messed up a character
-      if (!matchedUser) {
-         matchedUser = allUsers.find(u => u.magicToken && (cleanToken.includes(u.magicToken.trim()) || u.magicToken.trim().includes(cleanToken)));
-      }
 
       if (matchedUser) {
         localStorage.setItem('netipam_auth_session', JSON.stringify({
@@ -151,16 +146,17 @@ export const App: React.FC = () => {
         setCurrentUser(matchedUser);
         setAuthView('home');
         
-        // Use a tiny timeout to ensure React state updates before we replace the URL and show alert
+        // Ensure URL is cleaned completely of query params
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
         setTimeout(() => {
           Swal.fire({
             title: 'Berhasil Masuk!',
-            text: `Selamat datang, ${matchedUser.name}. Anda masuk via Token.`,
+            text: `Selamat datang, ${matchedUser?.name}. Anda masuk via Token.`,
             icon: 'success',
             timer: 2000,
             showConfirmButton: false
           });
-          window.history.replaceState({}, '', window.location.pathname);
         }, 100);
       } else {
         // Token invalid - Debugging what is wrong!
