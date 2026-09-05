@@ -5,11 +5,18 @@
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="alternate icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#2563eb" />
+    <meta name="theme-color" content="#10b981" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="NetIPAM">
-    <link rel="manifest" href="/manifest.json" />
+    <script>
+      // Only inject manifest tag if the initial path is /admin/users
+      if (window.location.pathname.replace(/\/+$/, '') === '/admin/users') {
+        const m = document.createElement('link');
+        m.rel = 'manifest';
+        m.href = '/manifest.json';
+        document.head.appendChild(m);
+      }
+    </script>
     <link rel="apple-touch-icon" href="/logo192.png">
     <title>IP & DNS - Manajemen Jaringan, IP Host & DNS Server</title>
     <!-- Google Font: Poppins -->
@@ -23,8 +30,14 @@
     <script>
       window.deferredPrompt = null;
       window.addEventListener('beforeinstallprompt', (e) => {
-        // Do NOT call e.preventDefault() so Chrome/Edge desktop omnibox immediately displays the install button!
         window.deferredPrompt = e;
+        const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+        // Hanya tampilkan icon install di omnibox (bilah URL) jika sedang di halaman /admin/users
+        if (currentPath === '/admin/users') {
+          // Jangan preventDefault agar browser memunculkan icon install di address bar
+        } else {
+          e.preventDefault();
+        }
         window.dispatchEvent(new CustomEvent('pwa-installable', { detail: e }));
       });
       window.addEventListener('appinstalled', () => {

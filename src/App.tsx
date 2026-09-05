@@ -295,18 +295,24 @@ export const App: React.FC = () => {
   }, [theme]);
 
 
-  // Update manifest dynamically for PWA shortcut URL
+  // Update manifest dynamically: ONLY present manifest tag on /admin/users
   useEffect(() => {
     let link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement;
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = 'manifest';
-      document.head.appendChild(link);
+    
+    if (currentTab === 'users') {
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'manifest';
+        document.head.appendChild(link);
+      }
+      const tokenParam = currentUser?.magicToken ? `?token=${encodeURIComponent(currentUser.magicToken)}` : '';
+      link.href = `/manifest.json${tokenParam}`;
+    } else {
+      // Remove manifest link on other tabs so browser omnibox hides the install button
+      if (link) {
+        link.remove();
+      }
     }
-
-    // Point manifest directly to standard URL endpoint with token if available
-    const tokenParam = currentUser?.magicToken ? `?token=${encodeURIComponent(currentUser.magicToken)}` : '';
-    link.href = `/manifest.json${tokenParam}`;
   }, [currentUser?.magicToken, currentTab]);
 
   const handleToggleTheme = () => {
