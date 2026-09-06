@@ -77,7 +77,7 @@ interface BackupViewProps {
     lanDevices?: LanDevice[];
     lanCables?: LanCableRun[];
   }, isDemo?: boolean) => void;
-  onWipeAllData: () => void;
+  onWipeAllData: () => Promise<void> | void;
 }
 
 export const BackupView: React.FC<BackupViewProps> = ({
@@ -284,7 +284,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
     });
 
     if (confirmed) {
-      onWipeAllData();
+      await onWipeAllData();
       showSuccess('Database Dikosongkan', 'Seluruh data sistem telah berhasil dihapus bersih.');
     }
   };

@@ -273,76 +273,18 @@ export const App: React.FC = () => {
         if (data['netipam_sub_domains_v1']) setSubDomains(data['netipam_sub_domains_v1']);
 
         // Sektor LAN (Lokasi/Sekolah, Ruangan/Lab, Fisik & Jalur Kabel)
-        if (data['netipam_lan_locations_v1'] && data['netipam_lan_locations_v1'].length > 0) {
-          setLanLocations(data['netipam_lan_locations_v1']);
-        } else {
-          setLanLocations(INITIAL_LAN_LOCATIONS);
-          saveLanLocations(INITIAL_LAN_LOCATIONS);
-        }
-
-        if (data['netipam_lan_zones_v1'] && data['netipam_lan_zones_v1'].length > 0) {
-          setLanZones(data['netipam_lan_zones_v1']);
-        } else {
-          setLanZones(INITIAL_LAN_ZONES);
-          saveLanZones(INITIAL_LAN_ZONES);
-        }
-
-        if (data['netipam_lan_devices_v1'] && data['netipam_lan_devices_v1'].length > 0) {
-          setLanDevices(data['netipam_lan_devices_v1']);
-        } else {
-          setLanDevices(INITIAL_LAN_DEVICES);
-          saveLanDevices(INITIAL_LAN_DEVICES);
-        }
-
-        if (data['netipam_lan_cables_v1'] && data['netipam_lan_cables_v1'].length > 0) {
-          setLanCables(data['netipam_lan_cables_v1']);
-        } else {
-          setLanCables(INITIAL_LAN_CABLES);
-          saveLanCables(INITIAL_LAN_CABLES);
-        }
+        setLanLocations(data['netipam_lan_locations_v1'] || []);
+        setLanZones(data['netipam_lan_zones_v1'] || []);
+        setLanDevices(data['netipam_lan_devices_v1'] || []);
+        setLanCables(data['netipam_lan_cables_v1'] || []);
         
         // Sektor Listrik, CCTV, AIR
-        if (data['netipam_electricity_devices_v1'] && data['netipam_electricity_devices_v1'].length > 0) {
-          setElectricityDevices(data['netipam_electricity_devices_v1']);
-        } else {
-          setElectricityDevices(INITIAL_ELECTRICITY_DEVICES);
-          saveElectricityDevices(INITIAL_ELECTRICITY_DEVICES);
-        }
-
-        if (data['netipam_electricity_cables_v1'] && data['netipam_electricity_cables_v1'].length > 0) {
-          setElectricityCables(data['netipam_electricity_cables_v1']);
-        } else {
-          setElectricityCables(INITIAL_ELECTRICITY_CABLES);
-          saveElectricityCables(INITIAL_ELECTRICITY_CABLES);
-        }
-
-        if (data['netipam_cctv_devices_v1'] && data['netipam_cctv_devices_v1'].length > 0) {
-          setCctvDevices(data['netipam_cctv_devices_v1']);
-        } else {
-          setCctvDevices(INITIAL_CCTV_DEVICES);
-          saveCctvDevices(INITIAL_CCTV_DEVICES);
-        }
-
-        if (data['netipam_cctv_cables_v1'] && data['netipam_cctv_cables_v1'].length > 0) {
-          setCctvCables(data['netipam_cctv_cables_v1']);
-        } else {
-          setCctvCables(INITIAL_CCTV_CABLES);
-          saveCctvCables(INITIAL_CCTV_CABLES);
-        }
-
-        if (data['netipam_water_devices_v1'] && data['netipam_water_devices_v1'].length > 0) {
-          setWaterDevices(data['netipam_water_devices_v1']);
-        } else {
-          setWaterDevices(INITIAL_WATER_DEVICES);
-          saveWaterDevices(INITIAL_WATER_DEVICES);
-        }
-
-        if (data['netipam_water_pipes_v1'] && data['netipam_water_pipes_v1'].length > 0) {
-          setWaterPipes(data['netipam_water_pipes_v1']);
-        } else {
-          setWaterPipes(INITIAL_WATER_PIPES);
-          saveWaterPipes(INITIAL_WATER_PIPES);
-        }
+        setElectricityDevices(data['netipam_electricity_devices_v1'] || []);
+        setElectricityCables(data['netipam_electricity_cables_v1'] || []);
+        setCctvDevices(data['netipam_cctv_devices_v1'] || []);
+        setCctvCables(data['netipam_cctv_cables_v1'] || []);
+        setWaterDevices(data['netipam_water_devices_v1'] || []);
+        setWaterPipes(data['netipam_water_pipes_v1'] || []);
         
         const serverUsers: UserAccount[] = data['netipam_users_list_v1'] || [];
         setUsers(serverUsers);
@@ -715,6 +657,7 @@ export const App: React.FC = () => {
   };
 
   const handleWipeAllData = async () => {
+    setIsSyncing(true);
     setGroups([]);
     setAllocations([]);
     setServices([]);
@@ -723,11 +666,6 @@ export const App: React.FC = () => {
     setSubDomains([]);
     setSelectedGroupId('');
     setSelectedServiceIp(null);
-    saveGroups([]);
-    saveAllocations([]);
-    saveServices([]);
-    saveDeviceCategories([]);
-    saveDnsRecords([]);
     setElectricityDevices([]);
     setElectricityCables([]);
     setCctvDevices([]);
@@ -738,23 +676,22 @@ export const App: React.FC = () => {
     setLanZones([]);
     setLanDevices([]);
     setLanCables([]);
-    saveElectricityDevices([]);
-    saveElectricityCables([]);
-    saveCctvDevices([]);
-    saveCctvCables([]);
-    saveWaterDevices([]);
-    saveWaterPipes([]);
-    saveLanLocations([]);
-    saveLanZones([]);
-    saveLanDevices([]);
-    saveLanCables([]);
-    saveSubDomains([]);
-    await wipeServer();
-    await wipeAllUsers();
     setUsers([]);
     setCurrentUser(null);
+    
+    // Hapus seluruh sesi & storage browser
+    logoutUser();
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch (e) {}
+
+    // Hapus bersih seluruh data di backend SQLite
+    await wipeServer();
+
     setAuthView('home');
     setIsViewingPublicHome(false);
+    setIsSyncing(false);
   };
 
   const handleImportData = (data: {
