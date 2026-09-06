@@ -19,6 +19,8 @@ export type ElectricalStatus = 'normal' | 'maintenance' | 'warning' | 'critical'
 
 export interface ElectricityDevice {
   id: string;
+  locationId?: string; // Relasi ke LanLocation
+  zoneId?: string; // Relasi ke LanZone
   name: string;
   code: string; // e.g., PNL-MDP-01, UPS-SRV-01
   type: ElectricityDeviceType;
@@ -34,6 +36,36 @@ export interface ElectricityDevice {
   sourcePanelId?: string; // Menghubungkan jalur/induk panel
   installationDate?: string;
   lastMaintenance?: string;
+  pic?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Jalur Kabel / Distribusi Listrik
+export interface ElectricityCableRun {
+  id: string;
+  locationId?: string;
+  zoneId?: string;
+  cableCode: string; // e.g. NYY-4x16-01, NYM-3x2.5-01
+  labelCode?: string; // alias
+  cableType: string; // e.g. NYY, NYM, NYA, XLPE, Twisted
+  sourceDeviceId?: string;
+  sourceDeviceName?: string; // e.g. Panel MDP Utama
+  sourceLocation: string; // e.g. Ruang Panel Lt 1
+  sourcePoint?: string; // alias for sourceLocation
+  targetDeviceId?: string;
+  targetDeviceName?: string; // e.g. Sub Panel SDP Lt 2 / Rack Server
+  targetLocation: string; // e.g. Ruang Server Lt 2
+  targetPoint?: string; // alias for targetLocation
+  pathwayRoute?: string; // e.g. Cable Ladder Shaft Timur
+  pathDescription?: string; // alias for pathwayRoute
+  lengthMeter?: number;
+  lengthMeters?: number; // alias
+  coreSpec?: string; // e.g. 4 x 16 mm², 3 x 2.5 mm²
+  voltageVolt?: number; // 220, 380
+  currentAmpere?: number; // Kapasitas breaker jalur
+  status: 'connected' | 'idle' | 'fault' | 'maintenance';
   pic?: string;
   notes?: string;
   createdAt: string;
@@ -56,6 +88,8 @@ export type CctvStatus = 'online' | 'offline' | 'recording' | 'issue' | 'mainten
 
 export interface CctvDevice {
   id: string;
+  locationId?: string; // Relasi ke LanLocation
+  zoneId?: string; // Relasi ke LanZone
   name: string; // e.g. CAM-LOBBY-01, NVR-MAIN-32CH
   type: CctvDeviceType;
   ipAddress?: string; // Alamat IP kamera / NVR
@@ -68,9 +102,39 @@ export interface CctvDevice {
   nvrId?: string; // ID NVR induk
   poePort?: string; // Port switch PoE (e.g. Port 12 - SW-POE-01)
   rtspUrl?: string; // rtsp://admin:pass@ip:554/stream
+  streamUrl?: string; // alias
   storageDays?: number; // Retensi rekaman (hari)
   status: CctvStatus;
   installationDate?: string;
+  pic?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Jalur Kabel / Koneksi CCTV (UTP / Coaxial / Fiber)
+export interface CctvCableRun {
+  id: string;
+  locationId?: string;
+  zoneId?: string;
+  cableCode: string; // e.g. CCTV-CBL-01, RG59-CAM-02
+  labelCode?: string; // alias
+  cableType: string; // e.g. Cat6 UTP, Cat5e PoE, RG59 Coaxial, Fiber Optic
+  sourceDeviceId?: string;
+  sourceDeviceName?: string; // e.g. Switch PoE Lt 1 / NVR
+  sourcePort?: string; // e.g. Port PoE 1
+  sourceLocation: string; // e.g. Rak Server Lt 1
+  sourcePoint?: string; // alias
+  targetDeviceId?: string;
+  targetDeviceName?: string; // e.g. CAM-01 Lobby Depan
+  targetPort?: string; // e.g. LAN Port Kamera
+  targetLocation: string; // e.g. Plafon Lobby Depan
+  targetPoint?: string; // alias
+  pathwayRoute?: string; // e.g. Conduit Plafon Lobby -> Tray Shaft
+  pathDescription?: string; // alias
+  lengthMeter?: number;
+  lengthMeters?: number; // alias
+  status: 'connected' | 'idle' | 'fault' | 'maintenance';
   pic?: string;
   notes?: string;
   createdAt: string;
@@ -95,6 +159,8 @@ export type WaterStatus = 'active' | 'standby' | 'leaking' | 'maintenance' | 'of
 
 export interface WaterDevice {
   id: string;
+  locationId?: string; // Relasi ke LanLocation
+  zoneId?: string; // Relasi ke LanZone
   name: string; // e.g. POMPA-SUMUR-01, SOLENOID-ZONA-A
   code: string;
   type: WaterDeviceType;
@@ -109,6 +175,36 @@ export interface WaterDevice {
   status: WaterStatus;
   sourceSupply?: string; // Sumber air (Sumur Bor, PDAM, Rainwater Harvest)
   installationDate?: string;
+  pic?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Jalur Pipa / Distribusi Air & Irigasi
+export interface WaterPipeRun {
+  id: string;
+  locationId?: string;
+  zoneId?: string;
+  pipeCode: string; // e.g. PIP-DIST-01, PPR-TOWER-02
+  labelCode?: string; // alias
+  pipeType: string; // e.g. PVC AW, HDPE, PPR, Galvanis, Selang Drip
+  pipeDiameter?: string; // 1/2", 3/4", 1", 2", 3", 4"
+  diameterInch?: string; // alias
+  sourceDeviceId?: string;
+  sourceDeviceName?: string; // e.g. Toren Utama Roof Top
+  sourceLocation: string; // e.g. Menara Toren Atap
+  sourcePoint?: string; // alias
+  targetDeviceId?: string;
+  targetDeviceName?: string; // e.g. Solenoid Valve Zona A / Kran Toilet
+  targetLocation: string; // e.g. Blok Taman Depan
+  targetPoint?: string; // alias
+  pathwayRoute?: string; // e.g. Tertanam tanah 50cm -> Dinding Shaft
+  pathDescription?: string; // alias
+  lengthMeter?: number;
+  lengthMeters?: number; // alias
+  pressureBar?: number; // Tekanan operasional
+  status: 'active' | 'standby' | 'leaking' | 'maintenance';
   pic?: string;
   notes?: string;
   createdAt: string;

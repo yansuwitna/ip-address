@@ -869,23 +869,101 @@ export function saveSubDomains(records: SubDomainRecord[]): void {
 }
 
 
-import { ElectricityDevice, CctvDevice, WaterDevice } from '../types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, ElectricityCableRun, CctvCableRun, WaterPipeRun } from '../types/utilityNetworks';
 
 export const STORAGE_KEY_ELECTRICITY = 'netipam_electricity_devices_v1';
+export const STORAGE_KEY_ELECTRICITY_CABLES = 'netipam_electricity_cables_v1';
 export const STORAGE_KEY_CCTV = 'netipam_cctv_devices_v1';
+export const STORAGE_KEY_CCTV_CABLES = 'netipam_cctv_cables_v1';
 export const STORAGE_KEY_WATER = 'netipam_water_devices_v1';
+export const STORAGE_KEY_WATER_PIPES = 'netipam_water_pipes_v1';
 
 export function saveElectricityDevices(devices: ElectricityDevice[]): void {
   syncToServer(STORAGE_KEY_ELECTRICITY, devices);
+}
+
+export function saveElectricityCables(cables: ElectricityCableRun[]): void {
+  syncToServer(STORAGE_KEY_ELECTRICITY_CABLES, cables);
 }
 
 export function saveCctvDevices(devices: CctvDevice[]): void {
   syncToServer(STORAGE_KEY_CCTV, devices);
 }
 
+export function saveCctvCables(cables: CctvCableRun[]): void {
+  syncToServer(STORAGE_KEY_CCTV_CABLES, cables);
+}
+
 export function saveWaterDevices(devices: WaterDevice[]): void {
   syncToServer(STORAGE_KEY_WATER, devices);
 }
+
+export function saveWaterPipes(pipes: WaterPipeRun[]): void {
+  syncToServer(STORAGE_KEY_WATER_PIPES, pipes);
+}
+
+export const INITIAL_ELECTRICITY_CABLES: ElectricityCableRun[] = [
+  {
+    id: 'elec-cbl-1',
+    cableCode: 'NYY-4X50-MDP-SDP1',
+    cableType: 'NYY 4x50mm²',
+    sourcePoint: 'Panel MDP Basement (Breaker 01)',
+    targetPoint: 'Sub Panel SDP Lantai 1',
+    sourceLocation: 'Panel MDP Basement (Breaker 01)',
+    targetLocation: 'Sub Panel SDP Lantai 1',
+    lengthMeter: 45,
+    status: 'connected',
+    pathwayRoute: 'Shaft ME Gedung Utama -> Cable Tray Plafon Lt. 1',
+    notes: 'Kabel tembaga inti tunggal standar PLN',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  }
+];
+
+export const INITIAL_CCTV_CABLES: CctvCableRun[] = [
+  {
+    id: 'cctv-cbl-1',
+    cableCode: 'CAT6-CCTV-LOBBY-01',
+    cableType: 'Cat6 UTP (PoE)',
+    sourcePoint: 'Switch PoE Ruang Server Port 1',
+    targetPoint: 'CCTV Dome Lobby Depan',
+    sourceLocation: 'Switch PoE Ruang Server Port 1',
+    targetLocation: 'CCTV Dome Lobby Depan',
+    lengthMeter: 30,
+    status: 'connected',
+    pathwayRoute: 'Tray Plafon Ruang Server -> Conduit Pipa PVC ke Lobby',
+    notes: 'Konektor RJ45 AMP Cat6 Shielded',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  }
+];
+
+export const INITIAL_WATER_PIPES: WaterPipeRun[] = [
+  {
+    id: 'water-pip-1',
+    pipeCode: 'PIP-PVC-TORN-TOILET',
+    pipeType: 'PVC AW (Air Bersih)',
+    pipeDiameter: '1 inch',
+    sourcePoint: 'Toren Utama Rooftop Lt. 3',
+    targetPoint: 'Pipa Distribusi Toilet & Wastafel Lt. 1',
+    sourceLocation: 'Toren Utama Rooftop Lt. 3',
+    targetLocation: 'Pipa Distribusi Toilet & Wastafel Lt. 1',
+    lengthMeter: 25,
+    pressureBar: 2.5,
+    status: 'active',
+    pathwayRoute: 'Shaft Plumbing Gedung Barat',
+    notes: 'Dilengkapi stop valve isolasi darurat di setiap lantai',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  }
+];
+
 
 export const INITIAL_ELECTRICITY_DEVICES: ElectricityDevice[] = [
   {

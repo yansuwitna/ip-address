@@ -476,19 +476,19 @@ export const LanView: React.FC<LanViewProps> = ({
       {/* ========================================================================= */}
       {selectedLocationId !== null && selectedZoneId === null && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-slate-300 dark:bg-slate-800/95 border border-slate-400/80 dark:border-slate-700 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[10px] font-bold">
                   {activeLocation?.code || 'SEKOLAH'}
                 </span>
-                <span className="text-xs text-slate-400">• Lokasi: {activeLocation?.address || 'Area Kampus'}</span>
+                <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">• Lokasi: {activeLocation?.address || 'Area Kampus'}</span>
               </div>
               <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-1 flex items-center gap-2.5">
                 <Network className="w-6 h-6 text-indigo-600" />
                 <span>Daftar Jaringan Ruangan & Lab di {activeLocation?.name}</span>
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
                 Klik salah satu jaringan lab di bawah ini (misal: Jaringan Lab 1, Lab 2, Lab 3) untuk melihat perangkat & jalur kabelnya
               </p>
             </div>
@@ -498,7 +498,7 @@ export const LanView: React.FC<LanViewProps> = ({
                   setSelectedLocationId(null);
                   setSelectedZoneId(null);
                 }}
-                className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 bg-white/80 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>
@@ -508,7 +508,7 @@ export const LanView: React.FC<LanViewProps> = ({
                 className="w-full sm:w-auto px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Tambah</span>
+                <span>Tambah Jaringan</span>
               </button>
             </div>
           </div>
@@ -637,26 +637,26 @@ export const LanView: React.FC<LanViewProps> = ({
         <div className="space-y-6">
           
           {/* Top Lab Header Info */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-slate-300 dark:bg-slate-800/95 border border-slate-400/80 dark:border-slate-700 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
                   {activeZone.code}
                 </span>
-                <span className="text-xs text-slate-400">• Lokasi: {activeLocation?.name} ({activeZone.floor || 'Lantai 1'})</span>
+                <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">• Lokasi: {activeLocation?.name} ({activeZone.floor || 'Lantai 1'})</span>
               </div>
               <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-1 flex items-center gap-2">
                 <Network className="w-6 h-6 text-indigo-600" />
                 <span>Detail Jaringan: {activeZone.name}</span>
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
                 Data perangkat keras dan pencatatan jalur kabel dari titik asal ke titik tujuan di dalam {activeZone.name}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
               <button
                 onClick={() => setSelectedZoneId(null)}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800 hover:bg-white text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>

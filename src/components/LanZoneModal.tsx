@@ -9,6 +9,9 @@ interface LanZoneModalProps {
   editZone?: LanZone | null;
   locations: LanLocation[];
   presetLocationId?: string;
+  title?: string;
+  nameLabel?: string;
+  namePlaceholder?: string;
 }
 
 export const LanZoneModal: React.FC<LanZoneModalProps> = ({
@@ -17,7 +20,10 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
   onSave,
   editZone,
   locations,
-  presetLocationId
+  presetLocationId,
+  title = 'Jaringan / Sub-Sistem',
+  nameLabel = 'Nama Jaringan / Sub-Sistem *',
+  namePlaceholder = 'Contoh: Jaringan Listrik Gedung A, CCTV Area Barat, Distribusi Irigasi Blok 1'
 }) => {
   const [locationId, setLocationId] = useState('');
   const [name, setName] = useState('');
@@ -41,7 +47,7 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
     } else {
       setLocationId(presetLocationId || locations[0]?.id || '');
       setName('');
-      setCode(`LAB-${String(Date.now()).slice(-4)}`);
+      setCode(`NET-${String(Date.now()).slice(-4)}`);
       setFloor('Lantai 1');
       setRoomType('lab');
       setPic('');
@@ -59,7 +65,7 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
       return;
     }
     if (!name.trim()) {
-      setError('Nama Ruangan / Jaringan Lab wajib diisi!');
+      setError('Nama Jaringan wajib diisi!');
       return;
     }
 
@@ -88,10 +94,10 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-base text-slate-900 dark:text-slate-100">
-                {editZone ? 'Edit Jaringan Ruangan / Lab' : 'Tambah Jaringan Ruangan / Lab Baru'}
+                {editZone ? `Edit ${title}` : `Tambah ${title} Baru`}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Tingkat 2: Area / Ruangan jaringan (misal: Lab 1, Ruang Server, Lantai 2)
+                Tingkat 2: Area / Zona sub-sistem di lokasi terpilih
               </p>
             </div>
           </div>
@@ -149,11 +155,11 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="sm:col-span-2 space-y-1.5">
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                Nama Ruangan / Jaringan Lab <span className="text-rose-500">*</span>
+                {nameLabel}
               </label>
               <input
                 type="text"
-                placeholder="misal: Jaringan Lab 1 (Komputer TKJ)"
+                placeholder={namePlaceholder}
                 value={name}
                 onChange={e => setName(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"

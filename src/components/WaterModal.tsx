@@ -1,20 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { X, Droplets, Save, AlertCircle } from 'lucide-react';
-import { WaterDevice, WaterDeviceType, WaterStatus } from '../types/utilityNetworks';
+import { WaterDevice, WaterDeviceType, WaterStatus, LanLocation, LanZone } from '../types/utilityNetworks';
 
 interface WaterModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (device: Partial<WaterDevice>) => void;
   editDevice?: WaterDevice | null;
+  locations?: LanLocation[];
+  zones?: LanZone[];
+  presetLocationId?: string;
+  presetZoneId?: string;
 }
 
 export const WaterModal: React.FC<WaterModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  editDevice
+  editDevice,
+  locations = [],
+  zones = [],
+  presetLocationId,
+  presetZoneId
 }) => {
+  const [locationId, setLocationId] = useState('');
+  const [zoneId, setZoneId] = useState('');
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [type, setType] = useState<WaterDeviceType>('pump_submersible');
@@ -36,6 +46,8 @@ export const WaterModal: React.FC<WaterModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     if (editDevice) {
+      setLocationId(editDevice.locationId || '');
+      setZoneId(editDevice.zoneId || '');
       setName(editDevice.name);
       setCode(editDevice.code || '');
       setType(editDevice.type);
@@ -53,6 +65,10 @@ export const WaterModal: React.FC<WaterModalProps> = ({
       setPic(editDevice.pic || '');
       setNotes(editDevice.notes || '');
     } else {
+      const initLoc = presetLocationId || (locations[0]?.id || '');
+      setLocationId(initLoc);
+      const availableZones = zones.filter(z => z.locationId === initLoc);
+      setZoneId(presetZoneId || (availableZones[0]?.id || ''));
       setName('');
       setCode('');
       setType('pump_submersible');
@@ -88,6 +104,8 @@ export const WaterModal: React.FC<WaterModalProps> = ({
 
     onSave({
       id: editDevice?.id,
+      locationId: locationId || undefined,
+      zoneId: zoneId || undefined,
       name: name.trim(),
       code: code.trim().toUpperCase(),
       type,
@@ -109,11 +127,11 @@ export const WaterModal: React.FC<WaterModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto font-poppins animate-in fade-in duration-150">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-150">
         
         {/* Header Modal */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-cyan-500/10 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-cyan-500/10 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-cyan-500 text-white rounded-2xl shadow-md shadow-cyan-500/20">
               <Droplets className="w-5 h-5" />
@@ -129,20 +147,67 @@ export const WaterModal: React.FC<WaterModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-          {error && (
-            <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-xl flex items-center gap-2 text-rose-700 dark:text-rose-400 text-xs font-semibold">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          <div className="p-6 space-y-4 overflow-y-auto flex-1">
+            {error && (
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-xl flex items-center gap-2 text-rose-700 dark:text-rose-400 text-xs font-semibold">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* Pilihan Lokasi & Jaringan Air */}
+            {locations.length > 0 && (
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Lokasi Tempat *
+                    </label>
+                    <select
+                      value={locationId}
+                      onChange={e => {
+                        const newLocId = e.target.value;
+                        setLocationId(newLocId);
+                        const matchingZones = zones.filter(z => z.locationId === newLocId);
+                        setZoneId(matchingZones[0]?.id || '');
+                      }}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-800 dark:text-slate-100"
+                    >
+                      {locations.map(loc => (
+                        <option key={loc.id} value={loc.id}>
+                          {loc.name} {loc.code ? `(${loc.code})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Jaringan / Area Distribusi Air *
+                    </label>
+                    <select
+                      value={zoneId}
+                      onChange={e => setZoneId(e.target.value)}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-800 dark:text-slate-100"
+                    >
+                      {zones.filter(z => z.locationId === locationId).map(zone => (
+                        <option key={zone.id} value={zone.id}>
+                          {zone.name} {zone.code ? `(${zone.code})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Nama Perangkat */}
@@ -409,19 +474,20 @@ export const WaterModal: React.FC<WaterModalProps> = ({
               className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-800 dark:text-slate-100"
             />
           </div>
+        </div>
 
           {/* Action Buttons */}
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2.5">
+          <div className="p-4 sm:px-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 flex-shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="w-full sm:w-auto px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer text-center"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-bold rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white shadow-md shadow-cyan-600/20 transition-all flex items-center gap-1.5"
+              className="w-full sm:w-auto px-5 py-2.5 text-xs font-bold rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white shadow-md shadow-cyan-600/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Save className="w-4 h-4" />
               <span>{editDevice ? 'Simpan Perubahan' : 'Tambah Perangkat Air'}</span>

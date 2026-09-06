@@ -45,15 +45,21 @@ import {
   saveDnsRecords,
   saveSubDomains,
   saveElectricityDevices,
+  saveElectricityCables,
   saveCctvDevices,
+  saveCctvCables,
   saveWaterDevices,
+  saveWaterPipes,
   saveLanDevices,
   saveLanCables,
   saveLanLocations,
   saveLanZones,
   INITIAL_ELECTRICITY_DEVICES,
+  INITIAL_ELECTRICITY_CABLES,
   INITIAL_CCTV_DEVICES,
+  INITIAL_CCTV_CABLES,
   INITIAL_WATER_DEVICES,
+  INITIAL_WATER_PIPES,
   INITIAL_LAN_DEVICES,
   INITIAL_LAN_CABLES,
   INITIAL_LAN_LOCATIONS,
@@ -62,7 +68,18 @@ import {
 import { exportToXlsx } from './utils/exportImport';
 import { parseCidr } from './utils/ipCalculator';
 import { showConfirm, showSuccess } from './utils/swal';
-import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun, LanLocation, LanZone } from './types/utilityNetworks';
+import { 
+  ElectricityDevice, 
+  ElectricityCableRun,
+  CctvDevice, 
+  CctvCableRun,
+  WaterDevice, 
+  WaterPipeRun,
+  LanDevice, 
+  LanCableRun, 
+  LanLocation, 
+  LanZone 
+} from './types/utilityNetworks';
 
 import { HomeView } from './components/HomeView';
 import { Login } from './components/Login';
@@ -84,10 +101,13 @@ import { BatchReserveModal } from './components/BatchReserveModal';
 import { PingSimulatorModal } from './components/PingSimulatorModal';
 import { ElectricityView } from './components/ElectricityView';
 import { ElectricityModal } from './components/ElectricityModal';
+import { ElectricityCableModal } from './components/ElectricityCableModal';
 import { CctvView } from './components/CctvView';
 import { CctvModal } from './components/CctvModal';
+import { CctvCableModal } from './components/CctvCableModal';
 import { WaterView } from './components/WaterView';
 import { WaterModal } from './components/WaterModal';
+import { WaterPipeModal } from './components/WaterPipeModal';
 import { LanView } from './components/LanView';
 import { LanCableModal } from './components/LanCableModal';
 import { LanDeviceModal } from './components/LanDeviceModal';
@@ -219,8 +239,11 @@ export const App: React.FC = () => {
   const [dnsRecords, setDnsRecords] = useState<DnsRecord[]>([]);
   const [subDomains, setSubDomains] = useState<SubDomainRecord[]>([]);
   const [electricityDevices, setElectricityDevices] = useState<ElectricityDevice[]>([]);
+  const [electricityCables, setElectricityCables] = useState<ElectricityCableRun[]>([]);
   const [cctvDevices, setCctvDevices] = useState<CctvDevice[]>([]);
+  const [cctvCables, setCctvCables] = useState<CctvCableRun[]>([]);
   const [waterDevices, setWaterDevices] = useState<WaterDevice[]>([]);
+  const [waterPipes, setWaterPipes] = useState<WaterPipeRun[]>([]);
   const [lanLocations, setLanLocations] = useState<LanLocation[]>([]);
   const [lanZones, setLanZones] = useState<LanZone[]>([]);
   const [lanDevices, setLanDevices] = useState<LanDevice[]>([]);
@@ -285,6 +308,13 @@ export const App: React.FC = () => {
           saveElectricityDevices(INITIAL_ELECTRICITY_DEVICES);
         }
 
+        if (data['netipam_electricity_cables_v1'] && data['netipam_electricity_cables_v1'].length > 0) {
+          setElectricityCables(data['netipam_electricity_cables_v1']);
+        } else {
+          setElectricityCables(INITIAL_ELECTRICITY_CABLES);
+          saveElectricityCables(INITIAL_ELECTRICITY_CABLES);
+        }
+
         if (data['netipam_cctv_devices_v1'] && data['netipam_cctv_devices_v1'].length > 0) {
           setCctvDevices(data['netipam_cctv_devices_v1']);
         } else {
@@ -292,11 +322,25 @@ export const App: React.FC = () => {
           saveCctvDevices(INITIAL_CCTV_DEVICES);
         }
 
+        if (data['netipam_cctv_cables_v1'] && data['netipam_cctv_cables_v1'].length > 0) {
+          setCctvCables(data['netipam_cctv_cables_v1']);
+        } else {
+          setCctvCables(INITIAL_CCTV_CABLES);
+          saveCctvCables(INITIAL_CCTV_CABLES);
+        }
+
         if (data['netipam_water_devices_v1'] && data['netipam_water_devices_v1'].length > 0) {
           setWaterDevices(data['netipam_water_devices_v1']);
         } else {
           setWaterDevices(INITIAL_WATER_DEVICES);
           saveWaterDevices(INITIAL_WATER_DEVICES);
+        }
+
+        if (data['netipam_water_pipes_v1'] && data['netipam_water_pipes_v1'].length > 0) {
+          setWaterPipes(data['netipam_water_pipes_v1']);
+        } else {
+          setWaterPipes(INITIAL_WATER_PIPES);
+          saveWaterPipes(INITIAL_WATER_PIPES);
         }
         
         const serverUsers: UserAccount[] = data['netipam_users_list_v1'] || [];
@@ -432,12 +476,33 @@ export const App: React.FC = () => {
   // Listrik, CCTV, AIR Modals
   const [isElectricityModalOpen, setIsElectricityModalOpen] = useState(false);
   const [editingElectricityDevice, setEditingElectricityDevice] = useState<ElectricityDevice | null>(null);
+  const [electricityDeviceDefaultLocationId, setElectricityDeviceDefaultLocationId] = useState<string | undefined>(undefined);
+  const [electricityDeviceDefaultZoneId, setElectricityDeviceDefaultZoneId] = useState<string | undefined>(undefined);
+
+  const [isElectricityCableModalOpen, setIsElectricityCableModalOpen] = useState(false);
+  const [editingElectricityCable, setEditingElectricityCable] = useState<ElectricityCableRun | null>(null);
+  const [electricityCableDefaultLocationId, setElectricityCableDefaultLocationId] = useState<string | undefined>(undefined);
+  const [electricityCableDefaultZoneId, setElectricityCableDefaultZoneId] = useState<string | undefined>(undefined);
 
   const [isCctvModalOpen, setIsCctvModalOpen] = useState(false);
   const [editingCctvDevice, setEditingCctvDevice] = useState<CctvDevice | null>(null);
+  const [cctvDeviceDefaultLocationId, setCctvDeviceDefaultLocationId] = useState<string | undefined>(undefined);
+  const [cctvDeviceDefaultZoneId, setCctvDeviceDefaultZoneId] = useState<string | undefined>(undefined);
+
+  const [isCctvCableModalOpen, setIsCctvCableModalOpen] = useState(false);
+  const [editingCctvCable, setEditingCctvCable] = useState<CctvCableRun | null>(null);
+  const [cctvCableDefaultLocationId, setCctvCableDefaultLocationId] = useState<string | undefined>(undefined);
+  const [cctvCableDefaultZoneId, setCctvCableDefaultZoneId] = useState<string | undefined>(undefined);
 
   const [isWaterModalOpen, setIsWaterModalOpen] = useState(false);
   const [editingWaterDevice, setEditingWaterDevice] = useState<WaterDevice | null>(null);
+  const [waterDeviceDefaultLocationId, setWaterDeviceDefaultLocationId] = useState<string | undefined>(undefined);
+  const [waterDeviceDefaultZoneId, setWaterDeviceDefaultZoneId] = useState<string | undefined>(undefined);
+
+  const [isWaterPipeModalOpen, setIsWaterPipeModalOpen] = useState(false);
+  const [editingWaterPipe, setEditingWaterPipe] = useState<WaterPipeRun | null>(null);
+  const [waterPipeDefaultLocationId, setWaterPipeDefaultLocationId] = useState<string | undefined>(undefined);
+  const [waterPipeDefaultZoneId, setWaterPipeDefaultZoneId] = useState<string | undefined>(undefined);
 
   // LAN Modals (Lokasi Sekolah, Ruangan Lab, Perangkat, Jalur Kabel)
   const [isLanLocationModalOpen, setIsLanLocationModalOpen] = useState(false);
@@ -507,15 +572,33 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     if (!isSyncing) {
+      saveElectricityCables(electricityCables);
+    }
+  }, [electricityCables, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
       saveCctvDevices(cctvDevices);
     }
   }, [cctvDevices, isSyncing]);
 
   useEffect(() => {
     if (!isSyncing) {
+      saveCctvCables(cctvCables);
+    }
+  }, [cctvCables, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
       saveWaterDevices(waterDevices);
     }
   }, [waterDevices, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveWaterPipes(waterPipes);
+    }
+  }, [waterPipes, isSyncing]);
 
   useEffect(() => {
     if (!isSyncing) {
@@ -1063,6 +1146,134 @@ export const App: React.FC = () => {
 
   const handleDeleteWaterDevice = (id: string) => {
     setWaterDevices(prev => prev.filter(d => d.id !== id));
+  };
+
+  // Jalur Kabel Listrik Handlers
+  const handleSaveElectricityCable = (cableData: Partial<ElectricityCableRun>) => {
+    const now = new Date().toISOString();
+    const src = cableData.sourcePoint || cableData.sourceLocation || '';
+    const tgt = cableData.targetPoint || cableData.targetLocation || '';
+    if (cableData.id) {
+      setElectricityCables(prev => prev.map(c => c.id === cableData.id ? { 
+        ...c, 
+        ...cableData,
+        sourcePoint: src,
+        targetPoint: tgt,
+        sourceLocation: src,
+        targetLocation: tgt,
+        updatedAt: now 
+      } as ElectricityCableRun : c));
+    } else {
+      const newCable: ElectricityCableRun = {
+        id: `elec-cable-${Date.now()}`,
+        cableCode: cableData.cableCode || `CBL-${Math.floor(100 + Math.random() * 900)}`,
+        cableType: cableData.cableType || 'NYY 4x50mm²',
+        coreSpec: cableData.coreSpec,
+        sourcePoint: src,
+        targetPoint: tgt,
+        sourceLocation: src,
+        targetLocation: tgt,
+        lengthMeter: cableData.lengthMeter || 10,
+        voltageVolt: cableData.voltageVolt,
+        currentAmpere: cableData.currentAmpere,
+        status: cableData.status || 'connected',
+        pathwayRoute: cableData.pathwayRoute,
+        notes: cableData.notes,
+        locationId: cableData.locationId,
+        zoneId: cableData.zoneId,
+        createdAt: now,
+        updatedAt: now
+      };
+      setElectricityCables(prev => [...prev, newCable]);
+    }
+  };
+
+  const handleDeleteElectricityCable = (id: string) => {
+    setElectricityCables(prev => prev.filter(c => c.id !== id));
+  };
+
+  // Jalur Kabel CCTV Handlers
+  const handleSaveCctvCable = (cableData: Partial<CctvCableRun>) => {
+    const now = new Date().toISOString();
+    const src = cableData.sourcePoint || cableData.sourceLocation || '';
+    const tgt = cableData.targetPoint || cableData.targetLocation || '';
+    if (cableData.id) {
+      setCctvCables(prev => prev.map(c => c.id === cableData.id ? { 
+        ...c, 
+        ...cableData,
+        sourcePoint: src,
+        targetPoint: tgt,
+        sourceLocation: src,
+        targetLocation: tgt,
+        updatedAt: now 
+      } as CctvCableRun : c));
+    } else {
+      const newCable: CctvCableRun = {
+        id: `cctv-cable-${Date.now()}`,
+        cableCode: cableData.cableCode || `CBL-CCTV-${Math.floor(100 + Math.random() * 900)}`,
+        cableType: cableData.cableType || 'Cat6 UTP (PoE)',
+        sourcePoint: src,
+        targetPoint: tgt,
+        sourceLocation: src,
+        targetLocation: tgt,
+        lengthMeter: cableData.lengthMeter || 15,
+        status: cableData.status || 'connected',
+        pathwayRoute: cableData.pathwayRoute,
+        notes: cableData.notes,
+        locationId: cableData.locationId,
+        zoneId: cableData.zoneId,
+        createdAt: now,
+        updatedAt: now
+      };
+      setCctvCables(prev => [...prev, newCable]);
+    }
+  };
+
+  const handleDeleteCctvCable = (id: string) => {
+    setCctvCables(prev => prev.filter(c => c.id !== id));
+  };
+
+  // Jalur Pipa Air Handlers
+  const handleSaveWaterPipe = (pipeData: Partial<WaterPipeRun>) => {
+    const now = new Date().toISOString();
+    const src = pipeData.sourcePoint || pipeData.sourceLocation || '';
+    const tgt = pipeData.targetPoint || pipeData.targetLocation || '';
+    if (pipeData.id) {
+      setWaterPipes(prev => prev.map(p => p.id === pipeData.id ? { 
+        ...p, 
+        ...pipeData,
+        sourcePoint: src,
+        targetPoint: tgt,
+        sourceLocation: src,
+        targetLocation: tgt,
+        updatedAt: now 
+      } as WaterPipeRun : p));
+    } else {
+      const newPipe: WaterPipeRun = {
+        id: `water-pipe-${Date.now()}`,
+        pipeCode: pipeData.pipeCode || `PIP-AIR-${Math.floor(100 + Math.random() * 900)}`,
+        pipeType: pipeData.pipeType || 'PVC AW (Air Bersih)',
+        pipeDiameter: pipeData.pipeDiameter || '3/4 inch',
+        sourcePoint: src,
+        targetPoint: tgt,
+        sourceLocation: src,
+        targetLocation: tgt,
+        lengthMeter: pipeData.lengthMeter || 10,
+        pressureBar: pipeData.pressureBar,
+        status: pipeData.status || 'active',
+        pathwayRoute: pipeData.pathwayRoute,
+        notes: pipeData.notes,
+        locationId: pipeData.locationId,
+        zoneId: pipeData.zoneId,
+        createdAt: now,
+        updatedAt: now
+      };
+      setWaterPipes(prev => [...prev, newPipe]);
+    }
+  };
+
+  const handleDeleteWaterPipe = (id: string) => {
+    setWaterPipes(prev => prev.filter(p => p.id !== id));
   };
 
   // LAN: Lokasi & Sekolah Handlers
@@ -1990,16 +2201,54 @@ export const App: React.FC = () => {
           {/* TAB: JARINGAN LISTRIK */}
           {currentTab === 'electricity' && (
             <ElectricityView
+              locations={lanLocations}
+              zones={lanZones}
               devices={electricityDevices}
+              cables={electricityCables}
+              onSaveLocation={handleSaveLanLocation}
+              onDeleteLocation={handleDeleteLanLocation}
+              onSaveZone={handleSaveLanZone}
+              onDeleteZone={handleDeleteLanZone}
               onSaveDevice={handleSaveElectricityDevice}
               onDeleteDevice={handleDeleteElectricityDevice}
-              onOpenAddModal={() => {
+              onSaveCable={handleSaveElectricityCable}
+              onDeleteCable={handleDeleteElectricityCable}
+              onOpenAddLocationModal={() => {
+                setEditingLanLocation(null);
+                setIsLanLocationModalOpen(true);
+              }}
+              onOpenEditLocationModal={(loc) => {
+                setEditingLanLocation(loc);
+                setIsLanLocationModalOpen(true);
+              }}
+              onOpenAddZoneModal={(locId) => {
+                setEditingLanZone(null);
+                setLanZoneDefaultLocationId(locId);
+                setIsLanZoneModalOpen(true);
+              }}
+              onOpenEditZoneModal={(zone) => {
+                setEditingLanZone(zone);
+                setIsLanZoneModalOpen(true);
+              }}
+              onOpenAddDeviceModal={(locId, zId) => {
                 setEditingElectricityDevice(null);
+                setElectricityDeviceDefaultLocationId(locId);
+                setElectricityDeviceDefaultZoneId(zId);
                 setIsElectricityModalOpen(true);
               }}
-              onOpenEditModal={(device) => {
+              onOpenEditDeviceModal={(device) => {
                 setEditingElectricityDevice(device);
                 setIsElectricityModalOpen(true);
+              }}
+              onOpenAddCableModal={(locId, zId) => {
+                setEditingElectricityCable(null);
+                setElectricityCableDefaultLocationId(locId);
+                setElectricityCableDefaultZoneId(zId);
+                setIsElectricityCableModalOpen(true);
+              }}
+              onOpenEditCableModal={(cable) => {
+                setEditingElectricityCable(cable);
+                setIsElectricityCableModalOpen(true);
               }}
             />
           )}
@@ -2007,16 +2256,54 @@ export const App: React.FC = () => {
           {/* TAB: JARINGAN CCTV */}
           {currentTab === 'cctv' && (
             <CctvView
+              locations={lanLocations}
+              zones={lanZones}
               devices={cctvDevices}
+              cables={cctvCables}
+              onSaveLocation={handleSaveLanLocation}
+              onDeleteLocation={handleDeleteLanLocation}
+              onSaveZone={handleSaveLanZone}
+              onDeleteZone={handleDeleteLanZone}
               onSaveDevice={handleSaveCctvDevice}
               onDeleteDevice={handleDeleteCctvDevice}
-              onOpenAddModal={() => {
+              onSaveCable={handleSaveCctvCable}
+              onDeleteCable={handleDeleteCctvCable}
+              onOpenAddLocationModal={() => {
+                setEditingLanLocation(null);
+                setIsLanLocationModalOpen(true);
+              }}
+              onOpenEditLocationModal={(loc) => {
+                setEditingLanLocation(loc);
+                setIsLanLocationModalOpen(true);
+              }}
+              onOpenAddZoneModal={(locId) => {
+                setEditingLanZone(null);
+                setLanZoneDefaultLocationId(locId);
+                setIsLanZoneModalOpen(true);
+              }}
+              onOpenEditZoneModal={(zone) => {
+                setEditingLanZone(zone);
+                setIsLanZoneModalOpen(true);
+              }}
+              onOpenAddDeviceModal={(locId, zId) => {
                 setEditingCctvDevice(null);
+                setCctvDeviceDefaultLocationId(locId);
+                setCctvDeviceDefaultZoneId(zId);
                 setIsCctvModalOpen(true);
               }}
-              onOpenEditModal={(device) => {
+              onOpenEditDeviceModal={(device) => {
                 setEditingCctvDevice(device);
                 setIsCctvModalOpen(true);
+              }}
+              onOpenAddCableModal={(locId, zId) => {
+                setEditingCctvCable(null);
+                setCctvCableDefaultLocationId(locId);
+                setCctvCableDefaultZoneId(zId);
+                setIsCctvCableModalOpen(true);
+              }}
+              onOpenEditCableModal={(cable) => {
+                setEditingCctvCable(cable);
+                setIsCctvCableModalOpen(true);
               }}
             />
           )}
@@ -2024,16 +2311,54 @@ export const App: React.FC = () => {
           {/* TAB: JARINGAN AIR (IRIGASI) */}
           {currentTab === 'water' && (
             <WaterView
+              locations={lanLocations}
+              zones={lanZones}
               devices={waterDevices}
+              pipes={waterPipes}
+              onSaveLocation={handleSaveLanLocation}
+              onDeleteLocation={handleDeleteLanLocation}
+              onSaveZone={handleSaveLanZone}
+              onDeleteZone={handleDeleteLanZone}
               onSaveDevice={handleSaveWaterDevice}
               onDeleteDevice={handleDeleteWaterDevice}
-              onOpenAddModal={() => {
+              onSavePipe={handleSaveWaterPipe}
+              onDeletePipe={handleDeleteWaterPipe}
+              onOpenAddLocationModal={() => {
+                setEditingLanLocation(null);
+                setIsLanLocationModalOpen(true);
+              }}
+              onOpenEditLocationModal={(loc) => {
+                setEditingLanLocation(loc);
+                setIsLanLocationModalOpen(true);
+              }}
+              onOpenAddZoneModal={(locId) => {
+                setEditingLanZone(null);
+                setLanZoneDefaultLocationId(locId);
+                setIsLanZoneModalOpen(true);
+              }}
+              onOpenEditZoneModal={(zone) => {
+                setEditingLanZone(zone);
+                setIsLanZoneModalOpen(true);
+              }}
+              onOpenAddDeviceModal={(locId, zId) => {
                 setEditingWaterDevice(null);
+                setWaterDeviceDefaultLocationId(locId);
+                setWaterDeviceDefaultZoneId(zId);
                 setIsWaterModalOpen(true);
               }}
-              onOpenEditModal={(device) => {
+              onOpenEditDeviceModal={(device) => {
                 setEditingWaterDevice(device);
                 setIsWaterModalOpen(true);
+              }}
+              onOpenAddPipeModal={(locId, zId) => {
+                setEditingWaterPipe(null);
+                setWaterPipeDefaultLocationId(locId);
+                setWaterPipeDefaultZoneId(zId);
+                setIsWaterPipeModalOpen(true);
+              }}
+              onOpenEditPipeModal={(pipe) => {
+                setEditingWaterPipe(pipe);
+                setIsWaterPipeModalOpen(true);
               }}
             />
           )}
@@ -2181,10 +2506,35 @@ export const App: React.FC = () => {
           onClose={() => {
             setIsElectricityModalOpen(false);
             setEditingElectricityDevice(null);
+            setElectricityDeviceDefaultLocationId(undefined);
+            setElectricityDeviceDefaultZoneId(undefined);
           }}
           onSave={handleSaveElectricityDevice}
           editDevice={editingElectricityDevice}
           existingDevices={electricityDevices}
+          locations={lanLocations}
+          zones={lanZones}
+          presetLocationId={electricityDeviceDefaultLocationId}
+          presetZoneId={electricityDeviceDefaultZoneId}
+        />
+      )}
+
+      {isElectricityCableModalOpen && (
+        <ElectricityCableModal
+          isOpen={isElectricityCableModalOpen}
+          onClose={() => {
+            setIsElectricityCableModalOpen(false);
+            setEditingElectricityCable(null);
+            setElectricityCableDefaultLocationId(undefined);
+            setElectricityCableDefaultZoneId(undefined);
+          }}
+          onSave={handleSaveElectricityCable}
+          editCable={editingElectricityCable}
+          locations={lanLocations}
+          zones={lanZones}
+          electricityDevices={electricityDevices}
+          presetLocationId={electricityCableDefaultLocationId}
+          presetZoneId={electricityCableDefaultZoneId}
         />
       )}
 
@@ -2194,10 +2544,35 @@ export const App: React.FC = () => {
           onClose={() => {
             setIsCctvModalOpen(false);
             setEditingCctvDevice(null);
+            setCctvDeviceDefaultLocationId(undefined);
+            setCctvDeviceDefaultZoneId(undefined);
           }}
           onSave={handleSaveCctvDevice}
           editDevice={editingCctvDevice}
           existingNvrList={cctvDevices.filter(d => d.type === 'nvr' || d.type === 'dvr')}
+          locations={lanLocations}
+          zones={lanZones}
+          presetLocationId={cctvDeviceDefaultLocationId}
+          presetZoneId={cctvDeviceDefaultZoneId}
+        />
+      )}
+
+      {isCctvCableModalOpen && (
+        <CctvCableModal
+          isOpen={isCctvCableModalOpen}
+          onClose={() => {
+            setIsCctvCableModalOpen(false);
+            setEditingCctvCable(null);
+            setCctvCableDefaultLocationId(undefined);
+            setCctvCableDefaultZoneId(undefined);
+          }}
+          onSave={handleSaveCctvCable}
+          editCable={editingCctvCable}
+          locations={lanLocations}
+          zones={lanZones}
+          cctvDevices={cctvDevices}
+          presetLocationId={cctvCableDefaultLocationId}
+          presetZoneId={cctvCableDefaultZoneId}
         />
       )}
 
@@ -2207,9 +2582,34 @@ export const App: React.FC = () => {
           onClose={() => {
             setIsWaterModalOpen(false);
             setEditingWaterDevice(null);
+            setWaterDeviceDefaultLocationId(undefined);
+            setWaterDeviceDefaultZoneId(undefined);
           }}
           onSave={handleSaveWaterDevice}
           editDevice={editingWaterDevice}
+          locations={lanLocations}
+          zones={lanZones}
+          presetLocationId={waterDeviceDefaultLocationId}
+          presetZoneId={waterDeviceDefaultZoneId}
+        />
+      )}
+
+      {isWaterPipeModalOpen && (
+        <WaterPipeModal
+          isOpen={isWaterPipeModalOpen}
+          onClose={() => {
+            setIsWaterPipeModalOpen(false);
+            setEditingWaterPipe(null);
+            setWaterPipeDefaultLocationId(undefined);
+            setWaterPipeDefaultZoneId(undefined);
+          }}
+          onSave={handleSaveWaterPipe}
+          editPipe={editingWaterPipe}
+          locations={lanLocations}
+          zones={lanZones}
+          waterDevices={waterDevices}
+          presetLocationId={waterPipeDefaultLocationId}
+          presetZoneId={waterPipeDefaultZoneId}
         />
       )}
 
