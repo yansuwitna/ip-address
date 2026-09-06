@@ -248,3 +248,74 @@ model LanCableRun {
   createdAt       String
   updatedAt       String
 }
+
+model ElectricityCableRun {
+  id              String   @id
+  locationId      String?
+  zoneId          String?
+  cableCode       String   @default("")
+  cableType       String   @default("nya_nym")
+  sourceDeviceId  String?
+  sourceDeviceName String?
+  sourcePort      String?
+  sourceLocation  String   @default("")
+  targetDeviceId  String?
+  targetDeviceName String?
+  targetPort      String?
+  targetLocation  String   @default("")
+  pathwayRoute    String?
+  lengthMeter     Float?
+  color           String?  @default("black")
+  capacityAmpere  Float?
+  status          String   @default("connected")
+  pic             String?
+  notes           String?
+  createdAt       String
+  updatedAt       String
+}
+
+model CctvCableRun {
+  id              String   @id
+  locationId      String?
+  zoneId          String?
+  cableCode       String   @default("")
+  cableType       String   @default("cat6_utp")
+  sourceDeviceId  String?
+  sourceDeviceName String?
+  sourcePort      String?
+  sourceLocation  String   @default("")
+  targetDeviceId  String?
+  targetDeviceName String?
+  targetPort      String?
+  targetLocation  String   @default("")
+  pathwayRoute    String?
+  lengthMeter     Float?
+  status          String   @default("connected")
+  pic             String?
+  notes           String?
+  createdAt       String
+  updatedAt       String
+}
+
+model WaterPipeRun {
+  id              String   @id
+  locationId      String?
+  zoneId          String?
+  pipeCode        String   @default("")
+  pipeType        String   @default("pvc")
+  pipeDiameter    String?
+  sourceDeviceId  String?
+  sourceDeviceName String?
+  sourceLocation  String   @default("")
+  targetDeviceId  String?
+  targetDeviceName String?
+  targetLocation  String   @default("")
+  pathwayRoute    String?
+  lengthMeter     Float?
+  pressureBar     Float?
+  status          String   @default("active")
+  pic             String?
+  notes           String?
+  createdAt       String
+  updatedAt       String
+}

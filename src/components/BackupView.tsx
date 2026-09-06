@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { 
   Database, 
+  Sparkles,
   Download, 
   Upload, 
   FileSpreadsheet, 
@@ -35,6 +36,7 @@ import {
   LanZone 
 } from '../types/utilityNetworks';
 import { UserAccount } from '../types/auth';
+import { generateDemoData } from '../utils/demoData';
 import { exportBackupJson, parseImportJson, exportAllToSingleXlsx } from '../utils/exportImport';
 import { showConfirm, showSuccess, showError, showWarning } from '../utils/swal';
 
@@ -74,7 +76,7 @@ interface BackupViewProps {
     lanZones?: LanZone[];
     lanDevices?: LanDevice[];
     lanCables?: LanCableRun[];
-  }) => void;
+  }, isDemo?: boolean) => void;
   onWipeAllData: () => void;
 }
 
@@ -287,6 +289,21 @@ export const BackupView: React.FC<BackupViewProps> = ({
     }
   };
 
+  const handleGenerateDemo = async () => {
+    const confirmed = await showConfirm({
+      title: 'Buat Data Demo?',
+      text: 'Aksi ini akan menimpa seluruh tabel dengan data demo (kecuali akun admin/pengguna Anda akan tetap aman). Lanjutkan?',
+      confirmButtonText: 'Ya, Buat Data Demo',
+      cancelButtonText: 'Batal'
+    });
+
+    if (confirmed) {
+      const demoData = generateDemoData();
+      onImportData(demoData, true);
+      showSuccess('Data Demo Berhasil Dibuat', 'Berbagai tabel telah terisi oleh data contoh untuk keperluan pengujian dan presentasi.');
+    }
+  };
+
   return (
     <div className="space-y-6 font-poppins animate-in fade-in slide-in-from-bottom-4 duration-300">
       
@@ -364,6 +381,30 @@ export const BackupView: React.FC<BackupViewProps> = ({
           </button>
         </div>
 
+      </div>
+
+      {/* Area Demo */}
+      <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/60 rounded-3xl p-6 space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-amber-100 dark:bg-amber-900/60 text-amber-600 dark:text-amber-400 rounded-xl">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-amber-900 dark:text-amber-200">Data Dummy (Demo)</h3>
+              <p className="text-xs text-amber-700/80 dark:text-amber-400/80">
+                Otomatis mengisi tabel sistem dengan data contoh fiktif. (Catatan: Akun Anda akan tetap utuh, tabel lain akan diganti).
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleGenerateDemo}
+            className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-amber-600/30 transition-all cursor-pointer flex-shrink-0 flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Buat Data Demo</span>
+          </button>
+        </div>
       </div>
 
       {/* Area Bahaya (Wipe Data) */}

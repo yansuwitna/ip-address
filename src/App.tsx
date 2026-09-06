@@ -31,6 +31,7 @@ import {
   deleteUser, 
   wipeAllUsers 
 } from './utils/auth';
+import { wipeServer } from './utils/api';
 
 import { 
   loadGroups, 
@@ -659,6 +660,8 @@ export const App: React.FC = () => {
     password?: string;
     role?: string;
     avatar?: string;
+    appName?: string;
+    appLogo?: string;
     magicToken?: string;
   }) => {
     if (userData.id) {
@@ -673,6 +676,8 @@ export const App: React.FC = () => {
             email: res.user.email,
             role: res.user.role,
             avatar: res.user.avatar,
+            appName: res.user.appName,
+            appLogo: res.user.appLogo,
             magicToken: res.user.magicToken
           };
           setCurrentUserSession(safeUser);
@@ -744,6 +749,7 @@ export const App: React.FC = () => {
     saveLanDevices([]);
     saveLanCables([]);
     saveSubDomains([]);
+    await wipeServer();
     await wipeAllUsers();
     setUsers([]);
     setCurrentUser(null);
@@ -769,7 +775,7 @@ export const App: React.FC = () => {
     lanZones?: LanZone[];
     lanDevices?: LanDevice[];
     lanCables?: LanCableRun[];
-  }) => {
+  }, isDemo: boolean = false) => {
     if (data.lanLocations) {
       setLanLocations(data.lanLocations);
       saveLanLocations(data.lanLocations);
@@ -843,12 +849,14 @@ export const App: React.FC = () => {
       setSelectedGroupId(data.groups[0].id);
     }
     
-    // Automatically log out upon data import/restore
-    logoutUser();
-    setCurrentUser(null);
-    setAuthView('login');
-    setIsViewingPublicHome(false);
-    syncBrowserUrl('/login');
+    // Automatically log out upon data import/restore if not demo
+    if (!isDemo) {
+      logoutUser();
+      setCurrentUser(null);
+      setAuthView('login');
+      setIsViewingPublicHome(false);
+      syncBrowserUrl('/login');
+    }
   };
 
   const handleLogout = () => {

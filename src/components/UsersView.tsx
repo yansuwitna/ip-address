@@ -31,6 +31,8 @@ interface UsersViewProps {
     password?: string;
     role?: string;
     avatar?: string;
+    appName?: string;
+    appLogo?: string;
     magicToken?: string;
   }) => Promise<{ success: boolean; error?: string }>;
   onDeleteUser?: (userId: string) => Promise<{ success: boolean; error?: string }> | { success: boolean; error?: string };
