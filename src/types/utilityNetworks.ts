@@ -261,6 +261,7 @@ export interface LanZone {
   roomType?: string; // "lab" | "office" | "server_room" | "classroom" | "library" | "other"
   pic?: string; // Kepala Lab / Petugas
   notes?: string;
+  systemType?: string; // 'lan' | 'electricity' | 'cctv' | 'water'
   createdAt: string;
   updatedAt: string;
 }

@@ -83,7 +83,7 @@ export const WaterView: React.FC<WaterViewProps> = ({
 
   const locationZones = useMemo(() => {
     if (!selectedLocationId) return [];
-    return zones.filter(z => z.locationId === selectedLocationId);
+    return zones.filter(z => z.locationId === selectedLocationId && z.systemType === 'water');
   }, [zones, selectedLocationId]);
 
   const contextDevices = useMemo(() => {
@@ -184,7 +184,7 @@ export const WaterView: React.FC<WaterViewProps> = ({
   };
 
   const handleDeleteLocationItem = async (loc: LanLocation) => {
-    const locZones = zones.filter(z => z.locationId === loc.id);
+    const locZones = zones.filter(z => z.locationId === loc.id && z.systemType === 'water');
     const locDevs = devices.filter(d => d.locationId === loc.id);
     const locPipes = pipes.filter(p => p.locationId === loc.id);
 
@@ -321,7 +321,7 @@ export const WaterView: React.FC<WaterViewProps> = ({
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {locations.map((loc) => {
-                const locZones = zones.filter(z => z.locationId === loc.id);
+                const locZones = zones.filter(z => z.locationId === loc.id && z.systemType === 'water');
                 const locDevices = devices.filter(d => d.locationId === loc.id);
                 const locPipes = pipes.filter(p => p.locationId === loc.id);
                 const totalLiter = locDevices.reduce((sum, d) => sum + (d.tankCapacityLiter || 0), 0);

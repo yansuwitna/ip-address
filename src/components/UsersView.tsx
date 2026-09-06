@@ -50,6 +50,8 @@ export const UsersView: React.FC<UsersViewProps> = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [avatar, setAvatar] = useState('');
+  const [appName, setAppName] = useState('');
+  const [appLogo, setAppLogo] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [isSuccessToast, setIsSuccessToast] = useState(false);
 
@@ -61,12 +63,16 @@ export const UsersView: React.FC<UsersViewProps> = ({
       setEmail(singleUser.email || '');
       setPassword('');
       setAvatar(singleUser.avatar || '');
+      setAppName(singleUser.appName || '');
+      setAppLogo(singleUser.appLogo || '');
     } else {
       setName('');
       setUsername('');
       setEmail('');
       setPassword('');
       setAvatar('');
+      setAppName('');
+      setAppLogo('');
     }
     setFormError(null);
     setIsModalOpen(true);
@@ -99,7 +105,9 @@ export const UsersView: React.FC<UsersViewProps> = ({
       username,
       email,
       password: password || undefined,
-      avatar: avatar.trim() || undefined
+      avatar: avatar.trim() || undefined,
+      appName: appName.trim() || undefined,
+      appLogo: appLogo.trim() || undefined
     });
 
     if (!res.success) {

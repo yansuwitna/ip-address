@@ -107,7 +107,7 @@ export const LanView: React.FC<LanViewProps> = ({
   // Zona di dalam Lokasi terpilih
   const locationZones = useMemo(() => {
     if (!selectedLocationId) return [];
-    return zones.filter(z => z.locationId === selectedLocationId);
+    return zones.filter(z => z.locationId === selectedLocationId && (z.systemType === 'lan' || !z.systemType));
   }, [zones, selectedLocationId]);
 
   // Perangkat di dalam konteks aktif Lab terpilih
@@ -209,7 +209,7 @@ export const LanView: React.FC<LanViewProps> = ({
   };
 
   const handleDeleteLocationItem = async (loc: LanLocation) => {
-    const locZones = zones.filter(z => z.locationId === loc.id);
+    const locZones = zones.filter(z => z.locationId === loc.id && (z.systemType === 'lan' || !z.systemType));
     const locDevs = devices.filter(d => d.locationId === loc.id);
     const locCbls = cables.filter(c => c.locationId === loc.id);
 
@@ -366,7 +366,7 @@ export const LanView: React.FC<LanViewProps> = ({
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {locations.map(loc => {
-                const locZones = zones.filter(z => z.locationId === loc.id);
+                const locZones = zones.filter(z => z.locationId === loc.id && (z.systemType === 'lan' || !z.systemType));
                 const locDevices = devices.filter(d => d.locationId === loc.id);
                 const locCables = cables.filter(c => c.locationId === loc.id);
 

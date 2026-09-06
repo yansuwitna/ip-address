@@ -10,9 +10,10 @@ import {
   ArrowRight,
   Activity,
   Gauge,
-  HardDrive
+  HardDrive,
+  Globe
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceCategory } from '../types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, DnsRecord, SubDomainRecord } from '../types/ipam';
 import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/utilityNetworks';
 import { parseCidr } from '../utils/ipCalculator';
 import { getCategoryIconComponent } from './CategoriesView';
@@ -26,6 +27,8 @@ interface DashboardViewProps {
   electricityDevices?: ElectricityDevice[];
   cctvDevices?: CctvDevice[];
   waterDevices?: WaterDevice[];
+  dnsRecords?: DnsRecord[];
+  subDomains?: SubDomainRecord[];
   onNavigateToTab?: (tab: any) => void;
 }
 
@@ -38,6 +41,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   electricityDevices = [],
   cctvDevices = [],
   waterDevices = [],
+  dnsRecords = [],
+  subDomains = [],
   onNavigateToTab
 }) => {
   // 1. STATS LAN (KABEL & PERANGKAT FISIK)
@@ -232,6 +237,132 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <button 
                   onClick={() => onNavigateToTab('water')}
                   className="p-1.5 rounded-lg bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-600 hover:text-white transition-colors cursor-pointer"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 3 KARTU SEKTOR LOGICAL (IPAM, DNS, KATEGORI) */}
+      <div>
+        <div className="flex items-center justify-between mb-3 mt-2">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              3 Modul Pengalamatan & Layanan Jaringan
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Kelola alokasi IP Address (IPAM), domain web lokal (DNS), dan kategori perangkat
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          
+          {/* IP ADDRESS */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-indigo-400 transition-all flex flex-col justify-between group">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-100 dark:border-indigo-800/60">
+                  <Activity className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  {overallUsedPct}% Terpakai
+                </span>
+              </div>
+
+              <div className="mt-4">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Manajemen IPAM</span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Alamat IP & VLAN</h3>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{totalGroups}</span>
+                  <span className="text-xs font-semibold text-slate-500">Subnet ({totalUsedIps} IP Aktif)</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">Sistem kontrol IP, Host & VLAN</p>
+              </div>
+            </div>
+
+            <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
+              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">Buka Modul IP</span>
+              {onNavigateToTab && (
+                <button 
+                  onClick={() => onNavigateToTab('groups')}
+                  className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500 hover:text-white transition-colors cursor-pointer"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* DNS */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-fuchsia-400 transition-all flex flex-col justify-between group">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="p-2.5 bg-fuchsia-50 dark:bg-fuchsia-950/50 text-fuchsia-600 dark:text-fuchsia-400 rounded-2xl border border-fuchsia-100 dark:border-fuchsia-800/60">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-fuchsia-50 dark:bg-fuchsia-900/40 text-fuchsia-700 dark:text-fuchsia-300 border border-fuchsia-200 dark:border-fuchsia-800">
+                  {dnsRecords.length} Domain Aktif
+                </span>
+              </div>
+
+              <div className="mt-4">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Resolusi Domain</span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Manajemen DNS</h3>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{dnsRecords.length + subDomains.length}</span>
+                  <span className="text-xs font-semibold text-slate-500">Total Records</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">Pemetaan nama domain ke IP server lokal</p>
+              </div>
+            </div>
+
+            <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
+              <span className="text-xs font-bold text-fuchsia-600 dark:text-fuchsia-400">Buka Modul DNS</span>
+              {onNavigateToTab && (
+                <button 
+                  onClick={() => onNavigateToTab('dns')}
+                  className="p-1.5 rounded-lg bg-fuchsia-50 dark:bg-fuchsia-950/50 text-fuchsia-600 dark:text-fuchsia-400 hover:bg-fuchsia-500 hover:text-white transition-colors cursor-pointer"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* KATEGORI HARDWARE */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-emerald-400 transition-all flex flex-col justify-between group">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-2xl border border-emerald-100 dark:border-emerald-800/60">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  Terkonfigurasi
+                </span>
+              </div>
+
+              <div className="mt-4">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Klasifikasi Aset</span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Kategori Hardware</h3>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{categories.length}</span>
+                  <span className="text-xs font-semibold text-slate-500">Kategori Utama</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">Ikon dan tag untuk klasifikasi tipe perangkat</p>
+              </div>
+            </div>
+
+            <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">Buka Kategori</span>
+              {onNavigateToTab && (
+                <button 
+                  onClick={() => onNavigateToTab('categories')}
+                  className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors cursor-pointer"
                 >
                   <ArrowRight className="w-4 h-4" />
                 </button>

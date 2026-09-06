@@ -61,7 +61,7 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
     } else {
       const initLoc = presetLocationId || (locations[0]?.id || '');
       setLocationId(initLoc);
-      const availableZones = zones.filter(z => z.locationId === initLoc);
+      const availableZones = zones.filter(z => (z.systemType === 'lan' || !z.systemType) && z.locationId === initLoc);
       setZoneId(presetZoneId || (availableZones[0]?.id || ''));
       setName('');
       setCode(`SW-LAB-${String(Date.now()).slice(-4)}`);
@@ -83,7 +83,7 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
   if (!isOpen) return null;
 
   // Filter available zones for selected location
-  const filteredZones = locationId ? zones.filter(z => z.locationId === locationId) : zones;
+  const filteredZones = locationId ? zones.filter(z => (z.systemType === 'lan' || !z.systemType) && z.locationId === locationId) : zones;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,7 +167,7 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
                 onChange={e => {
                   const newLoc = e.target.value;
                   setLocationId(newLoc);
-                  const matchingZones = zones.filter(z => z.locationId === newLoc);
+                  const matchingZones = zones.filter(z => (z.systemType === 'lan' || !z.systemType) && z.locationId === newLoc);
                   setZoneId(matchingZones[0]?.id || '');
                 }}
                 disabled={true}

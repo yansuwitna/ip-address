@@ -77,7 +77,7 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
     } else {
       const initLoc = presetLocationId || (locations[0]?.id || '');
       setLocationId(initLoc);
-      const availableZones = zones.filter(z => z.locationId === initLoc);
+      const availableZones = zones.filter(z => (z.systemType === 'lan' || !z.systemType) && z.locationId === initLoc);
       const initZone = presetZoneId || (availableZones[0]?.id || '');
       setZoneId(initZone);
 
@@ -107,7 +107,7 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
 
   if (!isOpen) return null;
 
-  const filteredZones = locationId ? zones.filter(z => z.locationId === locationId) : zones;
+  const filteredZones = locationId ? zones.filter(z => (z.systemType === 'lan' || !z.systemType) && z.locationId === locationId) : zones;
   const filteredDevices = zoneId ? devices.filter(d => d.zoneId === zoneId) : devices;
 
   const handleSourceSelect = (devId: string) => {
@@ -218,7 +218,7 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
                 onChange={e => {
                   const newLoc = e.target.value;
                   setLocationId(newLoc);
-                  const matchingZones = zones.filter(z => z.locationId === newLoc);
+                  const matchingZones = zones.filter(z => (z.systemType === 'lan' || !z.systemType) && z.locationId === newLoc);
                   setZoneId(matchingZones[0]?.id || '');
                 }}
                 disabled={true}

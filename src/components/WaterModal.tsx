@@ -67,7 +67,7 @@ export const WaterModal: React.FC<WaterModalProps> = ({
     } else {
       const initLoc = presetLocationId || (locations[0]?.id || '');
       setLocationId(initLoc);
-      const availableZones = zones.filter(z => z.locationId === initLoc);
+      const availableZones = zones.filter(z => z.systemType === 'water' && z.locationId === initLoc);
       setZoneId(presetZoneId || (availableZones[0]?.id || ''));
       setName('');
       setCode('');
@@ -176,7 +176,7 @@ export const WaterModal: React.FC<WaterModalProps> = ({
                       onChange={e => {
                         const newLocId = e.target.value;
                         setLocationId(newLocId);
-                        const matchingZones = zones.filter(z => z.locationId === newLocId);
+                        const matchingZones = zones.filter(z => z.systemType === 'water' && z.locationId === newLocId);
                         setZoneId(matchingZones[0]?.id || '');
                       }}
                       className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-800 dark:text-slate-100"
@@ -198,7 +198,7 @@ export const WaterModal: React.FC<WaterModalProps> = ({
                       onChange={e => setZoneId(e.target.value)}
                       className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-800 dark:text-slate-100"
                     >
-                      {zones.filter(z => z.locationId === locationId).map(zone => (
+                      {zones.filter(z => z.systemType === 'water' && z.locationId === locationId).map(zone => (
                         <option key={zone.id} value={zone.id}>
                           {zone.name} {zone.code ? `(${zone.code})` : ''}
                         </option>

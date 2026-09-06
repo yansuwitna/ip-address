@@ -78,7 +78,7 @@ export const ElectricityCableModal: React.FC<ElectricityCableModalProps> = ({
 
   if (!isOpen) return null;
 
-  const availableZones = zones.filter(z => !selectedLocationId || z.locationId === selectedLocationId);
+  const availableZones = zones.filter(z => (z.systemType === 'electricity' || !z.systemType) && (!selectedLocationId || z.locationId === selectedLocationId));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,7 +151,7 @@ export const ElectricityCableModal: React.FC<ElectricityCableModalProps> = ({
                   value={selectedLocationId}
                   onChange={(e) => {
                     setSelectedLocationId(e.target.value);
-                    const matching = zones.filter(z => z.locationId === e.target.value);
+                    const matching = zones.filter(z => (z.systemType === 'electricity' || !z.systemType) && z.locationId === e.target.value);
                     setSelectedZoneId(matching[0]?.id || '');
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-amber-500 outline-hidden"

@@ -87,7 +87,7 @@ export const ElectricityView: React.FC<ElectricityViewProps> = ({
 
   const locationZones = useMemo(() => {
     if (!selectedLocationId) return [];
-    return zones.filter(z => z.locationId === selectedLocationId);
+    return zones.filter(z => z.locationId === selectedLocationId && (z.systemType === 'electricity' || !z.systemType));
   }, [zones, selectedLocationId]);
 
   const contextDevices = useMemo(() => {
@@ -186,7 +186,7 @@ export const ElectricityView: React.FC<ElectricityViewProps> = ({
   };
 
   const handleDeleteLocationItem = async (loc: LanLocation) => {
-    const locZones = zones.filter(z => z.locationId === loc.id);
+    const locZones = zones.filter(z => z.locationId === loc.id && (z.systemType === 'electricity' || !z.systemType));
     const locDevs = devices.filter(d => d.locationId === loc.id);
     const locCbls = cables.filter(c => c.locationId === loc.id);
 
@@ -323,7 +323,7 @@ export const ElectricityView: React.FC<ElectricityViewProps> = ({
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {locations.map((loc) => {
-                const locZones = zones.filter(z => z.locationId === loc.id);
+                const locZones = zones.filter(z => z.locationId === loc.id && (z.systemType === 'electricity' || !z.systemType));
                 const locDevices = devices.filter(d => d.locationId === loc.id);
                 const locCables = cables.filter(c => c.locationId === loc.id);
                 const totalCap = locDevices.reduce((sum, d) => sum + (d.capacityWatt || 0), 0);

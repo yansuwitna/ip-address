@@ -85,7 +85,7 @@ export const CctvView: React.FC<CctvViewProps> = ({
 
   const locationZones = useMemo(() => {
     if (!selectedLocationId) return [];
-    return zones.filter(z => z.locationId === selectedLocationId);
+    return zones.filter(z => z.locationId === selectedLocationId && z.systemType === 'cctv');
   }, [zones, selectedLocationId]);
 
   const contextDevices = useMemo(() => {
@@ -182,7 +182,7 @@ export const CctvView: React.FC<CctvViewProps> = ({
   };
 
   const handleDeleteLocationItem = async (loc: LanLocation) => {
-    const locZones = zones.filter(z => z.locationId === loc.id);
+    const locZones = zones.filter(z => z.locationId === loc.id && z.systemType === 'cctv');
     const locDevs = devices.filter(d => d.locationId === loc.id);
     const locCbls = cables.filter(c => c.locationId === loc.id);
 
@@ -319,7 +319,7 @@ export const CctvView: React.FC<CctvViewProps> = ({
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {locations.map((loc) => {
-                const locZones = zones.filter(z => z.locationId === loc.id);
+                const locZones = zones.filter(z => z.locationId === loc.id && z.systemType === 'cctv');
                 const locDevices = devices.filter(d => d.locationId === loc.id);
                 const locCables = cables.filter(c => c.locationId === loc.id);
                 const onlineCam = locDevices.filter(d => d.status === 'online' || d.status === 'recording').length;

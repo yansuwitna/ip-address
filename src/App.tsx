@@ -511,6 +511,7 @@ export const App: React.FC = () => {
   const [isLanZoneModalOpen, setIsLanZoneModalOpen] = useState(false);
   const [editingLanZone, setEditingLanZone] = useState<LanZone | null>(null);
   const [lanZoneDefaultLocationId, setLanZoneDefaultLocationId] = useState<string | undefined>(undefined);
+  const [lanZoneSystemType, setLanZoneSystemType] = useState<string>('lan');
 
   const [isLanDeviceModalOpen, setIsLanDeviceModalOpen] = useState(false);
   const [editingLanDevice, setEditingLanDevice] = useState<LanDevice | null>(null);
@@ -1343,6 +1344,7 @@ export const App: React.FC = () => {
         roomType: zoneData.roomType,
         pic: zoneData.pic,
         notes: zoneData.notes,
+        systemType: zoneData.systemType || lanZoneSystemType,
         createdAt: now,
         updatedAt: now
       };
@@ -1521,6 +1523,8 @@ export const App: React.FC = () => {
               electricityDevices={electricityDevices}
               cctvDevices={cctvDevices}
               waterDevices={waterDevices}
+              dnsRecords={dnsRecords}
+              subDomains={subDomains}
               onNavigateToTab={(tab) => {
                 if (tab === 'groups') setIsViewingGroupAllocations(false);
                 setCurrentTab(tab);
@@ -1554,6 +1558,7 @@ export const App: React.FC = () => {
               onOpenAddZoneModal={(locId) => {
                 setEditingLanZone(null);
                 setLanZoneDefaultLocationId(locId);
+                setLanZoneSystemType('lan');
                 setIsLanZoneModalOpen(true);
               }}
               onOpenEditZoneModal={(zone) => {
@@ -2253,6 +2258,7 @@ export const App: React.FC = () => {
               onOpenAddZoneModal={(locId) => {
                 setEditingLanZone(null);
                 setLanZoneDefaultLocationId(locId);
+                setLanZoneSystemType('electricity');
                 setIsLanZoneModalOpen(true);
               }}
               onOpenEditZoneModal={(zone) => {
@@ -2314,6 +2320,7 @@ export const App: React.FC = () => {
               onOpenAddZoneModal={(locId) => {
                 setEditingLanZone(null);
                 setLanZoneDefaultLocationId(locId);
+                setLanZoneSystemType('cctv');
                 setIsLanZoneModalOpen(true);
               }}
               onOpenEditZoneModal={(zone) => {
@@ -2375,6 +2382,7 @@ export const App: React.FC = () => {
               onOpenAddZoneModal={(locId) => {
                 setEditingLanZone(null);
                 setLanZoneDefaultLocationId(locId);
+                setLanZoneSystemType('water');
                 setIsLanZoneModalOpen(true);
               }}
               onOpenEditZoneModal={(zone) => {

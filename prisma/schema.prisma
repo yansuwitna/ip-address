@@ -15,6 +15,8 @@ model User {
   password   String
   role       String?
   avatar     String?
+  appName    String?
+  appLogo    String?
   lastLogin  String?
   createdAt  String
   magicToken String?
@@ -196,6 +198,7 @@ model LanZone {
   roomType    String?  @default("lab")
   pic         String?
   notes       String?
+  systemType  String   @default("lan")
   createdAt   String
   updatedAt   String
 }

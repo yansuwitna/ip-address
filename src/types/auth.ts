@@ -5,6 +5,8 @@ export interface User {
   email: string;
   role?: string;
   avatar?: string;
+  appName?: string;
+  appLogo?: string;
   lastLogin?: string;
   createdAt?: string;
   magicToken?: string;
