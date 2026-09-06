@@ -130,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const systemItems: NavItem[] = [
     {
       id: 'groups',
-      label: 'Alamat IP (Subnet IPAM)',
+      label: 'Alamat IP',
       icon: Layers,
       description: 'Subnet CIDR & Alokasi Host IP',
       badge: totalGroups.toString(),

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Printer, X, Download, Shield, Network, Globe, CheckCircle2, Zap, Video, Droplets, Cable } from 'lucide-react';
+import { Printer, X, Download, Shield, Network, Globe, CheckCircle2, Zap, Video, Droplets, Cable, Layers } from 'lucide-react';
 import { IPGroup, IPAllocation, IPService, DnsRecord, DeviceCategory } from '../types/ipam';
 import { 
   LanLocation, 
@@ -21,6 +21,7 @@ interface PrintModalProps {
   title?: string;
   type: 'allocations' | 'dns' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail';
   group?: IPGroup;
+  groups?: IPGroup[];
   allocations?: IPAllocation[];
   dnsRecords?: DnsRecord[];
   services?: IPService[];
@@ -45,6 +46,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
   title = 'Laporan Jaringan',
   type,
   group,
+  groups = [],
   allocations = [],
   dnsRecords = [],
   services = [],
@@ -124,6 +126,8 @@ export const PrintModal: React.FC<PrintModalProps> = ({
     if (title === 'Laporan Jaringan') displayTitle = 'Detail Infrastruktur Air';
   } else if (type === 'lan_detail') {
     if (title === 'Laporan Jaringan') displayTitle = 'Detail Jaringan LAN';
+  } else if (type === 'allocations') {
+    if (title === 'Laporan Jaringan') displayTitle = group ? `Laporan Alokasi Host Subnet: ${group.name}` : 'Laporan Alokasi Alamat IP';
   }
 
   return (
@@ -227,6 +231,95 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                 <div>
                   <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Layanan Aktif</span>
                   <strong className="text-emerald-700">{services.length} Port Terbuka</strong>
+                </div>
+              </div>
+            )}
+
+            {/* TABEL: Alokasi Host IP */}
+            {type === 'allocations' && (
+              <div className="space-y-4 mb-8">
+                <div>
+                  <h4 className="text-xs font-bold uppercase text-slate-700 dark:text-slate-200 mb-2 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Daftar Alokasi Host IP ({allocations.length} Terdaftar)</span>
+                    </span>
+                    {group && (
+                      <span className="font-mono text-[11px] font-normal text-slate-500">
+                        Subnet: {group.cidr} | Gateway: {group.gateway}
+                      </span>
+                    )}
+                  </h4>
+                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
+                          <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center w-8">No</th>
+                          <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">Alamat IP</th>
+                          <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">Hostname / Perangkat</th>
+                          <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">MAC Address</th>
+                          <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">Pengguna & Dept</th>
+                          <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center">Status</th>
+                          <th className="py-2 px-2.5">Catatan / Keterangan</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-slate-800 dark:text-slate-200">
+                        {allocations.length === 0 ? (
+                          <tr>
+                            <td colSpan={7} className="py-6 text-center text-slate-400">
+                              Tidak ada alokasi host terdaftar pada subnet ini.
+                            </td>
+                          </tr>
+                        ) : (
+                          allocations.map((a, idx) => {
+                            const statusColor = a.status === 'used' 
+                              ? 'text-emerald-700 bg-emerald-50 border-emerald-200' 
+                              : a.status === 'reserved' 
+                              ? 'text-purple-700 bg-purple-50 border-purple-200' 
+                              : a.status === 'dhcp' 
+                              ? 'text-blue-700 bg-blue-50 border-blue-200' 
+                              : 'text-slate-700 bg-slate-50 border-slate-200';
+                            
+                            const cat = categories.find(c => c.id === a.deviceType);
+                            const parentGrp = groups.find(g => g.id === a.groupId);
+
+                            return (
+                              <tr key={a.id} className={idx % 2 === 1 ? 'bg-slate-50 dark:bg-slate-800/70' : 'bg-white dark:bg-slate-900'}>
+                                <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center text-slate-500">
+                                  {idx + 1}
+                                </td>
+                                <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-mono font-bold text-blue-900">
+                                  <div>{a.ip}</div>
+                                  {!group && parentGrp && (
+                                    <div className="text-[9px] font-sans font-normal text-slate-500">{parentGrp.name}</div>
+                                  )}
+                                </td>
+                                <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600">
+                                  <div className="font-semibold">{a.hostname || '-'}</div>
+                                  {cat && <div className="text-[9px] text-slate-400">{cat.name}</div>}
+                                </td>
+                                <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-mono text-[10px] text-slate-600">
+                                  {a.macAddress || '-'}
+                                </td>
+                                <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600">
+                                  <div>{a.assignedTo || '-'}</div>
+                                  {a.department && <div className="text-[10px] text-slate-400">{a.department}</div>}
+                                </td>
+                                <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center">
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${statusColor}`}>
+                                    {a.status}
+                                  </span>
+                                </td>
+                                <td className="py-1.5 px-2.5 text-[10px] text-slate-600 dark:text-slate-400">
+                                  {a.notes || '-'}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             )}

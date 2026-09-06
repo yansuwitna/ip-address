@@ -16,7 +16,8 @@ import {
   Trash2,
   ServerCog,
   LayoutGrid,
-  Table as TableIcon
+  Table as TableIcon,
+  Printer
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from './types/ipam';
 import { User, UserAccount } from './types/auth';
@@ -1557,15 +1558,28 @@ export const App: React.FC = () => {
               {isViewingGroupAllocations && activeGroup ? (
                 /* Sub-tampilan: Kelola Alokasi IP Host untuk Subnet Terpilih */
                 <div className="space-y-4">
-                  {/* Top Bar: Tombol Kembali & Tambah Alokasi */}
+                  {/* Top Bar: Tombol Kembali & Cetak Detail */}
                   <div className="flex items-center justify-between gap-3">
-                    <button
-                      onClick={() => setIsViewingGroupAllocations(false)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-600/25 transition-all cursor-pointer group"
-                    >
-                      <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                      <span>Kembali</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setIsViewingGroupAllocations(false)}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-600/25 transition-all cursor-pointer group"
+                      >
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                        <span>Kembali</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setPrintType('allocations');
+                          setIsPrintModalOpen(true);
+                        }}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
+                      >
+                        <Printer className="w-4 h-4" />
+                        <span>Cetak Detail</span>
+                      </button>
+                    </div>
 
                     <button
                       onClick={() => {
@@ -1765,6 +1779,18 @@ export const App: React.FC = () => {
                           <span>Tabel</span>
                         </button>
                       </div>
+
+                      <button
+                        onClick={() => {
+                          setPrintType('allocations');
+                          setIsPrintModalOpen(true);
+                        }}
+                        className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs"
+                        title="Cetak Laporan Seluruh Alokasi IP"
+                      >
+                        <Printer className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <span>Cetak Laporan IP</span>
+                      </button>
 
                       <button
                         onClick={() => {
@@ -2692,8 +2718,9 @@ export const App: React.FC = () => {
           isOpen={isPrintModalOpen}
           onClose={() => setIsPrintModalOpen(false)}
           type={printType}
-          group={activeGroup}
-          allocations={activeGroup ? allocations.filter(a => a.groupId === activeGroup.id) : allocations}
+          group={isViewingGroupAllocations ? activeGroup : undefined}
+          groups={groups}
+          allocations={isViewingGroupAllocations && activeGroup ? allocations.filter(a => a.groupId === activeGroup.id) : allocations}
           dnsRecords={dnsRecords}
           services={services}
           categories={categories}
