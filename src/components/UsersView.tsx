@@ -373,6 +373,28 @@ export const UsersView: React.FC<UsersViewProps> = ({
 
           </div>
 
+          {/* Identitas Aplikasi & Logo Aktif */}
+          <div className="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              {singleUser.appLogo ? (
+                <img src={singleUser.appLogo} alt="Logo Aplikasi" className="w-10 h-10 object-contain rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-1" />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-[10px]">
+                  LOGO
+                </div>
+              )}
+              <div>
+                <div className="text-[11px] text-slate-400 font-medium">Nama Aplikasi Sistem (Aktif)</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                  {singleUser.appName || 'INFRA NET (Bawaan)'}
+                </div>
+              </div>
+            </div>
+            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+              Aktif di Home, Sidebar & Cetak
+            </span>
+          </div>
+
           {/* Single User Architecture Notice */}
           <div className="p-4 bg-blue-50 dark:bg-blue-900/60 rounded-2xl border border-blue-100 dark:border-blue-800/60 text-xs text-blue-900 flex items-start gap-3">
             <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -546,49 +568,47 @@ export const UsersView: React.FC<UsersViewProps> = ({
                 />
               </div>
 
-              {/* File Uploads (Only if singleUser is present / logged in context) */}
-              {singleUser && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Upload Logo Aplikasi
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onloadend = () => setAppLogo(reader.result as string);
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                      className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300 cursor-pointer text-slate-500"
-                    />
-                    {appLogo && <img src={appLogo} alt="Logo" className="mt-1 h-8 rounded" />}
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Upload Foto Profil
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onloadend = () => setAvatar(reader.result as string);
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                      className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/40 dark:file:text-indigo-300 cursor-pointer text-slate-500"
-                    />
-                    {avatar && <img src={avatar} alt="Profile" className="mt-1 h-8 w-8 rounded-full object-cover" />}
-                  </div>
+              {/* File Uploads - Langsung Aktif */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Upload Logo Aplikasi
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => setAppLogo(reader.result as string);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300 cursor-pointer text-slate-500"
+                  />
+                  {appLogo && <img src={appLogo} alt="Logo" className="mt-1 h-8 object-contain rounded" />}
                 </div>
-              )}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Upload Foto Profil (Avatar)
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => setAvatar(reader.result as string);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/40 dark:file:text-indigo-300 cursor-pointer text-slate-500"
+                  />
+                  {avatar && <img src={avatar} alt="Profile" className="mt-1 h-8 w-8 rounded-full object-cover border border-indigo-200" />}
+                </div>
+              </div>
 
               {/* Password */}
               <div>

@@ -12,7 +12,16 @@ async function hashPassword(password: string): Promise<string> {
 
 export async function createUser(
   currentUsers: UserAccount[], 
-  userData: { username: string; name: string; email: string; password: string; role?: string; avatar?: string; }
+  userData: { 
+    username: string; 
+    name: string; 
+    email: string; 
+    password: string; 
+    role?: string; 
+    avatar?: string;
+    appName?: string;
+    appLogo?: string;
+  }
 ): Promise<{ success: boolean; error?: string; user?: UserAccount; updatedUsers?: UserAccount[] }> {
   if (currentUsers.length >= 1) {
     return { success: false, error: 'Sistem hanya memerlukan 1 pengguna saja. Silakan perbarui akun yang sudah ada.' };
@@ -37,6 +46,8 @@ export async function createUser(
     email: userData.email.trim(),
     password: await hashPassword(userData.password),
     avatar: userData.avatar || undefined,
+    appName: userData.appName?.trim() || undefined,
+    appLogo: userData.appLogo?.trim() || undefined,
     createdAt: new Date().toISOString()
   };
 

@@ -883,7 +883,10 @@ export const App: React.FC = () => {
               username: userData.username,
               name: userData.name,
               email: userData.email,
-              password: userData.password
+              password: userData.password,
+              appName: userData.appName,
+              appLogo: userData.appLogo,
+              avatar: userData.avatar
             });
             if (res.success && res.updatedUsers) {
               setUsers(res.updatedUsers);
@@ -935,8 +938,8 @@ export const App: React.FC = () => {
         onNavigateToDashboard={() => setIsViewingPublicHome(false)}
         theme={theme}
         onToggleTheme={handleToggleTheme}
-        appName={users[0]?.appName}
-        appLogo={users[0]?.appLogo}
+        appName={currentUser?.appName || users[0]?.appName}
+        appLogo={currentUser?.appLogo || users[0]?.appLogo}
       />
     );
   }

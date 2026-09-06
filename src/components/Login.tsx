@@ -21,7 +21,15 @@ interface LoginProps {
   users?: UserAccount[];
   hasNoUsers?: boolean;
   onLoginSuccess: (user: User) => void;
-  onRegisterUser?: (userData: { username: string; name: string; email: string; password: string }) => Promise<{ success: boolean; error?: string; user?: UserAccount }>;
+  onRegisterUser?: (userData: { 
+    username: string; 
+    name: string; 
+    email: string; 
+    password: string;
+    appName?: string;
+    appLogo?: string;
+    avatar?: string;
+  }) => Promise<{ success: boolean; error?: string; user?: UserAccount }>;
   onBackToHome?: () => void;
 }
 
@@ -44,6 +52,9 @@ export const Login: React.FC<LoginProps> = ({
   const [regUsername, setRegUsername] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [regAppName, setRegAppName] = useState('');
+  const [regAppLogo, setRegAppLogo] = useState('');
+  const [regAvatar, setRegAvatar] = useState('');
   const [regError, setRegError] = useState<string | null>(null);
   const [regSuccess, setRegSuccess] = useState<string | null>(null);
 
@@ -98,7 +109,10 @@ export const Login: React.FC<LoginProps> = ({
         name: regName,
         username: regUsername,
         email: regEmail,
-        password: regPassword
+        password: regPassword,
+        appName: regAppName.trim() || undefined,
+        appLogo: regAppLogo || undefined,
+        avatar: regAvatar || undefined
       });
 
       if (!res.success || !res.user) {
@@ -240,6 +254,67 @@ export const Login: React.FC<LoginProps> = ({
                     placeholder="Contoh: admin@corp.net"
                     className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:focus:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
+                </div>
+
+                {/* Nama Aplikasi */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Nama Aplikasi (Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    value={regAppName}
+                    onChange={(e) => setRegAppName(e.target.value)}
+                    placeholder="Contoh: NetIPAM SMK Negeri 1"
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/70 focus:bg-white dark:focus:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                </div>
+
+                {/* Upload Logo & Foto Profil Langsung Aktif */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Logo Aplikasi (Opsional)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => setRegAppLogo(reader.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300 cursor-pointer text-slate-500"
+                    />
+                    {regAppLogo && (
+                      <img src={regAppLogo} alt="Logo Preview" className="mt-1.5 h-8 object-contain rounded" />
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Foto Profil / Avatar (Opsional)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => setRegAvatar(reader.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/40 dark:file:text-indigo-300 cursor-pointer text-slate-500"
+                    />
+                    {regAvatar && (
+                      <img src={regAvatar} alt="Avatar Preview" className="mt-1.5 h-8 w-8 rounded-full object-cover border border-indigo-200" />
+                    )}
+                  </div>
                 </div>
 
                 {/* Password */}
