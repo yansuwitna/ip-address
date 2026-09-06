@@ -8,3 +8,4 @@ prisma/*.db
 pesan-git.txt
 .env
 package-lock.json
+prompt.txt

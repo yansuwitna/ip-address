@@ -169,8 +169,11 @@ async function startServer() {
         dnsRecords,
         subDomains,
         electricityDevices,
+        electricityCableRuns,
         cctvDevices,
+        cctvCableRuns,
         waterDevices,
+        waterPipeRuns,
         lanLocations,
         lanZones,
         lanDevices,
@@ -184,8 +187,11 @@ async function startServer() {
         prisma.dnsRecord.findMany(),
         prisma.subDomainRecord.findMany(),
         prisma.electricityDevice.findMany(),
+        prisma.electricityCableRun.findMany(),
         prisma.cctvDevice.findMany(),
+        prisma.cctvCableRun.findMany(),
         prisma.waterDevice.findMany(),
+        prisma.waterPipeRun.findMany(),
         prisma.lanLocation.findMany(),
         prisma.lanZone.findMany(),
         prisma.lanDevice.findMany(),
@@ -201,8 +207,11 @@ async function startServer() {
         'netipam_dns_records_v1': dnsRecords,
         'netipam_sub_domains_v1': subDomains,
         'netipam_electricity_devices_v1': electricityDevices,
+        'netipam_electricity_cables_v1': electricityCableRuns,
         'netipam_cctv_devices_v1': cctvDevices,
+        'netipam_cctv_cables_v1': cctvCableRuns,
         'netipam_water_devices_v1': waterDevices,
+        'netipam_water_pipes_v1': waterPipeRuns,
         'netipam_lan_locations_v1': lanLocations,
         'netipam_lan_zones_v1': lanZones,
         'netipam_lan_devices_v1': lanDevices,
@@ -258,11 +267,20 @@ async function startServer() {
         case 'netipam_electricity_devices_v1':
           await replaceTable(prisma.electricityDevice, data);
           break;
+        case 'netipam_electricity_cables_v1':
+          await replaceTable(prisma.electricityCableRun, data);
+          break;
         case 'netipam_cctv_devices_v1':
           await replaceTable(prisma.cctvDevice, data);
           break;
+        case 'netipam_cctv_cables_v1':
+          await replaceTable(prisma.cctvCableRun, data);
+          break;
         case 'netipam_water_devices_v1':
           await replaceTable(prisma.waterDevice, data);
+          break;
+        case 'netipam_water_pipes_v1':
+          await replaceTable(prisma.waterPipeRun, data);
           break;
         case 'netipam_lan_locations_v1':
           await replaceTable(prisma.lanLocation, data);
@@ -298,8 +316,11 @@ async function startServer() {
         prisma.dnsRecord.deleteMany({}),
         prisma.subDomainRecord.deleteMany({}),
         prisma.electricityDevice.deleteMany({}),
+        prisma.electricityCableRun.deleteMany({}),
         prisma.cctvDevice.deleteMany({}),
+        prisma.cctvCableRun.deleteMany({}),
         prisma.waterDevice.deleteMany({}),
+        prisma.waterPipeRun.deleteMany({}),
         prisma.lanCableRun.deleteMany({}),
         prisma.lanDevice.deleteMany({}),
         prisma.lanZone.deleteMany({}),
