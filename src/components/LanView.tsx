@@ -661,23 +661,6 @@ export const LanView: React.FC<LanViewProps> = ({
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>
               </button>
-              {activeSubTab === 'cables' ? (
-                <button
-                  onClick={() => onOpenAddCableModal(selectedLocationId, selectedZoneId)}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Catat Jalur Kabel ({activeZone.name})</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => onOpenAddDeviceModal(selectedLocationId, selectedZoneId)}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Tambah Perangkat ({activeZone.name})</span>
-                </button>
-              )}
             </div>
           </div>
 
