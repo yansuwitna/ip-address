@@ -124,6 +124,7 @@ export const CctvView: React.FC<CctvViewProps> = ({
     return contextDevices.filter(d => {
       const matchSearch = 
         d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (d.code && d.code.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (d.ipAddress && d.ipAddress.toLowerCase().includes(searchQuery.toLowerCase())) ||
         d.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (d.brand && d.brand.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -817,6 +818,12 @@ export const CctvView: React.FC<CctvViewProps> = ({
                             <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-slate-400" /> Lokasi:</span>
                             <span className="font-medium text-slate-800 dark:text-slate-200">{dev.location}</span>
                           </div>
+                          {dev.code && (
+                            <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                              <span>Kode Unit:</span>
+                              <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{dev.code}</span>
+                            </div>
+                          )}
                           {dev.ipAddress && (
                             <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
                               <span>IP Address:</span>

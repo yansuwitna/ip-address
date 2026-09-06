@@ -91,6 +91,7 @@ export interface CctvDevice {
   locationId?: string; // Relasi ke LanLocation
   zoneId?: string; // Relasi ke LanZone
   name: string; // e.g. CAM-LOBBY-01, NVR-MAIN-32CH
+  code?: string; // e.g. CAM-GB-01, NVR-PUSAT-01
   type: CctvDeviceType;
   ipAddress?: string; // Alamat IP kamera / NVR
   macAddress?: string;

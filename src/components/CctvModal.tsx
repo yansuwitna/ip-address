@@ -28,6 +28,7 @@ export const CctvModal: React.FC<CctvModalProps> = ({
   const [locationId, setLocationId] = useState('');
   const [zoneId, setZoneId] = useState('');
   const [name, setName] = useState('');
+  const [code, setCode] = useState('');
   const [type, setType] = useState<CctvDeviceType>('camera_ip_bullet');
   const [ipAddress, setIpAddress] = useState('');
   const [macAddress, setMacAddress] = useState('');
@@ -52,6 +53,7 @@ export const CctvModal: React.FC<CctvModalProps> = ({
       setLocationId(editDevice.locationId || '');
       setZoneId(editDevice.zoneId || '');
       setName(editDevice.name);
+      setCode(editDevice.code || '');
       setType(editDevice.type);
       setIpAddress(editDevice.ipAddress || '');
       setMacAddress(editDevice.macAddress || '');
@@ -74,6 +76,7 @@ export const CctvModal: React.FC<CctvModalProps> = ({
       const availableZones = zones.filter(z => z.systemType === 'cctv' && z.locationId === initLoc);
       setZoneId(presetZoneId || (availableZones[0]?.id || ''));
       setName('');
+      setCode('');
       setType('camera_ip_bullet');
       setIpAddress('');
       setMacAddress('');
@@ -112,6 +115,7 @@ export const CctvModal: React.FC<CctvModalProps> = ({
       locationId: locationId || undefined,
       zoneId: zoneId || undefined,
       name: name.trim(),
+      code: code.trim() || undefined,
       type,
       ipAddress: ipAddress.trim() || undefined,
       macAddress: macAddress.trim() || undefined,
@@ -217,17 +221,33 @@ export const CctvModal: React.FC<CctvModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Nama / Identifikasi Kamera *
+                Nama Perangkat / Kamera *
               </label>
               <input
                 type="text"
-                placeholder="Contoh: CAM-01 Lobby Utama / NVR-RACK3"
+                placeholder="Contoh: Kamera Gerbang Depan / NVR Pusat"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500 text-slate-800 dark:text-slate-100"
                 required
               />
             </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Kode / Tag Identifikasi
+              </label>
+              <input
+                type="text"
+                placeholder="Contoh: CAM-GB-01 / NVR-PUSAT-01"
+                value={code}
+                onChange={e => setCode(e.target.value)}
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono text-slate-800 dark:text-slate-100"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             {/* Tipe Perangkat */}
             <div>

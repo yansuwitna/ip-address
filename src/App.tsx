@@ -1065,6 +1065,7 @@ export const App: React.FC = () => {
       const newDev: CctvDevice = {
         id: `cctv-${Date.now()}`,
         name: devData.name || 'Kamera CCTV',
+        code: devData.code || '',
         type: devData.type || 'camera_ip_bullet',
         ipAddress: devData.ipAddress,
         macAddress: devData.macAddress,
