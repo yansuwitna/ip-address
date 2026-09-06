@@ -20,7 +20,8 @@ import {
   Sliders,
   Cable,
   FolderTree,
-  Tag
+  Tag,
+  Printer
 } from 'lucide-react';
 import { ElectricityDevice, ElectricityCableRun, ElectricalStatus, ElectricityDeviceType, LanLocation, LanZone } from '../types/utilityNetworks';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
@@ -46,6 +47,7 @@ interface ElectricityViewProps {
   onOpenEditDeviceModal: (device: ElectricityDevice) => void;
   onOpenAddCableModal: (locationId?: string, zoneId?: string) => void;
   onOpenEditCableModal: (cable: ElectricityCableRun) => void;
+  onOpenPrintDetail?: (location: LanLocation, zone: LanZone) => void;
 }
 
 export const ElectricityView: React.FC<ElectricityViewProps> = ({
@@ -64,7 +66,8 @@ export const ElectricityView: React.FC<ElectricityViewProps> = ({
   onOpenAddDeviceModal,
   onOpenEditDeviceModal,
   onOpenAddCableModal,
-  onOpenEditCableModal
+  onOpenEditCableModal,
+  onOpenPrintDetail
 }) => {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
@@ -599,6 +602,15 @@ export const ElectricityView: React.FC<ElectricityViewProps> = ({
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+              {onOpenPrintDetail && activeLocation && activeZone && (
+                <button
+                  onClick={() => onOpenPrintDetail(activeLocation, activeZone)}
+                  className="w-full sm:w-auto px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-md shadow-amber-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Cetak Detail</span>
+                </button>
+              )}
               <button
                 onClick={() => setSelectedZoneId(null)}
                 className="w-full sm:w-auto px-4 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"

@@ -1,19 +1,42 @@
 import React from 'react';
-import { Printer, X, Download, Shield, Network, Globe, CheckCircle2 } from 'lucide-react';
+import { Printer, X, Download, Shield, Network, Globe, CheckCircle2, Zap, Video, Droplets, Cable } from 'lucide-react';
 import { IPGroup, IPAllocation, IPService, DnsRecord, DeviceCategory } from '../types/ipam';
+import { 
+  LanLocation, 
+  LanZone, 
+  LanDevice, 
+  LanCableRun, 
+  ElectricityDevice, 
+  ElectricityCableRun, 
+  CctvDevice, 
+  CctvCableRun, 
+  WaterDevice, 
+  WaterPipeRun 
+} from '../types/utilityNetworks';
 import { User } from '../types/auth';
 
 interface PrintModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-  type: 'allocations' | 'dns' | 'services';
+  type: 'allocations' | 'dns' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail';
   group?: IPGroup;
   allocations?: IPAllocation[];
   dnsRecords?: DnsRecord[];
   services?: IPService[];
   categories?: DeviceCategory[];
   currentUser: User | null;
+  // Detail Jaringan Props
+  location?: LanLocation;
+  zone?: LanZone;
+  lanDevices?: LanDevice[];
+  lanCables?: LanCableRun[];
+  electricityDevices?: ElectricityDevice[];
+  electricityCables?: ElectricityCableRun[];
+  cctvDevices?: CctvDevice[];
+  cctvCables?: CctvCableRun[];
+  waterDevices?: WaterDevice[];
+  waterPipes?: WaterPipeRun[];
 }
 
 export const PrintModal: React.FC<PrintModalProps> = ({
@@ -26,7 +49,17 @@ export const PrintModal: React.FC<PrintModalProps> = ({
   dnsRecords = [],
   services = [],
   categories = [],
-  currentUser
+  currentUser,
+  location,
+  zone,
+  lanDevices = [],
+  lanCables = [],
+  electricityDevices = [],
+  electricityCables = [],
+  cctvDevices = [],
+  cctvCables = [],
+  waterDevices = [],
+  waterPipes = []
 }) => {
   if (!isOpen) return null;
 
@@ -152,66 +185,357 @@ export const PrintModal: React.FC<PrintModalProps> = ({
               </div>
             )}
 
-            {/* TABEL: Alokasi IP Host */}
-            {type === 'allocations' && (
-              <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg mb-8">
-                <table className="w-full text-left border-collapse text-[11px]">
-                  <thead>
-                    <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
-                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center w-8">No</th>
-                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">Alamat IP</th>
-                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">Hostname</th>
-                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">Status</th>
-                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">Kategori Perangkat</th>
-                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">MAC Address</th>
-                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">PIC / Bagian</th>
-                      <th className="py-2 px-2.5">Port Layanan</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 text-slate-800 dark:text-slate-200">
-                    {allocations.length === 0 ? (
-                      <tr>
-                        <td colSpan={8} className="py-6 text-center text-slate-400">
-                          Tidak ada data alokasi IP host.
-                        </td>
-                      </tr>
-                    ) : (
-                      allocations.map((a, idx) => {
-                        const itemServices = services.filter(s => s.allocationId === a.id || s.ip === a.ip);
-                        return (
-                          <tr key={a.id} className={idx % 2 === 1 ? 'bg-slate-50 dark:bg-slate-800/70' : 'bg-white dark:bg-slate-900'}>
-                            <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center text-slate-500 dark:text-slate-400">
-                              {idx + 1}
-                            </td>
-                            <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-mono font-bold whitespace-nowrap">
-                              {a.ip}
-                            </td>
-                            <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-medium">
-                              {a.hostname}
-                            </td>
-                            <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 capitalize text-[10px]">
-                              {a.status}
-                            </td>
-                            <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600">
-                              {getCategoryName(a.deviceType)}
-                            </td>
-                            <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-mono text-[10px]">
-                              {a.macAddress || '-'}
-                            </td>
-                            <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600">
-                              {a.assignedTo || '-'}{a.department ? ` (${a.department})` : ''}
-                            </td>
-                            <td className="py-1.5 px-2.5 text-[10px]">
-                              {itemServices.length > 0 
-                                ? itemServices.map(s => `:${s.port}`).join(', ')
-                                : '-'}
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
+            {/* Metadata Ringkasan Detail Jaringan (Lokasi & Lab/Ruang) */}
+            {location && zone && (
+              <div className="grid grid-cols-4 gap-2 text-xs mb-6 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl">
+                <div>
+                  <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Lokasi Utama</span>
+                  <strong className="text-slate-800 dark:text-slate-200">{location.name}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Area / Lab / Ruang</span>
+                  <strong className="text-slate-800 dark:text-slate-200">{zone.name}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Lantai / Kode</span>
+                  <strong className="text-slate-800 dark:text-slate-200">{zone.floor || 'Lantai 1'} ({zone.code})</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 dark:text-slate-400 block text-[10px]">PIC / Penanggung Jawab</span>
+                  <strong className="text-indigo-700">{zone.pic || location.pic || '-'}</strong>
+                </div>
+              </div>
+            )}
+
+            {/* TABEL: Detail Jaringan LAN */}
+            {type === 'lan_detail' && (
+              <div className="space-y-6 mb-8">
+                <div>
+                  <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
+                    <Network className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Daftar Perangkat Fisik LAN ({lanDevices.length})</span>
+                  </h4>
+                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
+                          <th className="py-2 px-2 border-r border-slate-300 text-center w-8">No</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Nama Perangkat</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Kode & Tipe</th>
+                          <th className="py-2 px-2 border-r border-slate-300">IP Address</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Lokasi / Rak</th>
+                          <th className="py-2 px-2 border-r border-slate-300 text-center">Port</th>
+                          <th className="py-2 px-2 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-slate-800">
+                        {lanDevices.length === 0 ? (
+                          <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada perangkat LAN terdaftar.</td></tr>
+                        ) : (
+                          lanDevices.map((d, idx) => (
+                            <tr key={d.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-bold text-blue-900">{d.name}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.code} ({d.type})</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-mono">{d.ipAddress || '-'}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.location || '-'} {d.rackNumber ? `(Rak: ${d.rackNumber})` : ''}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center">{d.totalPorts ? `${d.totalPorts} Port` : '-'}</td>
+                              <td className="py-1.5 px-2 text-center capitalize text-[10px] font-semibold">{d.status}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
+                    <Cable className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Daftar Pencatatan Jalur Kabel LAN ({lanCables.length})</span>
+                  </h4>
+                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
+                          <th className="py-2 px-2 border-r border-slate-300 text-center w-8">No</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Kode & Tipe</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Titik Asal (Arah Dari)</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Titik Tujuan (Arah Ke)</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Rute Jalur</th>
+                          <th className="py-2 px-2 border-r border-slate-300 text-center">Panjang</th>
+                          <th className="py-2 px-2 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-slate-800">
+                        {lanCables.length === 0 ? (
+                          <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada jalur kabel LAN terdaftar.</td></tr>
+                        ) : (
+                          lanCables.map((c, idx) => (
+                            <tr key={c.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-mono font-bold text-blue-900">{c.cableCode} ({c.cableType})</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{c.sourceDeviceName || c.sourceLocation} {c.sourcePort ? `(${c.sourcePort})` : ''}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{c.targetDeviceName || c.targetLocation} {c.targetPort ? `(${c.targetPort})` : ''}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-slate-600 text-[10px]">{c.pathwayRoute || '-'}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center">{c.lengthMeter || 0} m</td>
+                              <td className="py-1.5 px-2 text-center capitalize text-[10px] font-semibold">{c.status}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TABEL: Detail Jaringan Listrik */}
+            {type === 'electricity_detail' && (
+              <div className="space-y-6 mb-8">
+                <div>
+                  <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Daftar Perangkat Listrik ({electricityDevices.length})</span>
+                  </h4>
+                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
+                          <th className="py-2 px-2 border-r border-slate-300 text-center w-8">No</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Komponen</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Kode & Tipe</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Fase & Volt</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Kapasitas / Beban</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Lokasi / Letak</th>
+                          <th className="py-2 px-2 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-slate-800">
+                        {electricityDevices.length === 0 ? (
+                          <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada komponen listrik terdaftar.</td></tr>
+                        ) : (
+                          electricityDevices.map((d, idx) => (
+                            <tr key={d.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-bold text-amber-900">{d.name}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.code} ({d.type})</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.phase === '3_phase' ? '3 Phase' : '1 Phase'} ({d.voltage || 220}V)</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.capacityWatt || 0}W / {d.currentLoadWatt || 0}W</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.location || '-'}</td>
+                              <td className="py-1.5 px-2 text-center capitalize text-[10px] font-semibold">{d.status}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
+                    <Cable className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Daftar Distribusi Kabel Listrik ({electricityCables.length})</span>
+                  </h4>
+                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
+                          <th className="py-2 px-2 border-r border-slate-300 text-center w-8">No</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Kode & Tipe</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Sumber / Panel Asal</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Tujuan Beban / Ruang</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Core Spec & Rute</th>
+                          <th className="py-2 px-2 border-r border-slate-300 text-center">Panjang</th>
+                          <th className="py-2 px-2 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-slate-800">
+                        {electricityCables.length === 0 ? (
+                          <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada kabel distribusi listrik terdaftar.</td></tr>
+                        ) : (
+                          electricityCables.map((c, idx) => (
+                            <tr key={c.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-mono font-bold text-amber-900">{c.cableCode} ({c.cableType})</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{c.sourceDeviceName || c.sourceLocation}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{c.targetDeviceName || c.targetLocation}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-[10px]">{c.coreSpec || '-'} | {c.pathwayRoute || c.pathDescription || '-'}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center">{c.lengthMeter || c.lengthMeters || 0} m</td>
+                              <td className="py-1.5 px-2 text-center capitalize text-[10px] font-semibold">{c.status}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TABEL: Detail Jaringan CCTV */}
+            {type === 'cctv_detail' && (
+              <div className="space-y-6 mb-8">
+                <div>
+                  <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
+                    <Video className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Daftar Kamera & NVR CCTV ({cctvDevices.length})</span>
+                  </h4>
+                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
+                          <th className="py-2 px-2 border-r border-slate-300 text-center w-8">No</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Nama Kamera / NVR</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Tipe & Resolusi</th>
+                          <th className="py-2 px-2 border-r border-slate-300">IP Address</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Channel / Brand</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Lokasi / Titik</th>
+                          <th className="py-2 px-2 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-slate-800">
+                        {cctvDevices.length === 0 ? (
+                          <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada perangkat CCTV terdaftar.</td></tr>
+                        ) : (
+                          cctvDevices.map((d, idx) => (
+                            <tr key={d.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-bold text-indigo-900">{d.name}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.type} {d.resolution ? `(${d.resolution})` : ''}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-mono">{d.ipAddress || '-'}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.channelNumber ? `CH-${d.channelNumber}` : '-'} | {d.brand || '-'}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.location || '-'}</td>
+                              <td className="py-1.5 px-2 text-center capitalize text-[10px] font-semibold">{d.status}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
+                    <Cable className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Daftar Jalur Kabel CCTV ({cctvCables.length})</span>
+                  </h4>
+                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
+                          <th className="py-2 px-2 border-r border-slate-300 text-center w-8">No</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Kode & Tipe</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Sumber (NVR / Switch PoE)</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Tujuan (Kamera / Titik)</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Rute Jalur</th>
+                          <th className="py-2 px-2 border-r border-slate-300 text-center">Panjang</th>
+                          <th className="py-2 px-2 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-slate-800">
+                        {cctvCables.length === 0 ? (
+                          <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada kabel CCTV terdaftar.</td></tr>
+                        ) : (
+                          cctvCables.map((c, idx) => (
+                            <tr key={c.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-mono font-bold text-indigo-900">{c.cableCode} ({c.cableType})</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{c.sourceDeviceName || c.sourceLocation} {c.sourcePort ? `(${c.sourcePort})` : ''}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{c.targetDeviceName || c.targetLocation} {c.targetPort ? `(${c.targetPort})` : ''}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-[10px]">{c.pathwayRoute || c.pathDescription || '-'}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center">{c.lengthMeter || c.lengthMeters || 0} m</td>
+                              <td className="py-1.5 px-2 text-center capitalize text-[10px] font-semibold">{c.status}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TABEL: Detail Jaringan AIR */}
+            {type === 'water_detail' && (
+              <div className="space-y-6 mb-8">
+                <div>
+                  <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
+                    <Droplets className="w-3.5 h-3.5 text-cyan-600" />
+                    <span>Daftar Titik / Pompa Air & Irigasi ({waterDevices.length})</span>
+                  </h4>
+                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
+                          <th className="py-2 px-2 border-r border-slate-300 text-center w-8">No</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Nama Titik / Pompa</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Kode & Tipe</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Pipa & Debit</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Kapasitas Toren</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Lokasi / Penempatan</th>
+                          <th className="py-2 px-2 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-slate-800">
+                        {waterDevices.length === 0 ? (
+                          <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada komponen air terdaftar.</td></tr>
+                        ) : (
+                          waterDevices.map((d, idx) => (
+                            <tr key={d.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-bold text-cyan-900">{d.name}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.code} ({d.type})</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.pipeDiameter || '-'} | {d.flowRateLpm ? `${d.flowRateLpm} L/m` : '-'}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.tankCapacityLiter ? `${d.tankCapacityLiter} Liter` : '-'} {d.currentWaterLevelPct !== undefined ? `(${d.currentWaterLevelPct}%)` : ''}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{d.location || '-'}</td>
+                              <td className="py-1.5 px-2 text-center capitalize text-[10px] font-semibold">{d.status}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
+                    <Cable className="w-3.5 h-3.5 text-cyan-600" />
+                    <span>Daftar Jalur Pipa Distribusi Air ({waterPipes.length})</span>
+                  </h4>
+                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
+                          <th className="py-2 px-2 border-r border-slate-300 text-center w-8">No</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Kode & Pipa</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Titik Asal / Sumber</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Titik Tujuan / Distribusi</th>
+                          <th className="py-2 px-2 border-r border-slate-300">Diameter & Rute</th>
+                          <th className="py-2 px-2 border-r border-slate-300 text-center">Panjang</th>
+                          <th className="py-2 px-2 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-slate-800">
+                        {waterPipes.length === 0 ? (
+                          <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada jalur pipa air terdaftar.</td></tr>
+                        ) : (
+                          waterPipes.map((p, idx) => (
+                            <tr key={p.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-mono font-bold text-cyan-900">{p.pipeCode} ({p.pipeType})</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{p.sourceDeviceName || p.sourceLocation}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300">{p.targetDeviceName || p.targetLocation}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-[10px]">{p.pipeDiameter || p.diameterInch || '-'} | {p.pathwayRoute || p.pathDescription || '-'}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 text-center">{p.lengthMeter || p.lengthMeters || 0} m</td>
+                              <td className="py-1.5 px-2 text-center capitalize text-[10px] font-semibold">{p.status}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             )}
 

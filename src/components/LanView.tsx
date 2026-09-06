@@ -25,7 +25,8 @@ import {
   Activity,
   Maximize2,
   Phone,
-  Info
+  Info,
+  Printer
 } from 'lucide-react';
 import { 
   LanDevice, 
@@ -59,6 +60,7 @@ interface LanViewProps {
   onOpenEditDeviceModal: (device: LanDevice) => void;
   onOpenAddCableModal: (locationId?: string, zoneId?: string) => void;
   onOpenEditCableModal: (cable: LanCableRun) => void;
+  onOpenPrintDetail?: (location: LanLocation, zone: LanZone) => void;
 }
 
 export const LanView: React.FC<LanViewProps> = ({
@@ -77,7 +79,8 @@ export const LanView: React.FC<LanViewProps> = ({
   onOpenAddDeviceModal,
   onOpenEditDeviceModal,
   onOpenAddCableModal,
-  onOpenEditCableModal
+  onOpenEditCableModal,
+  onOpenPrintDetail
 }) => {
   // Navigation Hirarki Bertahap:
   // selectedLocationId === null: TINGKAT 1 -> Tampilan Daftar Lokasi / Tempat (Sekolah 1, Sekolah 2, dst)
@@ -654,6 +657,15 @@ export const LanView: React.FC<LanViewProps> = ({
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+              {onOpenPrintDetail && activeLocation && activeZone && (
+                <button
+                  onClick={() => onOpenPrintDetail(activeLocation, activeZone)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm shadow-blue-600/30"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Cetak Detail</span>
+                </button>
+              )}
               <button
                 onClick={() => setSelectedZoneId(null)}
                 className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-800 hover:bg-white text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"

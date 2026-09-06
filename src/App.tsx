@@ -721,15 +721,21 @@ export const App: React.FC = () => {
     saveDeviceCategories([]);
     saveDnsRecords([]);
     setElectricityDevices([]);
+    setElectricityCables([]);
     setCctvDevices([]);
+    setCctvCables([]);
     setWaterDevices([]);
+    setWaterPipes([]);
     setLanLocations([]);
     setLanZones([]);
     setLanDevices([]);
     setLanCables([]);
     saveElectricityDevices([]);
+    saveElectricityCables([]);
     saveCctvDevices([]);
+    saveCctvCables([]);
     saveWaterDevices([]);
+    saveWaterPipes([]);
     saveLanLocations([]);
     saveLanZones([]);
     saveLanDevices([]);
@@ -751,8 +757,11 @@ export const App: React.FC = () => {
     dnsRecords?: DnsRecord[];
     subDomains?: SubDomainRecord[];
     electricityDevices?: ElectricityDevice[];
+    electricityCables?: ElectricityCableRun[];
     cctvDevices?: CctvDevice[];
+    cctvCables?: CctvCableRun[];
     waterDevices?: WaterDevice[];
+    waterPipes?: WaterPipeRun[];
     lanLocations?: LanLocation[];
     lanZones?: LanZone[];
     lanDevices?: LanDevice[];
@@ -786,13 +795,25 @@ export const App: React.FC = () => {
       setElectricityDevices(data.electricityDevices);
       saveElectricityDevices(data.electricityDevices);
     }
+    if (data.electricityCables) {
+      setElectricityCables(data.electricityCables);
+      saveElectricityCables(data.electricityCables);
+    }
     if (data.cctvDevices) {
       setCctvDevices(data.cctvDevices);
       saveCctvDevices(data.cctvDevices);
     }
+    if (data.cctvCables) {
+      setCctvCables(data.cctvCables);
+      saveCctvCables(data.cctvCables);
+    }
     if (data.waterDevices) {
       setWaterDevices(data.waterDevices);
       saveWaterDevices(data.waterDevices);
+    }
+    if (data.waterPipes) {
+      setWaterPipes(data.waterPipes);
+      saveWaterPipes(data.waterPipes);
     }
     if (data.categories) {
       setCategories(data.categories);
@@ -2398,8 +2419,11 @@ export const App: React.FC = () => {
               lanDevices={lanDevices}
               lanCables={lanCables}
               electricityDevices={electricityDevices}
+              electricityCables={electricityCables}
               cctvDevices={cctvDevices}
+              cctvCables={cctvCables}
               waterDevices={waterDevices}
+              waterPipes={waterPipes}
               onImportData={handleImportData}
               onWipeAllData={handleWipeAllData}
             />

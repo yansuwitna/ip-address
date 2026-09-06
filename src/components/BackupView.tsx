@@ -17,12 +17,25 @@ import {
   Droplets,
   Layers,
   Cpu,
-  Users
+  Users,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from '../types/ipam';
-import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun, LanLocation, LanZone } from '../types/utilityNetworks';
+import { 
+  ElectricityDevice, 
+  ElectricityCableRun,
+  CctvDevice, 
+  CctvCableRun,
+  WaterDevice, 
+  WaterPipeRun,
+  LanDevice, 
+  LanCableRun, 
+  LanLocation, 
+  LanZone 
+} from '../types/utilityNetworks';
 import { UserAccount } from '../types/auth';
-import { exportBackupJson, parseImportJson, exportToXlsx } from '../utils/exportImport';
+import { exportBackupJson, parseImportJson, exportAllToSingleXlsx } from '../utils/exportImport';
 import { showConfirm, showSuccess, showError, showWarning } from '../utils/swal';
 
 interface BackupViewProps {
@@ -34,8 +47,11 @@ interface BackupViewProps {
   dnsRecords?: DnsRecord[];
   subDomains?: SubDomainRecord[];
   electricityDevices?: ElectricityDevice[];
+  electricityCables?: ElectricityCableRun[];
   cctvDevices?: CctvDevice[];
+  cctvCables?: CctvCableRun[];
   waterDevices?: WaterDevice[];
+  waterPipes?: WaterPipeRun[];
   lanLocations?: LanLocation[];
   lanZones?: LanZone[];
   lanDevices?: LanDevice[];
@@ -49,8 +65,11 @@ interface BackupViewProps {
     dnsRecords?: DnsRecord[];
     subDomains?: SubDomainRecord[];
     electricityDevices?: ElectricityDevice[];
+    electricityCables?: ElectricityCableRun[];
     cctvDevices?: CctvDevice[];
+    cctvCables?: CctvCableRun[];
     waterDevices?: WaterDevice[];
+    waterPipes?: WaterPipeRun[];
     lanLocations?: LanLocation[];
     lanZones?: LanZone[];
     lanDevices?: LanDevice[];
@@ -68,8 +87,11 @@ export const BackupView: React.FC<BackupViewProps> = ({
   dnsRecords = [],
   subDomains = [],
   electricityDevices = [],
+  electricityCables = [],
   cctvDevices = [],
+  cctvCables = [],
   waterDevices = [],
+  waterPipes = [],
   lanLocations = [],
   lanZones = [],
   lanDevices = [],
@@ -84,7 +106,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
   const [pendingRestoreData, setPendingRestoreData] = useState<any>(null);
   
-  // Checkboxes
+  // Granular Checkboxes
   const [restoreLan, setRestoreLan] = useState(true);
   const [restoreIpam, setRestoreIpam] = useState(true);
   const [restoreElectricity, setRestoreElectricity] = useState(true);
@@ -95,6 +117,19 @@ export const BackupView: React.FC<BackupViewProps> = ({
   const [restoreServices, setRestoreServices] = useState(true);
   const [restoreCategories, setRestoreCategories] = useState(true);
   const [restoreUsers, setRestoreUsers] = useState(true);
+
+  const handleSelectAll = (select: boolean) => {
+    setRestoreLan(select);
+    setRestoreIpam(select);
+    setRestoreElectricity(select);
+    setRestoreCctv(select);
+    setRestoreWater(select);
+    setRestoreDns(select);
+    setRestoreSub(select);
+    setRestoreServices(select);
+    setRestoreCategories(select);
+    setRestoreUsers(select);
+  };
 
   const handleDownloadFullBackup = () => {
     exportBackupJson(
@@ -111,24 +146,48 @@ export const BackupView: React.FC<BackupViewProps> = ({
       lanDevices,
       lanCables,
       lanLocations,
-      lanZones
+      lanZones,
+      electricityCables,
+      cctvCables,
+      waterPipes
     );
     setHasBackedUp(true);
     showSuccess('Cadangan Berhasil Diunduh', 'Berkas cadangan format JSON berhasil disimpan.');
   };
 
   const handleExportAllToXlsx = () => {
-    if (groups.length === 0) {
-      showWarning('Data Kosong', 'Tidak ada grup subnet IP untuk diekspor ke format Excel.');
+    if (
+      groups.length === 0 && 
+      allocations.length === 0 && 
+      lanDevices.length === 0 && 
+      electricityDevices.length === 0 && 
+      cctvDevices.length === 0 && 
+      waterDevices.length === 0
+    ) {
+      showWarning('Data Kosong', 'Tidak ada data infrastruktur untuk diekspor ke format Excel.');
       return;
     }
-    groups.forEach((group, index) => {
-      setTimeout(() => {
-        const groupAllocs = allocations.filter(a => a.groupId === group.id);
-        exportToXlsx(group, groupAllocs, services, categories);
-      }, index * 200);
+
+    exportAllToSingleXlsx({
+      groups,
+      allocations,
+      services,
+      categories,
+      dnsRecords,
+      subDomains,
+      lanLocations,
+      lanZones,
+      lanDevices,
+      lanCables,
+      electricityDevices,
+      electricityCables,
+      cctvDevices,
+      cctvCables,
+      waterDevices,
+      waterPipes
     });
-    showSuccess('Ekspor Berjalan', `Mengekspor ${groups.length} berkas spreadsheet per subnet.`);
+
+    showSuccess('Ekspor Berhasil', 'Seluruh data infrastruktur (LAN, Listrik, CCTV, AIR, DNS) telah diekspor ke dalam 1 berkas Excel (.xlsx).');
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,6 +201,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
         const parsed = parseImportJson(content);
         
         setPendingRestoreData(parsed);
+        setRestoreLan(true);
         setRestoreIpam(true);
         setRestoreElectricity(true);
         setRestoreCctv(true);
@@ -163,6 +223,14 @@ export const BackupView: React.FC<BackupViewProps> = ({
 
   const executeRestore = () => {
     if (!pendingRestoreData) return;
+
+    const anySelected = restoreLan || restoreIpam || restoreElectricity || restoreCctv || 
+      restoreWater || restoreDns || restoreSub || restoreServices || restoreCategories || restoreUsers;
+    
+    if (!anySelected) {
+      showWarning('Belum Ada Pilihan', 'Pilih minimal satu kategori data untuk dipulihkan.');
+      return;
+    }
     
     const dataToRestore: any = {};
     if (restoreLan) {
@@ -175,9 +243,18 @@ export const BackupView: React.FC<BackupViewProps> = ({
       dataToRestore.groups = pendingRestoreData.groups;
       dataToRestore.allocations = pendingRestoreData.allocations;
     }
-    if (restoreElectricity) dataToRestore.electricityDevices = pendingRestoreData.electricityDevices;
-    if (restoreCctv) dataToRestore.cctvDevices = pendingRestoreData.cctvDevices;
-    if (restoreWater) dataToRestore.waterDevices = pendingRestoreData.waterDevices;
+    if (restoreElectricity) {
+      dataToRestore.electricityDevices = pendingRestoreData.electricityDevices;
+      dataToRestore.electricityCables = pendingRestoreData.electricityCables;
+    }
+    if (restoreCctv) {
+      dataToRestore.cctvDevices = pendingRestoreData.cctvDevices;
+      dataToRestore.cctvCables = pendingRestoreData.cctvCables;
+    }
+    if (restoreWater) {
+      dataToRestore.waterDevices = pendingRestoreData.waterDevices;
+      dataToRestore.waterPipes = pendingRestoreData.waterPipes;
+    }
     if (restoreDns) dataToRestore.dnsRecords = pendingRestoreData.dnsRecords;
     if (restoreSub) dataToRestore.subDomains = pendingRestoreData.subDomains;
     if (restoreServices) dataToRestore.services = pendingRestoreData.services;
@@ -213,18 +290,18 @@ export const BackupView: React.FC<BackupViewProps> = ({
   return (
     <div className="space-y-6 font-poppins animate-in fade-in slide-in-from-bottom-4 duration-300">
       
-      {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Header dengan background abu-abu standar seragam */}
+      <div className="bg-slate-300 dark:bg-slate-800/95 border border-slate-400/80 dark:border-slate-700 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl">
-            <Database className="w-5 h-5" />
+          <div className="p-2.5 bg-slate-200 dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 rounded-xl">
+            <Database className="w-5 h-5 text-blue-700 dark:text-blue-400" />
           </div>
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-              Pusat Cadangan Data Terpadu
+              Pusat Cadangan & Pemulihan Data Terpadu
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Kelola pencadangan, ekspor, dan pemulihan database SQLite (LAN, Listrik, CCTV, AIR).
+            <p className="text-xs text-slate-700 dark:text-slate-400 mt-0.5">
+              Ekspor 1 file komprehensif, pemulihan data selektif, dan reset basis data SQLite.
             </p>
           </div>
         </div>
@@ -233,22 +310,22 @@ export const BackupView: React.FC<BackupViewProps> = ({
           className="flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer flex-shrink-0"
         >
           <Download className="w-4 h-4" />
-          <span>Unduh Cadangan Lengkap (JSON)</span>
+          <span>Unduh Cadangan Lengkap (1 File JSON)</span>
         </button>
       </div>
 
       {/* Grid Menu Cadangan */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         
-        {/* Card Ekspor Excel */}
+        {/* Card Ekspor Excel Tunggal */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800/60">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Ekspor Laporan Spreadsheet (XLSX)</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Unduh data per subnet IP ke dalam format Microsoft Excel.</p>
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Ekspor Laporan Spreadsheet (1 File XLSX)</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Unduh seluruh infrastruktur (LAN, Listrik, CCTV, AIR, IP) ke dalam 1 file Excel multi-sheet.</p>
             </div>
           </div>
           <button
@@ -256,7 +333,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
             className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-emerald-600/20"
           >
             <Download className="w-4 h-4" />
-            <span>Ekspor Semua Subnet ke Excel</span>
+            <span>Ekspor Semua Data ke 1 Berkas Excel (.xlsx)</span>
           </button>
         </div>
 
@@ -268,7 +345,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Pulihkan Data (Impor JSON)</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Muat berkas cadangan JSON ke database SQLite backend.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Muat berkas cadangan JSON dan pilih kategori data yang ingin dipulihkan secara fleksibel.</p>
             </div>
           </div>
           <input
@@ -283,7 +360,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
             className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-indigo-600/20"
           >
             <Upload className="w-4 h-4" />
-            <span>Pilih Berkas Cadangan JSON</span>
+            <span>Pilih Berkas Cadangan JSON & Restore</span>
           </button>
         </div>
 
@@ -298,7 +375,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
           <div>
             <h3 className="font-bold text-sm text-rose-900 dark:text-rose-200">Area Kritis: Hapus Bersih Seluruh Data</h3>
             <p className="text-xs text-rose-700/80 dark:text-rose-400/80">
-              Tindakan ini akan mengosongkan seluruh tabel database SQLite.
+              Tindakan ini akan mengosongkan SELURUH tabel database SQLite (LAN, Listrik, CCTV, AIR, IPAM, DNS, Kategori, Layanan, dan Akun Pengguna).
             </p>
           </div>
         </div>
@@ -333,81 +410,154 @@ export const BackupView: React.FC<BackupViewProps> = ({
       {/* Restore Modal */}
       {isRestoreModalOpen && pendingRestoreData && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:items-center sm:pt-4 p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto font-poppins">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex items-center justify-between">
               <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <Upload className="w-5 h-5 text-indigo-600" />
-                Pemulihan Cadangan Data
+                Pilih Data Yang Ingin Dipulihkan
               </h3>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSelectAll(true)}
+                  className="px-2.5 py-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 rounded-lg hover:bg-indigo-100 transition-colors cursor-pointer"
+                >
+                  Pilih Semua
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSelectAll(false)}
+                  className="px-2.5 py-1 text-[11px] font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 transition-colors cursor-pointer"
+                >
+                  Batal Semua
+                </button>
+              </div>
             </div>
             
             <div className="p-6 space-y-4">
-              <p className="text-xs text-slate-600 dark:text-slate-300 mb-2">
-                File cadangan berhasil dibaca. Silakan centang data mana saja yang ingin Anda pulihkan:
+              <p className="text-xs text-slate-600 dark:text-slate-300">
+                File cadangan siap diproses. Anda dapat menentukan data apa saja yang akan dipulihkan ke sistem:
               </p>
               
-              <div className="space-y-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 p-4 rounded-xl max-h-[60vh] overflow-y-auto">
-                <label className="flex items-center gap-3 cursor-pointer group">
+              <div className="space-y-2.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl max-h-[55vh] overflow-y-auto">
+                <label className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer group">
                   <input type="checkbox" checked={restoreLan} onChange={() => setRestoreLan(!restoreLan)} className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 transition-colors">
-                    Jaringan LAN - Fisik & Jalur ({pendingRestoreData.lanCables?.length || 0} Jalur Kabel, {pendingRestoreData.lanDevices?.length || 0} Switch/Rack)
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 transition-colors">
+                      Jaringan LAN & Lokasi
+                    </span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {pendingRestoreData.lanLocations?.length || 0} Lokasi, {pendingRestoreData.lanZones?.length || 0} Lab/Ruang, {pendingRestoreData.lanDevices?.length || 0} Switch/Rack, {pendingRestoreData.lanCables?.length || 0} Kabel LAN
+                    </p>
+                  </div>
                 </label>
 
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer group">
                   <input type="checkbox" checked={restoreIpam} onChange={() => setRestoreIpam(!restoreIpam)} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
-                    Alamat IP (IPAM) ({pendingRestoreData.groups?.length || 0} Subnet, {pendingRestoreData.allocations?.length || 0} Host)
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
+                      Alamat IP & Subnet (IPAM)
+                    </span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {pendingRestoreData.groups?.length || 0} Subnet, {pendingRestoreData.allocations?.length || 0} Alokasi Host IP
+                    </p>
+                  </div>
                 </label>
 
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer group">
                   <input type="checkbox" checked={restoreElectricity} onChange={() => setRestoreElectricity(!restoreElectricity)} className="w-4 h-4 rounded text-amber-500 focus:ring-amber-500 border-slate-300" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-amber-500 transition-colors">
-                    Jaringan Listrik ({pendingRestoreData.electricityDevices?.length || 0} Perangkat)
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-amber-500 transition-colors">
+                      Jaringan Listrik & Kabel
+                    </span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {pendingRestoreData.electricityDevices?.length || 0} Panel/UPS, {pendingRestoreData.electricityCables?.length || 0} Jalur Kabel Listrik
+                    </p>
+                  </div>
                 </label>
 
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer group">
                   <input type="checkbox" checked={restoreCctv} onChange={() => setRestoreCctv(!restoreCctv)} className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-slate-300" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-rose-600 transition-colors">
-                    Jaringan CCTV ({pendingRestoreData.cctvDevices?.length || 0} Kamera/NVR)
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-rose-600 transition-colors">
+                      Jaringan CCTV & Kamera
+                    </span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {pendingRestoreData.cctvDevices?.length || 0} Kamera/NVR, {pendingRestoreData.cctvCables?.length || 0} Kabel CCTV/PoE
+                    </p>
+                  </div>
                 </label>
 
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer group">
                   <input type="checkbox" checked={restoreWater} onChange={() => setRestoreWater(!restoreWater)} className="w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500 border-slate-300" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-cyan-600 transition-colors">
-                    Jaringan AIR & Irigasi ({pendingRestoreData.waterDevices?.length || 0} Titik)
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-cyan-600 transition-colors">
+                      Jaringan AIR & Pipa Irigasi
+                    </span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {pendingRestoreData.waterDevices?.length || 0} Pompa/Toren, {pendingRestoreData.waterPipes?.length || 0} Jalur Pipa Distribusi
+                    </p>
+                  </div>
                 </label>
                 
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer group">
                   <input type="checkbox" checked={restoreDns} onChange={() => setRestoreDns(!restoreDns)} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
-                    Data Domain Utama ({pendingRestoreData.dnsRecords?.length || 0} record)
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
+                      Data Domain Utama (DNS)
+                    </span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {pendingRestoreData.dnsRecords?.length || 0} Record Domain
+                    </p>
+                  </div>
                 </label>
                 
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer group">
                   <input type="checkbox" checked={restoreSub} onChange={() => setRestoreSub(!restoreSub)} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
-                    Data Sub-Domain ({pendingRestoreData.subDomains?.length || 0} sub)
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
+                      Data Sub-Domain
+                    </span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {pendingRestoreData.subDomains?.length || 0} Record Subdomain
+                    </p>
+                  </div>
                 </label>
                 
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer group">
+                  <input type="checkbox" checked={restoreServices} onChange={() => setRestoreServices(!restoreServices)} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+                  <div className="flex-1">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
+                      Layanan & Port
+                    </span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {pendingRestoreData.services?.length || 0} Data Layanan Port
+                    </p>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer group">
                   <input type="checkbox" checked={restoreCategories} onChange={() => setRestoreCategories(!restoreCategories)} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
-                    Kategori Perangkat ({pendingRestoreData.categories?.length || 0} tipe)
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
+                      Kategori Perangkat
+                    </span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {pendingRestoreData.categories?.length || 0} Kategori Perangkat
+                    </p>
+                  </div>
                 </label>
                 
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer group">
                   <input type="checkbox" checked={restoreUsers} onChange={() => setRestoreUsers(!restoreUsers)} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
-                    Akun Pengguna ({pendingRestoreData.users?.length || 0} akun)
-                  </span>
+                  <div className="flex-1">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
+                      Akun Pengguna
+                    </span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {pendingRestoreData.users?.length || 0} Akun Pengguna Terdaftar
+                    </p>
+                  </div>
                 </label>
               </div>
             </div>
@@ -436,3 +586,4 @@ export const BackupView: React.FC<BackupViewProps> = ({
     </div>
   );
 };
+

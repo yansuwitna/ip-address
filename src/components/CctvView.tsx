@@ -18,7 +18,8 @@ import {
   Building2,
   Route,
   ShieldCheck,
-  Tag
+  Tag,
+  Printer
 } from 'lucide-react';
 import { CctvDevice, CctvCableRun, CctvStatus, CctvDeviceType, LanLocation, LanZone } from '../types/utilityNetworks';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
@@ -44,6 +45,7 @@ interface CctvViewProps {
   onOpenEditDeviceModal: (device: CctvDevice) => void;
   onOpenAddCableModal: (locationId?: string, zoneId?: string) => void;
   onOpenEditCableModal: (cable: CctvCableRun) => void;
+  onOpenPrintDetail?: (location: LanLocation, zone: LanZone) => void;
 }
 
 export const CctvView: React.FC<CctvViewProps> = ({
@@ -62,7 +64,8 @@ export const CctvView: React.FC<CctvViewProps> = ({
   onOpenAddDeviceModal,
   onOpenEditDeviceModal,
   onOpenAddCableModal,
-  onOpenEditCableModal
+  onOpenEditCableModal,
+  onOpenPrintDetail
 }) => {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
