@@ -576,6 +576,7 @@ export const App: React.FC = () => {
 
 
   const handleSaveCategory = (cat: DeviceCategory) => {
+    const isEdit = categories.some(c => c.id === cat.id);
     setCategories(prev => {
       const exists = prev.some(c => c.id === cat.id);
       if (exists) {
@@ -583,6 +584,10 @@ export const App: React.FC = () => {
       }
       return [...prev, cat];
     });
+    showSuccess(
+      isEdit ? 'Kategori Diperbarui' : 'Kategori Disimpan',
+      `Kategori "${cat.name}" berhasil ${isEdit ? 'diubah' : 'ditambahkan'}.`
+    );
   };
 
   const handleDeleteCategory = (catId: string) => {
@@ -627,6 +632,7 @@ export const App: React.FC = () => {
           setCurrentUserSession(safeUser);
           setCurrentUser(safeUser);
         }
+        showSuccess('Profil Diperbarui', 'Informasi akun pengguna berhasil diubah.');
       }
       return res;
     } else {
@@ -639,6 +645,7 @@ export const App: React.FC = () => {
       });
       if (res.success && res.updatedUsers) {
         setUsers(res.updatedUsers);
+        showSuccess('Pengguna Disimpan', `Pengguna "${userData.name}" berhasil dibuat.`);
       }
       return res;
     }
@@ -906,6 +913,7 @@ export const App: React.FC = () => {
     const now = new Date().toISOString();
     if (groupData.id) {
       setGroups(prev => prev.map(g => g.id === groupData.id ? { ...g, ...groupData, updatedAt: now } as IPGroup : g));
+      showSuccess('Subnet Diperbarui', `Subnet "${groupData.name || 'Subnet'}" berhasil diubah.`);
     } else {
       const newGroup: IPGroup = {
         id: `grp-${Date.now()}`,
@@ -922,6 +930,7 @@ export const App: React.FC = () => {
       };
       setGroups(prev => [...prev, newGroup]);
       setSelectedGroupId(newGroup.id);
+      showSuccess('Subnet Disimpan', `Subnet "${newGroup.name}" (${newGroup.cidr}) berhasil ditambahkan.`);
     }
   };
 
@@ -937,6 +946,7 @@ export const App: React.FC = () => {
     const fallbackCategory = categories[0]?.id || 'router';
     if (allocData.id) {
       setAllocations(prev => prev.map(a => a.id === allocData.id ? { ...a, ...allocData } as IPAllocation : a));
+      showSuccess('Alokasi IP Diperbarui', `Data IP ${allocData.ip || ''} (${allocData.hostname || ''}) berhasil diubah.`);
     } else {
       const newAlloc: IPAllocation = {
         id: `alloc-${Date.now()}`,
@@ -952,6 +962,7 @@ export const App: React.FC = () => {
         notes: allocData.notes || ''
       };
       setAllocations(prev => [...prev, newAlloc]);
+      showSuccess('Alokasi IP Disimpan', `IP ${newAlloc.ip} (${newAlloc.hostname}) berhasil ditambahkan.`);
     }
   };
 
@@ -968,6 +979,7 @@ export const App: React.FC = () => {
     const now = new Date().toISOString();
     if (serviceData.id) {
       setServices(prev => prev.map(s => s.id === serviceData.id ? { ...s, ...serviceData, updatedAt: now } as IPService : s));
+      showSuccess('Layanan Diperbarui', `Layanan "${serviceData.name || 'Layanan'}" port ${serviceData.port || ''} berhasil diubah.`);
     } else {
       const newService: IPService = {
         id: `srv-${Date.now()}`,
@@ -985,6 +997,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setServices(prev => [...prev, newService]);
+      showSuccess('Layanan Disimpan', `Layanan "${newService.name}" (${newService.ip}:${newService.port}) berhasil ditambahkan.`);
     }
   };
 
@@ -1007,6 +1020,7 @@ export const App: React.FC = () => {
       notes: item.notes || ''
     }));
     setAllocations(prev => [...prev, ...newItems]);
+    showSuccess('Reservasi Batch Berhasil', `${newItems.length} alamat IP berhasil disimpan ke subnet.`);
   };
 
   const handleUpdatePingStatus = (id: string, status: 'online' | 'offline', latency: number) => {
@@ -1026,6 +1040,7 @@ export const App: React.FC = () => {
     const now = new Date().toISOString();
     if (devData.id) {
       setElectricityDevices(prev => prev.map(d => d.id === devData.id ? { ...d, ...devData, updatedAt: now } as ElectricityDevice : d));
+      showSuccess('Perangkat Listrik Diperbarui', `Perangkat "${devData.name || 'Listrik'}" berhasil diubah.`);
     } else {
       const newDev: ElectricityDevice = {
         id: `elec-${Date.now()}`,
@@ -1050,6 +1065,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setElectricityDevices(prev => [...prev, newDev]);
+      showSuccess('Perangkat Listrik Disimpan', `Perangkat "${newDev.name}" berhasil ditambahkan.`);
     }
   };
 
@@ -1061,6 +1077,7 @@ export const App: React.FC = () => {
     const now = new Date().toISOString();
     if (devData.id) {
       setCctvDevices(prev => prev.map(d => d.id === devData.id ? { ...d, ...devData, updatedAt: now } as CctvDevice : d));
+      showSuccess('Perangkat CCTV Diperbarui', `Perangkat "${devData.name || 'CCTV'}" berhasil diubah.`);
     } else {
       const newDev: CctvDevice = {
         id: `cctv-${Date.now()}`,
@@ -1086,6 +1103,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setCctvDevices(prev => [...prev, newDev]);
+      showSuccess('Perangkat CCTV Disimpan', `Perangkat "${newDev.name}" berhasil ditambahkan.`);
     }
   };
 
@@ -1097,6 +1115,7 @@ export const App: React.FC = () => {
     const now = new Date().toISOString();
     if (devData.id) {
       setWaterDevices(prev => prev.map(d => d.id === devData.id ? { ...d, ...devData, updatedAt: now } as WaterDevice : d));
+      showSuccess('Perangkat Air Diperbarui', `Perangkat "${devData.name || 'Air'}" berhasil diubah.`);
     } else {
       const newDev: WaterDevice = {
         id: `water-${Date.now()}`,
@@ -1120,6 +1139,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setWaterDevices(prev => [...prev, newDev]);
+      showSuccess('Perangkat Air Disimpan', `Perangkat "${newDev.name}" berhasil ditambahkan.`);
     }
   };
 
@@ -1142,6 +1162,7 @@ export const App: React.FC = () => {
         targetLocation: tgt,
         updatedAt: now 
       } as ElectricityCableRun : c));
+      showSuccess('Kabel Listrik Diperbarui', `Jalur kabel ${cableData.cableCode || ''} berhasil diubah.`);
     } else {
       const newCable: ElectricityCableRun = {
         id: `elec-cable-${Date.now()}`,
@@ -1164,6 +1185,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setElectricityCables(prev => [...prev, newCable]);
+      showSuccess('Kabel Listrik Disimpan', `Jalur kabel ${newCable.cableCode} berhasil ditambahkan.`);
     }
   };
 
@@ -1186,6 +1208,7 @@ export const App: React.FC = () => {
         targetLocation: tgt,
         updatedAt: now 
       } as CctvCableRun : c));
+      showSuccess('Kabel CCTV Diperbarui', `Jalur kabel ${cableData.cableCode || ''} berhasil diubah.`);
     } else {
       const newCable: CctvCableRun = {
         id: `cctv-cable-${Date.now()}`,
@@ -1205,6 +1228,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setCctvCables(prev => [...prev, newCable]);
+      showSuccess('Kabel CCTV Disimpan', `Jalur kabel ${newCable.cableCode} berhasil ditambahkan.`);
     }
   };
 
@@ -1227,6 +1251,7 @@ export const App: React.FC = () => {
         targetLocation: tgt,
         updatedAt: now 
       } as WaterPipeRun : p));
+      showSuccess('Pipa Air Diperbarui', `Jalur pipa ${pipeData.pipeCode || ''} berhasil diubah.`);
     } else {
       const newPipe: WaterPipeRun = {
         id: `water-pipe-${Date.now()}`,
@@ -1248,6 +1273,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setWaterPipes(prev => [...prev, newPipe]);
+      showSuccess('Pipa Air Disimpan', `Jalur pipa ${newPipe.pipeCode} berhasil ditambahkan.`);
     }
   };
 
@@ -1260,6 +1286,7 @@ export const App: React.FC = () => {
     const now = new Date().toISOString();
     if (locData.id) {
       setLanLocations(prev => prev.map(l => l.id === locData.id ? { ...l, ...locData, updatedAt: now } as LanLocation : l));
+      showSuccess('Lokasi Diperbarui', `Lokasi "${locData.name || 'Lokasi'}" berhasil diubah.`);
     } else {
       const newLoc: LanLocation = {
         id: `loc-${Date.now()}`,
@@ -1273,6 +1300,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setLanLocations(prev => [...prev, newLoc]);
+      showSuccess('Lokasi Disimpan', `Lokasi "${newLoc.name}" berhasil ditambahkan.`);
     }
   };
 
@@ -1289,6 +1317,7 @@ export const App: React.FC = () => {
     const now = new Date().toISOString();
     if (zoneData.id) {
       setLanZones(prev => prev.map(z => z.id === zoneData.id ? { ...z, ...zoneData, updatedAt: now } as LanZone : z));
+      showSuccess('Jaringan Lab/Ruang Diperbarui', `Jaringan "${zoneData.name || 'Lab'}" berhasil diubah.`);
     } else {
       const newZone: LanZone = {
         id: `zone-${Date.now()}`,
@@ -1304,6 +1333,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setLanZones(prev => [...prev, newZone]);
+      showSuccess('Jaringan Lab/Ruang Disimpan', `Jaringan "${newZone.name}" berhasil ditambahkan.`);
     }
   };
 
@@ -1317,6 +1347,7 @@ export const App: React.FC = () => {
     const now = new Date().toISOString();
     if (devData.id) {
       setLanDevices(prev => prev.map(d => d.id === devData.id ? { ...d, ...devData, updatedAt: now } as LanDevice : d));
+      showSuccess('Perangkat LAN Diperbarui', `Perangkat "${devData.name || 'LAN'}" berhasil diubah.`);
     } else {
       const newDev: LanDevice = {
         id: `landev-${Date.now()}`,
@@ -1339,6 +1370,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setLanDevices(prev => [...prev, newDev]);
+      showSuccess('Perangkat LAN Disimpan', `Perangkat "${newDev.name}" berhasil ditambahkan.`);
     }
   };
 
@@ -1350,6 +1382,7 @@ export const App: React.FC = () => {
     const now = new Date().toISOString();
     if (cableData.id) {
       setLanCables(prev => prev.map(c => c.id === cableData.id ? { ...c, ...cableData, updatedAt: now } as LanCableRun : c));
+      showSuccess('Kabel LAN Diperbarui', `Jalur kabel ${cableData.cableCode || ''} berhasil diubah.`);
     } else {
       const newCable: LanCableRun = {
         id: `cable-${Date.now()}`,
@@ -1376,6 +1409,7 @@ export const App: React.FC = () => {
         updatedAt: now
       };
       setLanCables(prev => [...prev, newCable]);
+      showSuccess('Kabel LAN Disimpan', `Jalur kabel ${newCable.cableCode} berhasil ditambahkan.`);
     }
   };
 
@@ -2176,6 +2210,7 @@ export const App: React.FC = () => {
                 const now = new Date().toISOString();
                 if (recordData.id) {
                   setDnsRecords(prev => prev.map(r => r.id === recordData.id ? { ...r, ...recordData, updatedAt: now } as DnsRecord : r));
+                  showSuccess('Catatan DNS Diperbarui', `Record "${recordData.domain || ''}" berhasil diubah.`);
                 } else {
                   const newRecord: DnsRecord = {
                     id: `dns-${Date.now()}`,
@@ -2192,6 +2227,7 @@ export const App: React.FC = () => {
                     updatedAt: now
                   };
                   setDnsRecords(prev => [...prev, newRecord]);
+                  showSuccess('Catatan DNS Disimpan', `Record "${newRecord.domain}" (${newRecord.type}) berhasil ditambahkan.`);
                 }
               }}
               onDeleteRecord={(id) => {
@@ -2516,6 +2552,7 @@ export const App: React.FC = () => {
             const now = new Date().toISOString();
             if (recordData.id) {
               setDnsRecords(prev => prev.map(r => r.id === recordData.id ? { ...r, ...recordData, updatedAt: now } as DnsRecord : r));
+              showSuccess('Catatan DNS Diperbarui', `Record "${recordData.domain || ''}" berhasil diubah.`);
             } else {
               const newRecord: DnsRecord = {
                 id: `dns-${Date.now()}`,
@@ -2532,6 +2569,7 @@ export const App: React.FC = () => {
                 updatedAt: now
               };
               setDnsRecords(prev => [...prev, newRecord]);
+              showSuccess('Catatan DNS Disimpan', `Record "${newRecord.domain}" (${newRecord.type}) berhasil ditambahkan.`);
             }
             setIsDnsModalOpen(false);
             setEditingDnsRecord(null);

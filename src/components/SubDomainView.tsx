@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Plus, Search, Edit2, Trash2, Globe, Check, Database, Folder, Hash, Server, ExternalLink, Printer } from 'lucide-react';
 import { DnsRecord, SubDomainRecord } from '../types/ipam';
 import Swal from 'sweetalert2';
+import { showSuccess } from '../utils/swal';
 
 interface SubDomainViewProps {
   parentDomain: DnsRecord;
@@ -108,6 +109,7 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
         database,
         description
       } : s));
+      showSuccess('Sub Domain Diperbarui', `Sub Domain "${subName}.${parentDomain.domain}" berhasil diubah.`);
     } else {
       const newSub: SubDomainRecord = {
         id: Date.now().toString(),
@@ -122,6 +124,7 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
         createdAt: new Date().toISOString()
       };
       handleSave([...subDomains, newSub]);
+      showSuccess('Sub Domain Disimpan', `Sub Domain "${subName}.${parentDomain.domain}" berhasil ditambahkan.`);
     }
     setIsModalOpen(false);
   };
