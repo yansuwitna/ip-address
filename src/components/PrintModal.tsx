@@ -84,6 +84,48 @@ export const PrintModal: React.FC<PrintModalProps> = ({
     return cat ? cat.name : typeId;
   };
 
+  // Filter devices and cables by location and zone if provided
+  const filteredLanDevices = location && zone ? lanDevices.filter(d => d.locationId === location.id && d.zoneId === zone.id) : lanDevices;
+  const filteredLanCables = location && zone ? lanCables.filter(c => c.locationId === location.id && c.zoneId === zone.id) : lanCables;
+  
+  const filteredElectricityDevices = location && zone ? electricityDevices.filter(d => d.locationId === location.id && d.zoneId === zone.id) : electricityDevices;
+  const filteredElectricityCables = location && zone ? electricityCables.filter(c => c.locationId === location.id && c.zoneId === zone.id) : electricityCables;
+
+  const filteredCctvDevices = location && zone ? cctvDevices.filter(d => d.locationId === location.id && d.zoneId === zone.id) : cctvDevices;
+  const filteredCctvCables = location && zone ? cctvCables.filter(c => c.locationId === location.id && c.zoneId === zone.id) : cctvCables;
+
+  const filteredWaterDevices = location && zone ? waterDevices.filter(d => d.locationId === location.id && d.zoneId === zone.id) : waterDevices;
+  const filteredWaterPipes = location && zone ? waterPipes.filter(c => c.locationId === location.id && c.zoneId === zone.id) : waterPipes;
+
+  // Dynamic header based on type
+  let systemName = "SISTEM MANAJEMEN IP & DNS";
+  let systemSubtitle = "Dokumentasi Inventaris Infrastruktur Jaringan, Alokasi Host IP & DNS Server";
+  let systemLogo = "IP";
+  let systemLogoColor = "bg-blue-700";
+  let displayTitle = title;
+
+  if (type === 'electricity_detail') {
+    systemName = "SISTEM MANAJEMEN KELISTRIKAN";
+    systemSubtitle = "Dokumentasi Inventaris Infrastruktur Listrik, Panel & Rute Kabel";
+    systemLogo = "PL";
+    systemLogoColor = "bg-amber-600";
+    if (title === 'Laporan Jaringan') displayTitle = 'Detail Infrastruktur Listrik';
+  } else if (type === 'cctv_detail') {
+    systemName = "SISTEM MANAJEMEN CCTV";
+    systemSubtitle = "Dokumentasi Inventaris Kamera Keamanan, NVR & Rute Kabel CCTV";
+    systemLogo = "CC";
+    systemLogoColor = "bg-indigo-600";
+    if (title === 'Laporan Jaringan') displayTitle = 'Detail Jaringan CCTV';
+  } else if (type === 'water_detail') {
+    systemName = "SISTEM MANAJEMEN AIR & IRIGASI";
+    systemSubtitle = "Dokumentasi Inventaris Infrastruktur Air Bersih & Pompa Irigasi";
+    systemLogo = "AR";
+    systemLogoColor = "bg-teal-600";
+    if (title === 'Laporan Jaringan') displayTitle = 'Detail Infrastruktur Air';
+  } else if (type === 'lan_detail') {
+    if (title === 'Laporan Jaringan') displayTitle = 'Detail Jaringan LAN';
+  }
+
   return (
     <div className="fixed inset-0 z-[9999] bg-slate-100 dark:bg-slate-950 flex flex-col overflow-hidden animate-in fade-in duration-200 print:static print:z-auto print:bg-white print:overflow-visible print:h-auto">
       
@@ -93,7 +135,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
         {/* Top Action Bar (Hidden when printing) */}
         <div className="print:hidden p-4 sm:px-6 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-800/80 flex-shrink-0">
           <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 w-full sm:w-auto">
-            <div className="p-2 bg-blue-600 text-white rounded-xl shadow-xs">
+            <div className={`p-2 ${systemLogoColor} text-white rounded-xl shadow-xs`}>
               <Printer className="w-4 h-4" />
             </div>
             <div>
@@ -109,7 +151,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
           <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 w-full sm:w-auto">
             <button
               onClick={handlePrint}
-              className="flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/30 transition-all cursor-pointer"
+              className={`flex items-center justify-center gap-1.5 px-4 py-2 ${systemLogoColor.replace('bg-', 'bg-').replace('600', '600 hover:bg-').replace('700', '700')} hover:brightness-110 text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer`}
             >
               <Printer className="w-4 h-4" />
               <span>Cetak Sekarang</span>
@@ -132,15 +174,15 @@ export const PrintModal: React.FC<PrintModalProps> = ({
             <div className="border-b-2 border-slate-800 pb-4 mb-6 flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-7 h-7 bg-blue-700 text-white rounded-lg flex items-center justify-center font-black text-sm">
-                    IP
+                  <div className={`w-7 h-7 ${systemLogoColor} text-white rounded-lg flex items-center justify-center font-black text-sm`}>
+                    {systemLogo}
                   </div>
                   <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-slate-100 uppercase">
-                    SISTEM MANAJEMEN IP & DNS
+                    {systemName}
                   </h1>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">
-                  Dokumentasi Inventaris Infrastruktur Jaringan, Alokasi Host IP & DNS Server
+                  {systemSubtitle}
                 </p>
               </div>
 
@@ -154,7 +196,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
             {/* Judul Laporan */}
             <div className="mb-6 text-center">
               <h2 className="text-base font-extrabold uppercase tracking-wide text-slate-900 dark:text-slate-100">
-                {title}
+                {displayTitle}
               </h2>
               {group && (
                 <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mt-0.5">
@@ -213,7 +255,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                 <div>
                   <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
                     <Network className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Daftar Perangkat Fisik LAN ({lanDevices.length})</span>
+                    <span>Daftar Perangkat Fisik LAN ({filteredLanDevices.length})</span>
                   </h4>
                   <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
                     <table className="w-full text-left border-collapse text-[11px]">
@@ -229,10 +271,10 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 text-slate-800">
-                        {lanDevices.length === 0 ? (
+                        {filteredLanDevices.length === 0 ? (
                           <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada perangkat LAN terdaftar.</td></tr>
                         ) : (
-                          lanDevices.map((d, idx) => (
+                          filteredLanDevices.map((d, idx) => (
                             <tr key={d.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
                               <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
                               <td className="py-1.5 px-2 border-r border-slate-300 font-bold text-blue-900">{d.name}</td>
@@ -252,7 +294,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                 <div>
                   <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
                     <Cable className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Daftar Pencatatan Jalur Kabel LAN ({lanCables.length})</span>
+                    <span>Daftar Pencatatan Jalur Kabel LAN ({filteredLanCables.length})</span>
                   </h4>
                   <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
                     <table className="w-full text-left border-collapse text-[11px]">
@@ -268,10 +310,10 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 text-slate-800">
-                        {lanCables.length === 0 ? (
+                        {filteredLanCables.length === 0 ? (
                           <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada jalur kabel LAN terdaftar.</td></tr>
                         ) : (
-                          lanCables.map((c, idx) => (
+                          filteredLanCables.map((c, idx) => (
                             <tr key={c.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
                               <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
                               <td className="py-1.5 px-2 border-r border-slate-300 font-mono font-bold text-blue-900">{c.cableCode} ({c.cableType})</td>
@@ -296,7 +338,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                 <div>
                   <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5 text-amber-600" />
-                    <span>Daftar Perangkat Listrik ({electricityDevices.length})</span>
+                    <span>Daftar Perangkat Listrik ({filteredElectricityDevices.length})</span>
                   </h4>
                   <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
                     <table className="w-full text-left border-collapse text-[11px]">
@@ -312,10 +354,10 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 text-slate-800">
-                        {electricityDevices.length === 0 ? (
+                        {filteredElectricityDevices.length === 0 ? (
                           <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada komponen listrik terdaftar.</td></tr>
                         ) : (
-                          electricityDevices.map((d, idx) => (
+                          filteredElectricityDevices.map((d, idx) => (
                             <tr key={d.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
                               <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
                               <td className="py-1.5 px-2 border-r border-slate-300 font-bold text-amber-900">{d.name}</td>
@@ -335,7 +377,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                 <div>
                   <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
                     <Cable className="w-3.5 h-3.5 text-amber-600" />
-                    <span>Daftar Distribusi Kabel Listrik ({electricityCables.length})</span>
+                    <span>Daftar Distribusi Kabel Listrik ({filteredElectricityCables.length})</span>
                   </h4>
                   <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
                     <table className="w-full text-left border-collapse text-[11px]">
@@ -351,10 +393,10 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 text-slate-800">
-                        {electricityCables.length === 0 ? (
+                        {filteredElectricityCables.length === 0 ? (
                           <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada kabel distribusi listrik terdaftar.</td></tr>
                         ) : (
-                          electricityCables.map((c, idx) => (
+                          filteredElectricityCables.map((c, idx) => (
                             <tr key={c.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
                               <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
                               <td className="py-1.5 px-2 border-r border-slate-300 font-mono font-bold text-amber-900">{c.cableCode} ({c.cableType})</td>
@@ -379,7 +421,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                 <div>
                   <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
                     <Video className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Daftar Kamera & NVR CCTV ({cctvDevices.length})</span>
+                    <span>Daftar Kamera & NVR CCTV ({filteredCctvDevices.length})</span>
                   </h4>
                   <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
                     <table className="w-full text-left border-collapse text-[11px]">
@@ -395,10 +437,10 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 text-slate-800">
-                        {cctvDevices.length === 0 ? (
+                        {filteredCctvDevices.length === 0 ? (
                           <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada perangkat CCTV terdaftar.</td></tr>
                         ) : (
-                          cctvDevices.map((d, idx) => (
+                          filteredCctvDevices.map((d, idx) => (
                             <tr key={d.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
                               <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
                               <td className="py-1.5 px-2 border-r border-slate-300 font-bold text-indigo-900">{d.name}</td>
@@ -418,7 +460,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                 <div>
                   <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
                     <Cable className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Daftar Jalur Kabel CCTV ({cctvCables.length})</span>
+                    <span>Daftar Jalur Kabel CCTV ({filteredCctvCables.length})</span>
                   </h4>
                   <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
                     <table className="w-full text-left border-collapse text-[11px]">
@@ -434,10 +476,10 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 text-slate-800">
-                        {cctvCables.length === 0 ? (
+                        {filteredCctvCables.length === 0 ? (
                           <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada kabel CCTV terdaftar.</td></tr>
                         ) : (
-                          cctvCables.map((c, idx) => (
+                          filteredCctvCables.map((c, idx) => (
                             <tr key={c.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
                               <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
                               <td className="py-1.5 px-2 border-r border-slate-300 font-mono font-bold text-indigo-900">{c.cableCode} ({c.cableType})</td>
@@ -456,13 +498,13 @@ export const PrintModal: React.FC<PrintModalProps> = ({
               </div>
             )}
 
-            {/* TABEL: Detail Jaringan AIR */}
+            {/* TABEL: Detail Jaringan Air */}
             {type === 'water_detail' && (
               <div className="space-y-6 mb-8">
                 <div>
                   <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
-                    <Droplets className="w-3.5 h-3.5 text-cyan-600" />
-                    <span>Daftar Titik / Pompa Air & Irigasi ({waterDevices.length})</span>
+                    <Droplets className="w-3.5 h-3.5 text-teal-600" />
+                    <span>Daftar Perangkat Air & Irigasi ({filteredWaterDevices.length})</span>
                   </h4>
                   <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
                     <table className="w-full text-left border-collapse text-[11px]">
@@ -478,13 +520,13 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 text-slate-800">
-                        {waterDevices.length === 0 ? (
+                        {filteredWaterDevices.length === 0 ? (
                           <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada komponen air terdaftar.</td></tr>
                         ) : (
-                          waterDevices.map((d, idx) => (
+                          filteredWaterDevices.map((d, idx) => (
                             <tr key={d.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
                               <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
-                              <td className="py-1.5 px-2 border-r border-slate-300 font-bold text-cyan-900">{d.name}</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-bold text-teal-900">{d.name}</td>
                               <td className="py-1.5 px-2 border-r border-slate-300">{d.code} ({d.type})</td>
                               <td className="py-1.5 px-2 border-r border-slate-300">{d.pipeDiameter || '-'} | {d.flowRateLpm ? `${d.flowRateLpm} L/m` : '-'}</td>
                               <td className="py-1.5 px-2 border-r border-slate-300">{d.tankCapacityLiter ? `${d.tankCapacityLiter} Liter` : '-'} {d.currentWaterLevelPct !== undefined ? `(${d.currentWaterLevelPct}%)` : ''}</td>
@@ -500,8 +542,8 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
                 <div>
                   <h4 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1.5">
-                    <Cable className="w-3.5 h-3.5 text-cyan-600" />
-                    <span>Daftar Jalur Pipa Distribusi Air ({waterPipes.length})</span>
+                    <Network className="w-3.5 h-3.5 text-teal-600" />
+                    <span>Daftar Distribusi Pipa Air ({filteredWaterPipes.length})</span>
                   </h4>
                   <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
                     <table className="w-full text-left border-collapse text-[11px]">
@@ -517,13 +559,13 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 text-slate-800">
-                        {waterPipes.length === 0 ? (
+                        {filteredWaterPipes.length === 0 ? (
                           <tr><td colSpan={7} className="py-4 text-center text-slate-400">Tidak ada jalur pipa air terdaftar.</td></tr>
                         ) : (
-                          waterPipes.map((p, idx) => (
+                          filteredWaterPipes.map((p, idx) => (
                             <tr key={p.id} className={idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}>
                               <td className="py-1.5 px-2 border-r border-slate-300 text-center text-slate-500">{idx + 1}</td>
-                              <td className="py-1.5 px-2 border-r border-slate-300 font-mono font-bold text-cyan-900">{p.pipeCode} ({p.pipeType})</td>
+                              <td className="py-1.5 px-2 border-r border-slate-300 font-mono font-bold text-teal-900">{p.pipeCode} ({p.pipeType})</td>
                               <td className="py-1.5 px-2 border-r border-slate-300">{p.sourceDeviceName || p.sourceLocation}</td>
                               <td className="py-1.5 px-2 border-r border-slate-300">{p.targetDeviceName || p.targetLocation}</td>
                               <td className="py-1.5 px-2 border-r border-slate-300 text-[10px]">{p.pipeDiameter || p.diameterInch || '-'} | {p.pathwayRoute || p.pathDescription || '-'}</td>
