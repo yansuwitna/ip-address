@@ -147,7 +147,7 @@ export const Login: React.FC<LoginProps> = ({
             <button
               type="button"
               onClick={onBackToHome}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 bg-white dark:bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-xs transition-all cursor-pointer group"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-md shadow-red-600/25 transition-all cursor-pointer group"
             >
               <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
               <span>Kembali ke Halaman Beranda (Home)</span>

@@ -223,10 +223,10 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
           {onBackToGroups && (
             <button
               onClick={() => onBackToGroups(selectedIp !== 'all' ? selectedIp : (focusedIp || null))}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 border border-slate-200 dark:border-slate-700 text-xs font-bold shadow-xs transition-all cursor-pointer group"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-600/25 transition-all cursor-pointer group"
               title="Kembali ke halaman kelola alokasi IP host"
             >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:hover:text-slate-100" />
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               <span>Kembali ke Kelola IP Host</span>
             </button>
           )}

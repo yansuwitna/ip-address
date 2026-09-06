@@ -524,7 +524,9 @@ export const App: React.FC = () => {
 
   // Print Modal state
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [printType, setPrintType] = useState<'allocations' | 'dns' | 'services'>('allocations');
+  const [printType, setPrintType] = useState<'allocations' | 'dns' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail'>('allocations');
+  const [printLocation, setPrintLocation] = useState<LanLocation | undefined>(undefined);
+  const [printZone, setPrintZone] = useState<LanZone | undefined>(undefined);
 
 
   // Sync with Database via Server API
@@ -1583,6 +1585,12 @@ export const App: React.FC = () => {
                 setLanCableDefaultZoneId(cable.zoneId);
                 setIsLanCableModalOpen(true);
               }}
+              onOpenPrintDetail={(location, zone) => {
+                setPrintType('lan_detail');
+                setPrintLocation(location);
+                setPrintZone(zone);
+                setIsPrintModalOpen(true);
+              }}
             />
           )}
 
@@ -1596,9 +1604,9 @@ export const App: React.FC = () => {
                   <div className="flex items-center justify-between gap-3">
                     <button
                       onClick={() => setIsViewingGroupAllocations(false)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 border border-slate-200 dark:border-slate-700 text-xs font-bold shadow-xs transition-all cursor-pointer group"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-600/25 transition-all cursor-pointer group"
                     >
-                      <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:hover:text-slate-100" />
+                      <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                       <span>Kembali</span>
                     </button>
 
@@ -2271,6 +2279,12 @@ export const App: React.FC = () => {
                 setEditingElectricityCable(cable);
                 setIsElectricityCableModalOpen(true);
               }}
+              onOpenPrintDetail={(location, zone) => {
+                setPrintType('electricity_detail');
+                setPrintLocation(location);
+                setPrintZone(zone);
+                setIsPrintModalOpen(true);
+              }}
             />
           )}
 
@@ -2326,6 +2340,12 @@ export const App: React.FC = () => {
                 setEditingCctvCable(cable);
                 setIsCctvCableModalOpen(true);
               }}
+              onOpenPrintDetail={(location, zone) => {
+                setPrintType('cctv_detail');
+                setPrintLocation(location);
+                setPrintZone(zone);
+                setIsPrintModalOpen(true);
+              }}
             />
           )}
 
@@ -2380,6 +2400,12 @@ export const App: React.FC = () => {
               onOpenEditPipeModal={(pipe) => {
                 setEditingWaterPipe(pipe);
                 setIsWaterPipeModalOpen(true);
+              }}
+              onOpenPrintDetail={(location, zone) => {
+                setPrintType('water_detail');
+                setPrintLocation(location);
+                setPrintZone(zone);
+                setIsPrintModalOpen(true);
               }}
             />
           )}
@@ -2712,6 +2738,16 @@ export const App: React.FC = () => {
           services={services}
           categories={categories}
           currentUser={currentUser}
+          location={printLocation}
+          zone={printZone}
+          lanDevices={lanDevices}
+          lanCables={lanCables}
+          electricityDevices={electricityDevices}
+          electricityCables={electricityCables}
+          cctvDevices={cctvDevices}
+          cctvCables={cctvCables}
+          waterDevices={waterDevices}
+          waterPipes={waterPipes}
         />
       )}
     </div>

@@ -16,7 +16,8 @@ import {
   ArrowRight,
   ArrowLeft,
   Route,
-  Activity
+  Activity,
+  Printer
 } from 'lucide-react';
 import { WaterDevice, WaterPipeRun, WaterStatus, WaterDeviceType, LanLocation, LanZone } from '../types/utilityNetworks';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
@@ -42,6 +43,7 @@ interface WaterViewProps {
   onOpenEditDeviceModal: (device: WaterDevice) => void;
   onOpenAddPipeModal: (locationId?: string, zoneId?: string) => void;
   onOpenEditPipeModal: (pipe: WaterPipeRun) => void;
+  onOpenPrintDetail?: (location: LanLocation, zone: LanZone) => void;
 }
 
 export const WaterView: React.FC<WaterViewProps> = ({
@@ -60,7 +62,8 @@ export const WaterView: React.FC<WaterViewProps> = ({
   onOpenAddDeviceModal,
   onOpenEditDeviceModal,
   onOpenAddPipeModal,
-  onOpenEditPipeModal
+  onOpenEditPipeModal,
+  onOpenPrintDetail
 }) => {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
@@ -445,7 +448,7 @@ export const WaterView: React.FC<WaterViewProps> = ({
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
               <button
                 onClick={() => setSelectedLocationId(null)}
-                className="w-full sm:w-auto px-4 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-md shadow-red-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>
@@ -597,9 +600,18 @@ export const WaterView: React.FC<WaterViewProps> = ({
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+              {onOpenPrintDetail && activeLocation && activeZone && (
+                <button
+                  onClick={() => onOpenPrintDetail(activeLocation, activeZone)}
+                  className="w-full sm:w-auto px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Cetak Detail</span>
+                </button>
+              )}
               <button
                 onClick={() => setSelectedZoneId(null)}
-                className="w-full sm:w-auto px-4 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-md shadow-red-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>

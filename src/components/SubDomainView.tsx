@@ -132,7 +132,7 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
         <div className="flex items-start sm:items-center gap-3">
           <button 
             onClick={onBack}
-            className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl transition-all"
+            className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-md shadow-red-600/25 transition-all"
             title="Kembali ke DNS Utama"
           >
             <ArrowLeft className="w-5 h-5" />
