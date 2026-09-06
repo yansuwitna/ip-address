@@ -250,7 +250,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
               <span>Sektor Jaringan</span>
-              <span className="text-[9px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500">4 Sektor</span>
             </div>
 
             {mainNetworkItems.map(item => {
@@ -280,15 +279,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   </div>
 
-                  {item.badge && (
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                      isActive 
-                        ? 'bg-white/20 text-white border-white/30' 
-                        : item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
                 </button>
               );
             })}
@@ -323,19 +316,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   </div>
 
-                  {item.badge ? (
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                      isActive 
-                        ? 'bg-blue-700/80 text-white border-blue-500' 
-                        : item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  ) : (
-                    <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
-                      isActive ? 'opacity-100' : ''
-                    }`} />
-                  )}
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
                 </button>
               );
             })}
