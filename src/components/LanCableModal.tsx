@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Cable, Save, AlertCircle } from 'lucide-react';
+import { X, Cable, Save, AlertCircle, Lock } from 'lucide-react';
 import { LanCableRun, LanCableType, CableRunStatus, LanDevice, LanLocation, LanZone } from '../types/utilityNetworks';
 
 interface LanCableModalProps {
@@ -204,9 +204,15 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
           {/* HIRARKI LOKASI & RUANG LAB */}
           <div className="p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                Lokasi / Sekolah
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Lokasi / Sekolah
+                </label>
+                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  <span>Terkunci</span>
+                </span>
+              </div>
               <select
                 value={locationId}
                 onChange={e => {
@@ -215,7 +221,8 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
                   const matchingZones = zones.filter(z => z.locationId === newLoc);
                   setZoneId(matchingZones[0]?.id || '');
                 }}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
+                disabled={true}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 cursor-not-allowed select-none opacity-80 transition-all"
               >
                 <option value="">-- Tanpa Lokasi Tertentu --</option>
                 {locations.map(loc => (
@@ -227,13 +234,20 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                Jaringan Ruang / Lab
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Jaringan Ruang / Lab
+                </label>
+                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  <span>Terkunci</span>
+                </span>
+              </div>
               <select
                 value={zoneId}
                 onChange={e => setZoneId(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
+                disabled={true}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 cursor-not-allowed select-none opacity-80 transition-all"
               >
                 <option value="">-- Tanpa Ruang Tertentu --</option>
                 {filteredZones.map(zone => (
