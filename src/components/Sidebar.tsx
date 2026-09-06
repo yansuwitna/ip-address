@@ -202,12 +202,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Brand Header */}
         <div className="h-16 px-5 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between flex-shrink-0 bg-white dark:bg-slate-900">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
-              <Network className="w-5 h-5" />
-            </div>
+            {currentUser?.appLogo ? (
+              <img src={currentUser.appLogo} alt="App Logo" className="w-9 h-9 object-contain rounded-xl" />
+            ) : (
+              <div className="p-2.5 bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
+                <Network className="w-5 h-5" />
+              </div>
+            )}
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-slate-100">INFRA NET</span>
+                <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-slate-100">
+                  {currentUser?.appName || 'INFRA NET'}
+                </span>
               </div>
               <p className="text-[10px] text-slate-400 font-medium">
                 LAN • Listrik • CCTV • AIR

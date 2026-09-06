@@ -174,11 +174,15 @@ export const PrintModal: React.FC<PrintModalProps> = ({
             <div className="border-b-2 border-slate-800 pb-4 mb-6 flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <div className={`w-7 h-7 ${systemLogoColor} text-white rounded-lg flex items-center justify-center font-black text-sm`}>
-                    {systemLogo}
-                  </div>
+                  {currentUser?.appLogo ? (
+                    <img src={currentUser.appLogo} alt="Logo" className="w-8 h-8 object-contain rounded-lg" />
+                  ) : (
+                    <div className={`w-7 h-7 ${systemLogoColor} text-white rounded-lg flex items-center justify-center font-black text-sm`}>
+                      {systemLogo}
+                    </div>
+                  )}
                   <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-slate-100 uppercase">
-                    {systemName}
+                    {currentUser?.appName || systemName}
                   </h1>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">

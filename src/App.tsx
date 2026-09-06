@@ -902,6 +902,8 @@ export const App: React.FC = () => {
         onNavigateToLogin={() => setAuthView('login')}
         theme={theme}
         onToggleTheme={handleToggleTheme}
+        appName={users[0]?.appName}
+        appLogo={users[0]?.appLogo}
       />
     );
   }
@@ -925,6 +927,8 @@ export const App: React.FC = () => {
         onNavigateToDashboard={() => setIsViewingPublicHome(false)}
         theme={theme}
         onToggleTheme={handleToggleTheme}
+        appName={users[0]?.appName}
+        appLogo={users[0]?.appLogo}
       />
     );
   }
@@ -2745,7 +2749,7 @@ export const App: React.FC = () => {
           dnsRecords={dnsRecords}
           services={services}
           categories={categories}
-          currentUser={currentUser}
+          currentUser={currentUser || users[0] || null}
           location={printLocation}
           zone={printZone}
           lanDevices={lanDevices}

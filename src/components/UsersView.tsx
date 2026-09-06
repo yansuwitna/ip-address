@@ -530,6 +530,64 @@ export const UsersView: React.FC<UsersViewProps> = ({
                 />
               </div>
 
+              {/* App Name */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Nama Aplikasi Utama (Opsional)
+                </label>
+                <input
+                  type="text"
+                  value={appName}
+                  onChange={(e) => setAppName(e.target.value)}
+                  placeholder="Contoh: NetIPAM Sekolahku"
+                  className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-900 transition-all"
+                />
+              </div>
+
+              {/* File Uploads (Only if singleUser is present / logged in context) */}
+              {singleUser && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Upload Logo Aplikasi
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => setAppLogo(reader.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300 cursor-pointer text-slate-500"
+                    />
+                    {appLogo && <img src={appLogo} alt="Logo" className="mt-1 h-8 rounded" />}
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Upload Foto Profil
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => setAvatar(reader.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/40 dark:file:text-indigo-300 cursor-pointer text-slate-500"
+                    />
+                    {avatar && <img src={avatar} alt="Profile" className="mt-1 h-8 w-8 rounded-full object-cover" />}
+                  </div>
+                </div>
+              )}
+
               {/* Password */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">

@@ -38,6 +38,8 @@ interface HomeViewProps {
   onNavigateToDashboard?: () => void;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
+  appName?: string;
+  appLogo?: string;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -55,7 +57,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onNavigateToLogin,
   onNavigateToDashboard,
   theme = 'light',
-  onToggleTheme
+  onToggleTheme,
+  appName,
+  appLogo
 }) => {
   // Global statistics
   const totalCables = lanCables.length;
@@ -78,12 +82,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
           
           {/* Brand Logo */}
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
-              <Network className="w-5 h-5" />
-            </div>
+            {appLogo ? (
+              <img src={appLogo} alt="App Logo" className="h-10 w-10 object-contain rounded-xl" />
+            ) : (
+              <div className="p-2.5 bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
+                <Network className="w-5 h-5" />
+              </div>
+            )}
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-slate-100">INFRA NET</span>
+                <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-slate-100">{appName || 'INFRA NET'}</span>
               </div>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 hidden sm:block">
                 Manajemen 4 Sektor: LAN • Listrik • CCTV • AIR
