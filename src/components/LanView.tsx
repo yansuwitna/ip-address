@@ -458,10 +458,10 @@ export const LanView: React.FC<LanViewProps> = ({
                         setSelectedLocationId(loc.id);
                         setSelectedZoneId(null);
                       }}
-                      className="mt-5 w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-blue-600/20"
+                      className="mt-4 w-full py-2.5 px-4 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white dark:bg-blue-950/30 dark:hover:bg-blue-600 dark:text-blue-300 dark:hover:text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <span>Buka</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      <span>Buka Jaringan LAN</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 );
@@ -617,10 +617,10 @@ export const LanView: React.FC<LanViewProps> = ({
                     {/* Tombol Klik Masuk ke Tingkat 3 (Detail Lab: Perangkat & Jalur Kabel) */}
                     <button
                       onClick={() => setSelectedZoneId(zone.id)}
-                      className="mt-5 w-full py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-indigo-600/20"
+                      className="mt-4 w-full py-2.5 px-4 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white dark:bg-blue-950/30 dark:hover:bg-blue-600 dark:text-blue-300 dark:hover:text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <span>Buka</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      <span>Buka Komponen & Jalur</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 );
