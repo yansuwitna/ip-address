@@ -616,23 +616,6 @@ export const WaterView: React.FC<WaterViewProps> = ({
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>
               </button>
-              {activeSubTab === 'devices' ? (
-                <button
-                  onClick={() => onOpenAddDeviceModal(activeLocation.id, activeZone.id)}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Tambah Perangkat Baru</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => onOpenAddPipeModal(activeLocation.id, activeZone.id)}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Catat Jalur Baru</span>
-                </button>
-              )}
             </div>
           </div>
 
@@ -699,36 +682,57 @@ export const WaterView: React.FC<WaterViewProps> = ({
             </div>
           </div>
 
-          {/* Sub Tab Switching */}
-          <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
-            <button
-              onClick={() => {
-                setActiveSubTab('devices');
-                setSearchQuery('');
-              }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                activeSubTab === 'devices'
-                  ? 'bg-cyan-600 text-white shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <Droplets className="w-4 h-4" />
-              <span>Pompa, Toren & Katup ({contextDevices.length})</span>
-            </button>
-            <button
-              onClick={() => {
-                setActiveSubTab('pipes');
-                setSearchQuery('');
-              }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                activeSubTab === 'pipes'
-                  ? 'bg-cyan-600 text-white shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <Route className="w-4 h-4" />
-              <span>Pencatatan Jalur Pipa ({contextPipes.length})</span>
-            </button>
+          {/* Sub Tab Switching & Tombol Aksi */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-2">
+            <div className="flex items-center gap-2 overflow-x-auto">
+              <button
+                onClick={() => {
+                  setActiveSubTab('devices');
+                  setSearchQuery('');
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                  activeSubTab === 'devices'
+                    ? 'bg-cyan-600 text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                <Droplets className="w-4 h-4" />
+                <span>Pompa, Toren & Katup ({contextDevices.length})</span>
+              </button>
+              <button
+                onClick={() => {
+                  setActiveSubTab('pipes');
+                  setSearchQuery('');
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                  activeSubTab === 'pipes'
+                    ? 'bg-cyan-600 text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                <Route className="w-4 h-4" />
+                <span>Pencatatan Jalur Pipa ({contextPipes.length})</span>
+              </button>
+            </div>
+
+            {/* Tombol Aksi dibawah Card Total */}
+            {activeSubTab === 'devices' ? (
+              <button
+                onClick={() => onOpenAddDeviceModal(activeLocation.id, activeZone.id)}
+                className="w-full sm:w-auto px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah Perangkat Baru</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => onOpenAddPipeModal(activeLocation.id, activeZone.id)}
+                className="w-full sm:w-auto px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Catat Jalur Baru</span>
+              </button>
+            )}
           </div>
 
           {/* Filter Bar */}
