@@ -47,14 +47,18 @@ import {
   saveElectricityDevices,
   saveCctvDevices,
   saveWaterDevices,
+  saveLanDevices,
+  saveLanCables,
   INITIAL_ELECTRICITY_DEVICES,
   INITIAL_CCTV_DEVICES,
-  INITIAL_WATER_DEVICES
+  INITIAL_WATER_DEVICES,
+  INITIAL_LAN_DEVICES,
+  INITIAL_LAN_CABLES
 } from './utils/storage';
 import { exportToXlsx } from './utils/exportImport';
 import { parseCidr } from './utils/ipCalculator';
 import { showConfirm, showSuccess } from './utils/swal';
-import { ElectricityDevice, CctvDevice, WaterDevice } from './types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from './types/utilityNetworks';
 
 import { HomeView } from './components/HomeView';
 import { Login } from './components/Login';
@@ -80,12 +84,16 @@ import { CctvView } from './components/CctvView';
 import { CctvModal } from './components/CctvModal';
 import { WaterView } from './components/WaterView';
 import { WaterModal } from './components/WaterModal';
+import { LanView } from './components/LanView';
+import { LanCableModal } from './components/LanCableModal';
+import { LanDeviceModal } from './components/LanDeviceModal';
 
 export const App: React.FC = () => {
   // Map pathname to internal tab
   const getTabFromPath = (path: string): NavTab => {
     const clean = path.replace(/\/+$/, '').toLowerCase();
-    if (clean === '/admin/ip' || clean === '/admin/groups' || clean === '/admin/lan') return 'groups';
+    if (clean === '/admin/lan') return 'lan';
+    if (clean === '/admin/ip' || clean === '/admin/groups') return 'groups';
     if (clean === '/admin/listrik' || clean === '/admin/electricity') return 'electricity';
     if (clean === '/admin/cctv') return 'cctv';
     if (clean === '/admin/air' || clean === '/admin/water') return 'water';
@@ -101,6 +109,7 @@ export const App: React.FC = () => {
   const getPathFromTab = (tab: NavTab): string => {
     switch (tab) {
       case 'dashboard': return '/admin';
+      case 'lan': return '/admin/lan';
       case 'groups': return '/admin/ip';
       case 'electricity': return '/admin/listrik';
       case 'cctv': return '/admin/cctv';
@@ -206,6 +215,8 @@ export const App: React.FC = () => {
   const [electricityDevices, setElectricityDevices] = useState<ElectricityDevice[]>([]);
   const [cctvDevices, setCctvDevices] = useState<CctvDevice[]>([]);
   const [waterDevices, setWaterDevices] = useState<WaterDevice[]>([]);
+  const [lanDevices, setLanDevices] = useState<LanDevice[]>([]);
+  const [lanCables, setLanCables] = useState<LanCableRun[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
   const [selectedServiceIp, setSelectedServiceIp] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'matrix' | 'table'>('matrix');
@@ -228,6 +239,21 @@ export const App: React.FC = () => {
         if (data['netipam_device_categories_v1']) setCategories(data['netipam_device_categories_v1']);
         if (data['netipam_dns_records_v1']) setDnsRecords(data['netipam_dns_records_v1']);
         if (data['netipam_sub_domains_v1']) setSubDomains(data['netipam_sub_domains_v1']);
+
+        // Sektor LAN (Fisik & Jalur Kabel)
+        if (data['netipam_lan_devices_v1'] && data['netipam_lan_devices_v1'].length > 0) {
+          setLanDevices(data['netipam_lan_devices_v1']);
+        } else {
+          setLanDevices(INITIAL_LAN_DEVICES);
+          saveLanDevices(INITIAL_LAN_DEVICES);
+        }
+
+        if (data['netipam_lan_cables_v1'] && data['netipam_lan_cables_v1'].length > 0) {
+          setLanCables(data['netipam_lan_cables_v1']);
+        } else {
+          setLanCables(INITIAL_LAN_CABLES);
+          saveLanCables(INITIAL_LAN_CABLES);
+        }
         
         // Sektor Listrik, CCTV, AIR
         if (data['netipam_electricity_devices_v1'] && data['netipam_electricity_devices_v1'].length > 0) {
@@ -391,6 +417,13 @@ export const App: React.FC = () => {
   const [isWaterModalOpen, setIsWaterModalOpen] = useState(false);
   const [editingWaterDevice, setEditingWaterDevice] = useState<WaterDevice | null>(null);
 
+  // LAN Modals
+  const [isLanDeviceModalOpen, setIsLanDeviceModalOpen] = useState(false);
+  const [editingLanDevice, setEditingLanDevice] = useState<LanDevice | null>(null);
+
+  const [isLanCableModalOpen, setIsLanCableModalOpen] = useState(false);
+  const [editingLanCable, setEditingLanCable] = useState<LanCableRun | null>(null);
+
   // Print Modal state
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [printType, setPrintType] = useState<'allocations' | 'dns' | 'services'>('allocations');
@@ -450,6 +483,18 @@ export const App: React.FC = () => {
       saveWaterDevices(waterDevices);
     }
   }, [waterDevices, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveLanDevices(lanDevices);
+    }
+  }, [lanDevices, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveLanCables(lanCables);
+    }
+  }, [lanCables, isSyncing]);
 
 
 
@@ -550,9 +595,13 @@ export const App: React.FC = () => {
     setElectricityDevices([]);
     setCctvDevices([]);
     setWaterDevices([]);
+    setLanDevices([]);
+    setLanCables([]);
     saveElectricityDevices([]);
     saveCctvDevices([]);
     saveWaterDevices([]);
+    saveLanDevices([]);
+    saveLanCables([]);
     saveSubDomains([]);
     await wipeAllUsers();
     setUsers([]);
@@ -572,6 +621,8 @@ export const App: React.FC = () => {
     electricityDevices?: ElectricityDevice[];
     cctvDevices?: CctvDevice[];
     waterDevices?: WaterDevice[];
+    lanDevices?: LanDevice[];
+    lanCables?: LanCableRun[];
   }) => {
     if (data.groups) {
       setGroups(data.groups);
@@ -580,6 +631,14 @@ export const App: React.FC = () => {
     if (data.allocations) {
       setAllocations(data.allocations);
       saveAllocations(data.allocations);
+    }
+    if (data.lanDevices) {
+      setLanDevices(data.lanDevices);
+      saveLanDevices(data.lanDevices);
+    }
+    if (data.lanCables) {
+      setLanCables(data.lanCables);
+      saveLanCables(data.lanCables);
     }
     if (data.electricityDevices) {
       setElectricityDevices(data.electricityDevices);
@@ -668,6 +727,8 @@ export const App: React.FC = () => {
         categories={categories}
         dnsRecords={dnsRecords}
         subDomains={subDomains}
+        lanDevices={lanDevices}
+        lanCables={lanCables}
         electricityDevices={electricityDevices}
         cctvDevices={cctvDevices}
         waterDevices={waterDevices}
@@ -688,6 +749,8 @@ export const App: React.FC = () => {
         categories={categories}
         dnsRecords={dnsRecords}
         subDomains={subDomains}
+        lanDevices={lanDevices}
+        lanCables={lanCables}
         electricityDevices={electricityDevices}
         cctvDevices={cctvDevices}
         waterDevices={waterDevices}
@@ -943,15 +1006,82 @@ export const App: React.FC = () => {
     setWaterDevices(prev => prev.filter(d => d.id !== id));
   };
 
+  const handleSaveLanDevice = (devData: Partial<LanDevice>) => {
+    const now = new Date().toISOString();
+    if (devData.id) {
+      setLanDevices(prev => prev.map(d => d.id === devData.id ? { ...d, ...devData, updatedAt: now } as LanDevice : d));
+    } else {
+      const newDev: LanDevice = {
+        id: `landev-${Date.now()}`,
+        name: devData.name || 'Perangkat LAN',
+        code: devData.code || '',
+        type: devData.type || 'switch_distribution',
+        brand: devData.brand,
+        model: devData.model,
+        ipAddress: devData.ipAddress,
+        macAddress: devData.macAddress,
+        location: devData.location || '',
+        rackNumber: devData.rackNumber,
+        totalPorts: devData.totalPorts || 24,
+        status: devData.status || 'active',
+        pic: devData.pic,
+        notes: devData.notes,
+        createdAt: now,
+        updatedAt: now
+      };
+      setLanDevices(prev => [...prev, newDev]);
+    }
+  };
+
+  const handleDeleteLanDevice = (id: string) => {
+    setLanDevices(prev => prev.filter(d => d.id !== id));
+  };
+
+  const handleSaveLanCable = (cableData: Partial<LanCableRun>) => {
+    const now = new Date().toISOString();
+    if (cableData.id) {
+      setLanCables(prev => prev.map(c => c.id === cableData.id ? { ...c, ...cableData, updatedAt: now } as LanCableRun : c));
+    } else {
+      const newCable: LanCableRun = {
+        id: `cable-${Date.now()}`,
+        cableCode: cableData.cableCode || `CBL-${Date.now().toString().slice(-4)}`,
+        cableType: cableData.cableType || 'cat6_utp',
+        sourceDeviceId: cableData.sourceDeviceId,
+        sourceDeviceName: cableData.sourceDeviceName || '',
+        sourcePort: cableData.sourcePort,
+        sourceLocation: cableData.sourceLocation || '',
+        targetDeviceId: cableData.targetDeviceId,
+        targetDeviceName: cableData.targetDeviceName || '',
+        targetPort: cableData.targetPort,
+        targetLocation: cableData.targetLocation || '',
+        pathwayRoute: cableData.pathwayRoute,
+        lengthMeter: cableData.lengthMeter,
+        speedMbps: cableData.speedMbps || 1000,
+        status: cableData.status || 'connected',
+        color: cableData.color || '#3b82f6',
+        pic: cableData.pic,
+        notes: cableData.notes,
+        createdAt: now,
+        updatedAt: now
+      };
+      setLanCables(prev => [...prev, newCable]);
+    }
+  };
+
+  const handleDeleteLanCable = (id: string) => {
+    setLanCables(prev => prev.filter(c => c.id !== id));
+  };
+
   const totalUsedIps = allocations.filter(a => a.status === 'used').length;
 
   const getTabTitle = (tab: NavTab) => {
     switch (tab) {
       case 'dashboard': return 'Dashboard Infrastruktur';
-      case 'groups': return 'Jaringan LAN (Subnet & Host)';
+      case 'lan': return 'Jaringan LAN (Jalur Kabel & Perangkat Fisik)';
       case 'electricity': return 'Jaringan Listrik (Panel & Daya)';
       case 'cctv': return 'Jaringan CCTV (Kamera & Video)';
       case 'water': return 'Jaringan AIR (Irigasi & Pompa)';
+      case 'groups': return 'Manajemen Alamat IP (Subnet & CIDR)';
       case 'dns': return 'Manajemen DNS Server';
       case 'services': return 'Layanan & Port IP';
       case 'categories': return 'Kategori Perangkat';
@@ -981,6 +1111,8 @@ export const App: React.FC = () => {
         onLogout={handleLogout}
         totalGroups={groups.length}
         totalUsedIps={totalUsedIps}
+        totalLanCables={lanCables.length}
+        totalLanDevices={lanDevices.length}
         totalElectricityDevices={electricityDevices.length}
         totalCctvDevices={cctvDevices.length}
         totalWaterDevices={waterDevices.length}
@@ -1030,12 +1162,42 @@ export const App: React.FC = () => {
               groups={groups}
               allocations={allocations}
               categories={categories}
+              lanDevices={lanDevices}
+              lanCables={lanCables}
               electricityDevices={electricityDevices}
               cctvDevices={cctvDevices}
               waterDevices={waterDevices}
               onNavigateToTab={(tab) => {
                 if (tab === 'groups') setIsViewingGroupAllocations(false);
                 setCurrentTab(tab);
+              }}
+            />
+          )}
+
+          {/* TAB: JARINGAN LAN (JALUR KABEL & PERANGKAT FISIK) */}
+          {currentTab === 'lan' && (
+            <LanView
+              devices={lanDevices}
+              cables={lanCables}
+              onSaveDevice={handleSaveLanDevice}
+              onDeleteDevice={handleDeleteLanDevice}
+              onSaveCable={handleSaveLanCable}
+              onDeleteCable={handleDeleteLanCable}
+              onOpenAddDeviceModal={() => {
+                setEditingLanDevice(null);
+                setIsLanDeviceModalOpen(true);
+              }}
+              onOpenEditDeviceModal={(dev) => {
+                setEditingLanDevice(dev);
+                setIsLanDeviceModalOpen(true);
+              }}
+              onOpenAddCableModal={() => {
+                setEditingLanCable(null);
+                setIsLanCableModalOpen(true);
+              }}
+              onOpenEditCableModal={(cable) => {
+                setEditingLanCable(cable);
+                setIsLanCableModalOpen(true);
               }}
             />
           )}
@@ -1754,6 +1916,8 @@ export const App: React.FC = () => {
               services={services}
               dnsRecords={dnsRecords}
               subDomains={subDomains}
+              lanDevices={lanDevices}
+              lanCables={lanCables}
               electricityDevices={electricityDevices}
               cctvDevices={cctvDevices}
               waterDevices={waterDevices}
@@ -1892,6 +2056,31 @@ export const App: React.FC = () => {
           }}
           onSave={handleSaveWaterDevice}
           editDevice={editingWaterDevice}
+        />
+      )}
+
+      {isLanDeviceModalOpen && (
+        <LanDeviceModal
+          isOpen={isLanDeviceModalOpen}
+          onClose={() => {
+            setIsLanDeviceModalOpen(false);
+            setEditingLanDevice(null);
+          }}
+          onSave={handleSaveLanDevice}
+          editDevice={editingLanDevice}
+        />
+      )}
+
+      {isLanCableModalOpen && (
+        <LanCableModal
+          isOpen={isLanCableModalOpen}
+          onClose={() => {
+            setIsLanCableModalOpen(false);
+            setEditingLanCable(null);
+          }}
+          onSave={handleSaveLanCable}
+          editCable={editingLanCable}
+          devices={lanDevices}
         />
       )}
 

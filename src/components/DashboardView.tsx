@@ -13,7 +13,7 @@ import {
   HardDrive
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory } from '../types/ipam';
-import { ElectricityDevice, CctvDevice, WaterDevice } from '../types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/utilityNetworks';
 import { parseCidr } from '../utils/ipCalculator';
 import { getCategoryIconComponent } from './CategoriesView';
 
@@ -21,6 +21,8 @@ interface DashboardViewProps {
   groups: IPGroup[];
   allocations: IPAllocation[];
   categories?: DeviceCategory[];
+  lanDevices?: LanDevice[];
+  lanCables?: LanCableRun[];
   electricityDevices?: ElectricityDevice[];
   cctvDevices?: CctvDevice[];
   waterDevices?: WaterDevice[];
@@ -31,12 +33,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   groups,
   allocations,
   categories = [],
+  lanDevices = [],
+  lanCables = [],
   electricityDevices = [],
   cctvDevices = [],
   waterDevices = [],
   onNavigateToTab
 }) => {
-  // 1. STATS LAN
+  // 1. STATS LAN (KABEL & PERANGKAT FISIK)
+  const totalCables = lanCables.length;
+  const connectedCables = lanCables.filter(c => c.status === 'connected').length;
+  const totalCableMeters = lanCables.reduce((sum, c) => sum + (c.lengthMeter || 0), 0);
+  const totalLanDevs = lanDevices.length;
+  const totalSwitches = lanDevices.filter(d => d.type.startsWith('switch')).length;
+
+  // STATS IP SUBMET (IPAM)
   const totalGroups = groups.length;
   const usedAllocations = allocations.filter(a => a.status === 'used');
   const totalUsedIps = usedAllocations.length;
@@ -92,18 +103,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <Network className="w-5 h-5" />
                 </div>
                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                  {overallUsedPct}% IP Terpakai
+                  {totalCableMeters > 0 ? `${totalCableMeters}m Kabel` : `${totalGroups} Subnet`}
                 </span>
               </div>
 
               <div className="mt-4">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Jaringan Komputer</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Jalur Kabel & Perangkat Fisik</span>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Jaringan LAN</h3>
                 <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{totalGroups}</span>
-                  <span className="text-xs font-semibold text-slate-500">Subnet ({totalUsedIps} Host IP)</span>
+                  <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{totalCables}</span>
+                  <span className="text-xs font-semibold text-slate-500">Jalur Kabel ({connectedCables} Terhubung)</span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">PC, Laptop, Server, Router & Switch</p>
+                <p className="text-[11px] text-slate-400 mt-1">{totalLanDevs} Perangkat ({totalSwitches} Switch & Patch Panel)</p>
               </div>
             </div>
 
@@ -111,7 +122,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span className="text-xs font-bold text-blue-600 dark:text-blue-400">Buka Modul LAN</span>
               {onNavigateToTab && (
                 <button 
-                  onClick={() => onNavigateToTab('groups')}
+                  onClick={() => onNavigateToTab('lan')}
                   className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-colors cursor-pointer"
                 >
                   <ArrowRight className="w-4 h-4" />

@@ -174,3 +174,74 @@ model WaterDevice {
   createdAt            String
   updatedAt            String
 }
+
+model LanLocation {
+  id          String   @id
+  name        String
+  code        String   @default("")
+  address     String?
+  pic         String?
+  phone       String?
+  notes       String?
+  createdAt   String
+  updatedAt   String
+}
+
+model LanZone {
+  id          String   @id
+  locationId  String
+  name        String
+  code        String   @default("")
+  floor       String?
+  roomType    String?  @default("lab")
+  pic         String?
+  notes       String?
+  createdAt   String
+  updatedAt   String
+}
+
+model LanDevice {
+  id              String   @id
+  locationId      String?
+  zoneId          String?
+  name            String
+  code            String   @default("")
+  type            String   @default("switch")
+  brand           String?
+  model           String?
+  location        String   @default("")
+  rackNumber      String?
+  totalPorts      Int?
+  ipAddress       String?
+  macAddress      String?
+  status          String   @default("active")
+  pic             String?
+  notes           String?
+  createdAt       String
+  updatedAt       String
+}
+
+model LanCableRun {
+  id              String   @id
+  locationId      String?
+  zoneId          String?
+  cableCode       String   @default("")
+  cableType       String   @default("cat6_utp")
+  sourceDeviceId  String?
+  sourceDeviceName String?
+  sourcePort      String?
+  sourceLocation  String   @default("")
+  targetDeviceId  String?
+  targetDeviceName String?
+  targetPort      String?
+  targetLocation  String   @default("")
+  pathwayRoute    String?
+  lengthMeter     Float?
+  color           String?  @default("blue")
+  speedMbps       Int?     @default(1000)
+  status          String   @default("connected")
+  pic             String?
+  notes           String?
+  createdAt       String
+  updatedAt       String
+}

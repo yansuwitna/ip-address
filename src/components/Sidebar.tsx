@@ -22,10 +22,11 @@ import { showConfirm } from '../utils/swal';
 
 export type NavTab = 
   | 'dashboard' 
-  | 'groups' 
+  | 'lan'
   | 'electricity' 
   | 'cctv' 
   | 'water' 
+  | 'groups' 
   | 'dns' 
   | 'services' 
   | 'categories' 
@@ -41,6 +42,8 @@ interface SidebarProps {
   onLogout: () => void;
   totalGroups: number;
   totalUsedIps: number;
+  totalLanCables?: number;
+  totalLanDevices?: number;
   totalElectricityDevices?: number;
   totalCctvDevices?: number;
   totalWaterDevices?: number;
@@ -61,6 +64,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLogout,
   totalGroups,
   totalUsedIps,
+  totalLanCables = 0,
+  totalLanDevices = 0,
   totalElectricityDevices = 0,
   totalCctvDevices = 0,
   totalWaterDevices = 0,
@@ -81,14 +86,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     activeColor?: string;
   }
 
-  // 4 Menu Utama Jaringan Infrastruktur
+  // 4 Menu Utama Jaringan Infrastruktur Fisik & Distribusi
   const mainNetworkItems: NavItem[] = [
     {
-      id: 'groups',
+      id: 'lan',
       label: 'Jaringan LAN',
       icon: Network,
-      description: 'Komputer, Host & Subnet IP',
-      badge: totalGroups.toString(),
+      description: 'Jalur Kabel, Switch & Arah',
+      badge: totalLanCables > 0 ? `${totalLanCables} Jalur` : (totalLanDevices > 0 ? `${totalLanDevices} Unit` : undefined),
+      badgeColor: 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
       activeColor: 'bg-blue-600'
     },
     {
@@ -120,8 +126,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  // Menu Pendukung Sistem
+  // Menu Pendukung Sistem (Alamat IP / IPAM, DNS, Hardware & Users)
   const systemItems: NavItem[] = [
+    {
+      id: 'groups',
+      label: 'Alamat IP (Subnet IPAM)',
+      icon: Layers,
+      description: 'Subnet CIDR & Alokasi Host IP',
+      badge: totalGroups.toString(),
+      badgeColor: 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+    },
     {
       id: 'dns',
       label: 'Manajemen DNS',
@@ -241,7 +255,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {mainNetworkItems.map(item => {
               const Icon = item.icon;
-              const isActive = currentTab === item.id || (currentTab === 'services' && item.id === 'groups');
+              const isActive = currentTab === item.id;
               const activeBg = item.activeColor || 'bg-blue-600';
 
               return (
@@ -288,7 +302,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {systemItems.map(item => {
               const Icon = item.icon;
-              const isActive = currentTab === item.id;
+              const isActive = currentTab === item.id || (item.id === 'groups' && currentTab === 'services');
 
               return (
                 <button

@@ -1137,3 +1137,284 @@ export const INITIAL_WATER_DEVICES: WaterDevice[] = [
     updatedAt: '2026-03-01T00:00:00Z'
   }
 ];
+
+import { LanDevice, LanCableRun, LanLocation, LanZone } from '../types/utilityNetworks';
+
+export const STORAGE_KEY_LAN_LOCATIONS = 'netipam_lan_locations_v1';
+export const STORAGE_KEY_LAN_ZONES = 'netipam_lan_zones_v1';
+export const STORAGE_KEY_LAN_DEVICES = 'netipam_lan_devices_v1';
+export const STORAGE_KEY_LAN_CABLES = 'netipam_lan_cables_v1';
+
+export function saveLanLocations(locations: LanLocation[]): void {
+  syncToServer(STORAGE_KEY_LAN_LOCATIONS, locations);
+}
+
+export function saveLanZones(zones: LanZone[]): void {
+  syncToServer(STORAGE_KEY_LAN_ZONES, zones);
+}
+
+export function saveLanDevices(devices: LanDevice[]): void {
+  syncToServer(STORAGE_KEY_LAN_DEVICES, devices);
+}
+
+export function saveLanCables(cables: LanCableRun[]): void {
+  syncToServer(STORAGE_KEY_LAN_CABLES, cables);
+}
+
+// SAMPLE INITIAL DATA TINGKAT 1: LOKASI (Sekolah 1, Sekolah 2, dst)
+export const INITIAL_LAN_LOCATIONS: LanLocation[] = [
+  {
+    id: 'loc-sekolah-1',
+    name: 'SMK Negeri 1 (Sekolah 1)',
+    code: 'SMKN-01',
+    address: 'Jl. Pendidikan Mandiri No. 45, Kampus Barat',
+    pic: 'Budi Santoso, S.Kom (Koordinator IT)',
+    phone: '0812-3456-7890',
+    notes: 'Kampus utama dengan 4 Laboratorium Komputer dan Ruang Server Pusat.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'loc-sekolah-2',
+    name: 'SMA Negeri 2 (Sekolah 2)',
+    code: 'SMAN-02',
+    address: 'Jl. Merdeka Belajar No. 12, Kampus Timur',
+    pic: 'Dewi Lestari, M.T (Kepala Lab)',
+    phone: '0813-9876-5432',
+    notes: 'Kampus cabang dengan 2 Laboratorium Multimedia dan Lab Bahasa.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  }
+];
+
+// SAMPLE INITIAL DATA TINGKAT 2: JARINGAN RUANGAN / LAB DI DALAM SEKOLAH (Lab 1, Lab 2, Lab 3, dll)
+export const INITIAL_LAN_ZONES: LanZone[] = [
+  {
+    id: 'zone-lab-1',
+    locationId: 'loc-sekolah-1',
+    name: 'Jaringan Lab Komputer 1 (Lab 1 TKJ)',
+    code: 'LAB-01-TKJ',
+    floor: 'Lantai 1 - Gedung Teori & Praktik',
+    roomType: 'lab',
+    pic: 'Ahmad Fauzi (Teknisi Lab 1)',
+    notes: 'Laboratorium Teknik Jaringan Komputer dengan 36 PC Siswa dan 1 Server CBT.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'zone-lab-2',
+    locationId: 'loc-sekolah-1',
+    name: 'Jaringan Lab Multimedia 2 (Lab 2 RPL)',
+    code: 'LAB-02-RPL',
+    floor: 'Lantai 2 - Gedung Multimedia',
+    roomType: 'lab',
+    pic: 'Siti Aminah, S.Kom',
+    notes: 'Lab Rekayasa Perangkat Lunak dan Pemrograman Web.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'zone-lab-3',
+    locationId: 'loc-sekolah-1',
+    name: 'Jaringan Lab Bahasa 3 (Lab 3)',
+    code: 'LAB-03-BHS',
+    floor: 'Lantai 2 - Sayap Timur',
+    roomType: 'lab',
+    pic: 'Rina Wulandari, S.Pd',
+    notes: 'Laboratorium Audio Visual dan CBT Ujian Mandiri.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'zone-lab-sek2-1',
+    locationId: 'loc-sekolah-2',
+    name: 'Jaringan Lab CBT 1 (Sekolah 2)',
+    code: 'LAB-CBT-01',
+    floor: 'Lantai 1 - Gedung Utama SMAN 2',
+    roomType: 'lab',
+    pic: 'Hendra Gunawan',
+    notes: 'Lab CBT Ujian Nasional & Asesmen Mandiri.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  }
+];
+
+// SAMPLE INITIAL DATA TINGKAT 3: PERANGKAT FISIK DI DALAM LAB 1 & SEKOLAH
+export const INITIAL_LAN_DEVICES: LanDevice[] = [
+  {
+    id: 'lan-dev-1',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    name: 'Switch Distribusi Lab 1 (Ruijie 24-Port)',
+    code: 'SW-LAB1-01',
+    type: 'switch_distribution',
+    brand: 'Ruijie Reyee',
+    model: 'RG-NBS3100-24GT4SFP-P',
+    location: 'Lab 1 TKJ - Wallmount Rack Depan Meja Guru',
+    rackNumber: 'Rack Lab 1 U04',
+    totalPorts: 24,
+    ipAddress: '192.168.10.10',
+    macAddress: '84:D8:1B:45:67:89',
+    status: 'active',
+    pic: 'Ahmad Fauzi',
+    notes: 'Switch utama yang menghubungkan seluruh PC Siswa Baris A dan Baris B Lab 1.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'lan-dev-2',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    name: 'Patch Panel Cat6 24P Lab 1',
+    code: 'PP-LAB1-01',
+    type: 'patch_panel',
+    brand: 'Panduit',
+    model: 'DP24688TGY 24-Port',
+    location: 'Lab 1 TKJ - Wallmount Rack Depan Meja Guru',
+    rackNumber: 'Rack Lab 1 U02',
+    totalPorts: 24,
+    status: 'active',
+    pic: 'Ahmad Fauzi',
+    notes: 'Terminasi jalur kabel UTP dari meja-meja komputer siswa Lab 1.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'lan-dev-3',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    name: 'Router Mikrotik Gateway Lab 1',
+    code: 'RTR-LAB1-01',
+    type: 'router_gateway',
+    brand: 'Mikrotik',
+    model: 'RB4011iGS+RM',
+    location: 'Lab 1 TKJ - Meja Server Guru',
+    rackNumber: 'Rack Lab 1 U06',
+    totalPorts: 10,
+    ipAddress: '192.168.10.1',
+    macAddress: 'CC:2D:E0:1A:3B:4C',
+    status: 'active',
+    pic: 'Ahmad Fauzi',
+    notes: 'Router manajemen bandwidth, DHCP Server, dan firewall khusus Lab 1.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'lan-dev-4',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    name: 'Server Ujian CBT Lab 1',
+    code: 'SRV-CBT-LAB1',
+    type: 'server_host',
+    brand: 'Dell',
+    model: 'PowerEdge T340 Tower',
+    location: 'Lab 1 TKJ - Meja Instruktur',
+    rackNumber: 'Meja Instruktur #01',
+    totalPorts: 2,
+    ipAddress: '192.168.10.200',
+    macAddress: '00:1E:F7:8C:9D:12',
+    status: 'active',
+    pic: 'Ahmad Fauzi',
+    notes: 'Server hosting sistem ujian lokal offline dan materi praktikum.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  }
+];
+
+// SAMPLE INITIAL DATA TINGKAT 3: JALUR KABEL & ARAH TARIKAN DI DALAM LAB 1
+export const INITIAL_LAN_CABLES: LanCableRun[] = [
+  {
+    id: 'cbl-1',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    cableCode: 'CBL-UPLINK-LAB1',
+    cableType: 'cat6a_stp',
+    sourceDeviceId: 'lan-dev-3',
+    sourceDeviceName: 'Router Mikrotik Gateway Lab 1',
+    sourcePort: 'Port Ether 1 (Trunk)',
+    sourceLocation: 'Lab 1 TKJ (Meja Server Rack U06)',
+    targetDeviceId: 'lan-dev-1',
+    targetDeviceName: 'Switch Distribusi Lab 1',
+    targetPort: 'Port SFP/Uplink 1',
+    targetLocation: 'Lab 1 TKJ (Wallmount Rack U04)',
+    pathwayRoute: 'Kabel Tray Rack Internal Lab 1 (Panjang 1.5 Meter)',
+    lengthMeter: 2,
+    color: 'Kuning (Yellow)',
+    speedMbps: 1000,
+    status: 'connected',
+    pic: 'Ahmad Fauzi',
+    notes: 'Patch cord STP Cat6a interkoneksi Router Gateway ke Switch Lab 1.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'cbl-2',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    cableCode: 'CBL-LAB1-MEJA-A01',
+    cableType: 'cat6_utp',
+    sourceDeviceId: 'lan-dev-1',
+    sourceDeviceName: 'Switch Distribusi Lab 1',
+    sourcePort: 'Port 01 (Gigabit)',
+    sourceLocation: 'Lab 1 TKJ (Wallmount Rack Depan)',
+    targetDeviceName: 'Komputer Siswa PC-01 (Baris A)',
+    targetPort: 'LAN Port Onboard PC',
+    targetLocation: 'Lab 1 TKJ - Meja Siswa Baris A No 01',
+    pathwayRoute: 'Tray Plafon Lab 1 -> Pipa Conduit Turun ke Floor Duct Baris A',
+    lengthMeter: 14,
+    color: 'Biru (Blue)',
+    speedMbps: 1000,
+    status: 'connected',
+    pic: 'Ahmad Fauzi',
+    notes: 'Kabel tarikan dari switch utama ke PC Siswa nomor 01 Baris A.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'cbl-3',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    cableCode: 'CBL-LAB1-MEJA-A02',
+    cableType: 'cat6_utp',
+    sourceDeviceId: 'lan-dev-1',
+    sourceDeviceName: 'Switch Distribusi Lab 1',
+    sourcePort: 'Port 02 (Gigabit)',
+    sourceLocation: 'Lab 1 TKJ (Wallmount Rack Depan)',
+    targetDeviceName: 'Komputer Siswa PC-02 (Baris A)',
+    targetPort: 'LAN Port Onboard PC',
+    targetLocation: 'Lab 1 TKJ - Meja Siswa Baris A No 02',
+    pathwayRoute: 'Tray Plafon Lab 1 -> Pipa Conduit Turun ke Floor Duct Baris A',
+    lengthMeter: 16,
+    color: 'Biru (Blue)',
+    speedMbps: 1000,
+    status: 'connected',
+    pic: 'Ahmad Fauzi',
+    notes: 'Kabel tarikan dari switch utama ke PC Siswa nomor 02 Baris A.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'cbl-4',
+    locationId: 'loc-sekolah-1',
+    zoneId: 'zone-lab-1',
+    cableCode: 'CBL-LAB1-SERVER-CBT',
+    cableType: 'cat6a_stp',
+    sourceDeviceId: 'lan-dev-1',
+    sourceDeviceName: 'Switch Distribusi Lab 1',
+    sourcePort: 'Port 24 (Gigabit Priority)',
+    sourceLocation: 'Lab 1 TKJ (Wallmount Rack Depan)',
+    targetDeviceId: 'lan-dev-4',
+    targetDeviceName: 'Server Ujian CBT Lab 1',
+    targetPort: 'NIC 1 Dual Gigabit',
+    targetLocation: 'Lab 1 TKJ - Meja Instruktur',
+    pathwayRoute: 'Ducting Dinding samping meja instruktur',
+    lengthMeter: 6,
+    color: 'Merah (Red)',
+    speedMbps: 1000,
+    status: 'connected',
+    pic: 'Ahmad Fauzi',
+    notes: 'Jalur kabel berkecepatan tinggi khusus Server CBT Lab 1.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  }
+];

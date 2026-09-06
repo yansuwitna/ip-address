@@ -19,7 +19,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory, DnsRecord, SubDomainRecord } from '../types/ipam';
-import { ElectricityDevice, CctvDevice, WaterDevice } from '../types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/utilityNetworks';
 import { User } from '../types/auth';
 
 interface HomeViewProps {
@@ -28,6 +28,8 @@ interface HomeViewProps {
   categories: DeviceCategory[];
   dnsRecords?: DnsRecord[];
   subDomains?: SubDomainRecord[];
+  lanDevices?: LanDevice[];
+  lanCables?: LanCableRun[];
   electricityDevices?: ElectricityDevice[];
   cctvDevices?: CctvDevice[];
   waterDevices?: WaterDevice[];
@@ -44,6 +46,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   categories,
   dnsRecords = [],
   subDomains = [],
+  lanDevices = [],
+  lanCables = [],
   electricityDevices = [],
   cctvDevices = [],
   waterDevices = [],
@@ -54,6 +58,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onToggleTheme
 }) => {
   // Global statistics
+  const totalCables = lanCables.length;
+  const totalLanDevs = lanDevices.length;
   const totalUsedAll = allocations.filter(a => a.status === 'used').length;
   const totalElec = electricityDevices.length;
   const totalCctv = cctvDevices.length;
@@ -163,8 +169,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Jaringan LAN</span>
               <Network className="w-4 h-4 text-blue-600" />
             </div>
-            <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{groups.length} Subnet</div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{totalUsedAll} Host IP Terhubung</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{totalCables > 0 ? `${totalCables} Jalur` : `${groups.length} Subnet`}</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{totalLanDevs > 0 ? `${totalLanDevs} Switch/Rack/Router` : `${totalUsedAll} Host IP Terhubung`}</div>
           </div>
 
           <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs text-left">
@@ -217,10 +223,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <Network className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
-              LAN: Jaringan Komputer
+              LAN: Jalur Kabel & Perangkat Fisik
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Mendata PC workstation, laptop, server farm, router Mikrotik, switch PoE, dan access point beserta alokasi IP CIDR dan DNS.
+              Mendata tarikan kabel UTP/STP/Fiber Optik, arah asal & tujuan (Switch/Patch Panel ke Ruangan/User), panjang kabel, port, dan rack server.
             </p>
           </div>
 

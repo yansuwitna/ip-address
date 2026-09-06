@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from '../types/ipam';
-import { ElectricityDevice, CctvDevice, WaterDevice } from '../types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/utilityNetworks';
 import { UserAccount } from '../types/auth';
 
 export function exportToXlsx(
@@ -58,18 +58,17 @@ export function exportToXlsx(
   const summaryRows = [
     ['LAPORAN ALOKASI IP HOST & INFRASTRUKTUR LAN'],
     ['Nama Subnet / Grup', group.name],
-    ['Subnet CIDR', group.cidr],
-    ['Default Gateway', group.gateway],
-    ['VLAN ID', group.vlanId ? `VLAN ${group.vlanId}` : '-'],
-    ['Lokasi', group.location || '-'],
-    ['Penanggung Jawab Subnet', group.pic || '-'],
+    ['CIDR Subnet', group.cidr],
+    ['Gateway', group.gateway || '-'],
+    ['Lokasi / Ruang', group.location || '-'],
+    ['VLAN', group.vlanId ? `VLAN ${group.vlanId}` : '-'],
+    ['PIC Subnet', group.pic || '-'],
     ['Tanggal Ekspor', new Date().toLocaleString('id-ID')],
-    [], // empty spacer row
-    headers,
-    ...rows
+    [],
+    headers
   ];
 
-  const worksheet = XLSX.utils.aoa_to_sheet(summaryRows);
+  const worksheet = XLSX.utils.aoa_to_sheet([...summaryRows, ...rows]);
 
   // Column widths for neat layout
   worksheet['!cols'] = [
@@ -108,7 +107,11 @@ export function exportBackupJson(
   subDomains?: SubDomainRecord[],
   electricityDevices?: ElectricityDevice[],
   cctvDevices?: CctvDevice[],
-  waterDevices?: WaterDevice[]
+  waterDevices?: WaterDevice[],
+  lanDevices?: LanDevice[],
+  lanCables?: LanCableRun[],
+  lanLocations?: LanLocation[],
+  lanZones?: LanZone[]
 ): void {
   const backupData = {
     appName: 'Infrastruktur Jaringan Terpadu (LAN, Listrik, CCTV, AIR)',
@@ -124,7 +127,11 @@ export function exportBackupJson(
       subDomains: subDomains?.length || 0,
       electricityDevices: electricityDevices?.length || 0,
       cctvDevices: cctvDevices?.length || 0,
-      waterDevices: waterDevices?.length || 0
+      waterDevices: waterDevices?.length || 0,
+      lanLocations: lanLocations?.length || 0,
+      lanZones: lanZones?.length || 0,
+      lanDevices: lanDevices?.length || 0,
+      lanCables: lanCables?.length || 0
     },
     groups,
     allocations,
@@ -135,7 +142,11 @@ export function exportBackupJson(
     subDomains: subDomains || [],
     electricityDevices: electricityDevices || [],
     cctvDevices: cctvDevices || [],
-    waterDevices: waterDevices || []
+    waterDevices: waterDevices || [],
+    lanLocations: lanLocations || [],
+    lanZones: lanZones || [],
+    lanDevices: lanDevices || [],
+    lanCables: lanCables || []
   };
 
   const jsonStr = JSON.stringify(backupData, null, 2);
@@ -161,6 +172,10 @@ export function parseImportJson(fileContent: string): {
   electricityDevices?: ElectricityDevice[];
   cctvDevices?: CctvDevice[];
   waterDevices?: WaterDevice[];
+  lanLocations?: LanLocation[];
+  lanZones?: LanZone[];
+  lanDevices?: LanDevice[];
+  lanCables?: LanCableRun[];
 } {
   const parsed = JSON.parse(fileContent);
   if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.allocations)) {
@@ -176,6 +191,10 @@ export function parseImportJson(fileContent: string): {
     subDomains: Array.isArray(parsed.subDomains) ? parsed.subDomains : undefined,
     electricityDevices: Array.isArray(parsed.electricityDevices) ? parsed.electricityDevices : undefined,
     cctvDevices: Array.isArray(parsed.cctvDevices) ? parsed.cctvDevices : undefined,
-    waterDevices: Array.isArray(parsed.waterDevices) ? parsed.waterDevices : undefined
+    waterDevices: Array.isArray(parsed.waterDevices) ? parsed.waterDevices : undefined,
+    lanLocations: Array.isArray(parsed.lanLocations) ? parsed.lanLocations : undefined,
+    lanZones: Array.isArray(parsed.lanZones) ? parsed.lanZones : undefined,
+    lanDevices: Array.isArray(parsed.lanDevices) ? parsed.lanDevices : undefined,
+    lanCables: Array.isArray(parsed.lanCables) ? parsed.lanCables : undefined
   };
 }

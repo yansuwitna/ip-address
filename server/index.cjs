@@ -170,7 +170,11 @@ async function startServer() {
         subDomains,
         electricityDevices,
         cctvDevices,
-        waterDevices
+        waterDevices,
+        lanLocations,
+        lanZones,
+        lanDevices,
+        lanCableRuns
       ] = await Promise.all([
         prisma.user.findMany(),
         prisma.iPGroup.findMany(),
@@ -181,7 +185,11 @@ async function startServer() {
         prisma.subDomainRecord.findMany(),
         prisma.electricityDevice.findMany(),
         prisma.cctvDevice.findMany(),
-        prisma.waterDevice.findMany()
+        prisma.waterDevice.findMany(),
+        prisma.lanLocation.findMany(),
+        prisma.lanZone.findMany(),
+        prisma.lanDevice.findMany(),
+        prisma.lanCableRun.findMany()
       ]);
       
       res.json({
@@ -194,7 +202,11 @@ async function startServer() {
         'netipam_sub_domains_v1': subDomains,
         'netipam_electricity_devices_v1': electricityDevices,
         'netipam_cctv_devices_v1': cctvDevices,
-        'netipam_water_devices_v1': waterDevices
+        'netipam_water_devices_v1': waterDevices,
+        'netipam_lan_locations_v1': lanLocations,
+        'netipam_lan_zones_v1': lanZones,
+        'netipam_lan_devices_v1': lanDevices,
+        'netipam_lan_cables_v1': lanCableRuns
       });
     } catch (error) {
       console.error(error);
@@ -252,6 +264,18 @@ async function startServer() {
         case 'netipam_water_devices_v1':
           await replaceTable(prisma.waterDevice, data);
           break;
+        case 'netipam_lan_locations_v1':
+          await replaceTable(prisma.lanLocation, data);
+          break;
+        case 'netipam_lan_zones_v1':
+          await replaceTable(prisma.lanZone, data);
+          break;
+        case 'netipam_lan_devices_v1':
+          await replaceTable(prisma.lanDevice, data);
+          break;
+        case 'netipam_lan_cables_v1':
+          await replaceTable(prisma.lanCableRun, data);
+          break;
         default:
           return res.status(400).json({ error: 'Unknown key' });
       }
@@ -275,7 +299,11 @@ async function startServer() {
         prisma.subDomainRecord.deleteMany({}),
         prisma.electricityDevice.deleteMany({}),
         prisma.cctvDevice.deleteMany({}),
-        prisma.waterDevice.deleteMany({})
+        prisma.waterDevice.deleteMany({}),
+        prisma.lanCableRun.deleteMany({}),
+        prisma.lanDevice.deleteMany({}),
+        prisma.lanZone.deleteMany({}),
+        prisma.lanLocation.deleteMany({})
       ]);
       res.json({ success: true });
     } catch (error) {

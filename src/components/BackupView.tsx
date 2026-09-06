@@ -20,7 +20,7 @@ import {
   Users
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from '../types/ipam';
-import { ElectricityDevice, CctvDevice, WaterDevice } from '../types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/utilityNetworks';
 import { UserAccount } from '../types/auth';
 import { exportBackupJson, parseImportJson, exportToXlsx } from '../utils/exportImport';
 import { showConfirm, showSuccess, showError, showWarning } from '../utils/swal';
@@ -36,6 +36,8 @@ interface BackupViewProps {
   electricityDevices?: ElectricityDevice[];
   cctvDevices?: CctvDevice[];
   waterDevices?: WaterDevice[];
+  lanDevices?: LanDevice[];
+  lanCables?: LanCableRun[];
   onImportData: (data: {
     groups?: IPGroup[];
     allocations?: IPAllocation[];
@@ -47,6 +49,8 @@ interface BackupViewProps {
     electricityDevices?: ElectricityDevice[];
     cctvDevices?: CctvDevice[];
     waterDevices?: WaterDevice[];
+    lanDevices?: LanDevice[];
+    lanCables?: LanCableRun[];
   }) => void;
   onWipeAllData: () => void;
 }
@@ -62,6 +66,8 @@ export const BackupView: React.FC<BackupViewProps> = ({
   electricityDevices = [],
   cctvDevices = [],
   waterDevices = [],
+  lanDevices = [],
+  lanCables = [],
   onImportData,
   onWipeAllData
 }) => {
@@ -73,6 +79,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
   const [pendingRestoreData, setPendingRestoreData] = useState<any>(null);
   
   // Checkboxes
+  const [restoreLan, setRestoreLan] = useState(true);
   const [restoreIpam, setRestoreIpam] = useState(true);
   const [restoreElectricity, setRestoreElectricity] = useState(true);
   const [restoreCctv, setRestoreCctv] = useState(true);
@@ -94,7 +101,9 @@ export const BackupView: React.FC<BackupViewProps> = ({
       subDomains,
       electricityDevices,
       cctvDevices,
-      waterDevices
+      waterDevices,
+      lanDevices,
+      lanCables
     );
     setHasBackedUp(true);
     showSuccess('Cadangan Berhasil Diunduh', 'Berkas cadangan format JSON berhasil disimpan.');
@@ -148,6 +157,10 @@ export const BackupView: React.FC<BackupViewProps> = ({
     if (!pendingRestoreData) return;
     
     const dataToRestore: any = {};
+    if (restoreLan) {
+      dataToRestore.lanDevices = pendingRestoreData.lanDevices;
+      dataToRestore.lanCables = pendingRestoreData.lanCables;
+    }
     if (restoreIpam) {
       dataToRestore.groups = pendingRestoreData.groups;
       dataToRestore.allocations = pendingRestoreData.allocations;
@@ -325,9 +338,16 @@ export const BackupView: React.FC<BackupViewProps> = ({
               
               <div className="space-y-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 p-4 rounded-xl max-h-[60vh] overflow-y-auto">
                 <label className="flex items-center gap-3 cursor-pointer group">
-                  <input type="checkbox" checked={restoreIpam} onChange={() => setRestoreIpam(!restoreIpam)} className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300" />
+                  <input type="checkbox" checked={restoreLan} onChange={() => setRestoreLan(!restoreLan)} className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300" />
                   <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 transition-colors">
-                    Jaringan LAN ({pendingRestoreData.groups?.length || 0} Subnet, {pendingRestoreData.allocations?.length || 0} Host)
+                    Jaringan LAN - Fisik & Jalur ({pendingRestoreData.lanCables?.length || 0} Jalur Kabel, {pendingRestoreData.lanDevices?.length || 0} Switch/Rack)
+                  </span>
+                </label>
+
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input type="checkbox" checked={restoreIpam} onChange={() => setRestoreIpam(!restoreIpam)} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
+                    Alamat IP (IPAM) ({pendingRestoreData.groups?.length || 0} Subnet, {pendingRestoreData.allocations?.length || 0} Host)
                   </span>
                 </label>
 

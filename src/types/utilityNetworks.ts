@@ -114,3 +114,111 @@ export interface WaterDevice {
   createdAt: string;
   updatedAt: string;
 }
+
+// --- JARINGAN LAN (PERANGKAT FISIK & JALUR KABEL) ---
+export type LanDeviceType = 
+  | 'switch_core' 
+  | 'switch_distribution' 
+  | 'switch_access' 
+  | 'patch_panel' 
+  | 'router_gateway' 
+  | 'access_point' 
+  | 'server_host' 
+  | 'otb_fiber' 
+  | 'wallplate_jack' 
+  | 'media_converter' 
+  | 'other';
+
+export type LanCableType = 
+  | 'cat5e_utp' 
+  | 'cat6_utp' 
+  | 'cat6a_stp' 
+  | 'cat7_stp' 
+  | 'fiber_sm' 
+  | 'fiber_mm' 
+  | 'dac_sfp' 
+  | 'coaxial' 
+  | 'other';
+
+export type CableRunStatus = 'connected' | 'idle' | 'fault' | 'maintenance';
+
+// LEVEL 1: LOKASI TEMPAT JARINGAN (contoh: Sekolah 1, Sekolah 2, Gedung Kantor A)
+export interface LanLocation {
+  id: string;
+  name: string; // e.g. "SMK Negeri 1 (Sekolah 1)", "SMA Negeri 2"
+  code: string; // e.g. "SEKOLAH-01"
+  address?: string; // Jl. Pendidikan No. 12
+  pic?: string; // Penanggung Jawab Gedung / Sekolah
+  phone?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// LEVEL 2: AREA / RUANGAN / JARINGAN DI DALAM LOKASI (contoh: Lab 1, Lab 2, Ruang Guru, Ruang Server)
+export interface LanZone {
+  id: string;
+  locationId: string; // Relasi ke LanLocation
+  name: string; // e.g. "Jaringan Lab Komputer 1", "Jaringan Lab Multimedia 2"
+  code: string; // e.g. "LAB-01", "LAB-02"
+  floor?: string; // e.g. "Lantai 1", "Lantai 2"
+  roomType?: string; // "lab" | "office" | "server_room" | "classroom" | "library" | "other"
+  pic?: string; // Kepala Lab / Petugas
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// LEVEL 3: PERANGKAT FISIK DI DALAM AREA/LAB TERSEBUT
+export interface LanDevice {
+  id: string;
+  locationId?: string; // Relasi ke LanLocation (Sekolah 1)
+  zoneId?: string; // Relasi ke LanZone (Lab 1)
+  name: string; // e.g., SW-LAB1-01, PP-LAB1-01, PC-CLIENT-01
+  code: string; // Kode unik aset
+  type: LanDeviceType;
+  brand?: string; // Cisco, Ruijie, Mikrotik, Ubiquiti, TP-Link
+  model?: string;
+  location: string; // Detail letak: Rak Depan Lab 1, Meja Guru, dsb
+  rackNumber?: string; // Rack 01, Meja 01
+  totalPorts?: number; // 24 Port, 48 Port
+  ipAddress?: string;
+  macAddress?: string;
+  status: 'active' | 'standby' | 'fault' | 'maintenance';
+  pic?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// LEVEL 3: JALUR KABEL & ARAH TARIKAN DI DALAM AREA/LAB MAUPUN ANTAR LAB
+export interface LanCableRun {
+  id: string;
+  locationId?: string; // Relasi ke LanLocation
+  zoneId?: string; // Relasi ke LanZone
+  cableCode: string; // e.g., CBL-LAB1-01, FO-BACKBONE-01
+  cableType: LanCableType;
+  
+  // Titik Asal (Source / Arah Dari)
+  sourceDeviceId?: string;
+  sourceDeviceName?: string; // e.g., Switch Core Lab 1
+  sourcePort?: string; // e.g., Port 1, Port G0/1
+  sourceLocation: string; // Meja Guru Rack Switch Lab 1
+  
+  // Titik Tujuan (Target / Arah Ke)
+  targetDeviceId?: string;
+  targetDeviceName?: string; // e.g., PC-Siswa-01 / Patch Panel Meja 1
+  targetPort?: string; // e.g., Port LAN PC / Jack RJ45 #01
+  targetLocation: string; // Meja Siswa Baris 1 No 1
+  
+  // Rute Jalur & Spesifikasi Kabel
+  pathwayRoute?: string; // e.g., Tray Plafon Lab 1 -> Floor Duct Meja 1
+  lengthMeter?: number; // Panjang kabel (meter)
+  color?: string; // Warna kabel (Biru, Abu-abu, Kuning FO)
+  speedMbps?: number; // 1000 (1Gbps), 10000 (10Gbps)
+  status: CableRunStatus;
+  pic?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
