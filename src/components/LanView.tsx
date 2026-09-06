@@ -764,7 +764,7 @@ export const LanView: React.FC<LanViewProps> = ({
                 className="w-full md:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
               >
                 <Plus className="w-4 h-4" />
-                <span>Catat Jalur Kabel Baru ({activeZone.name})</span>
+                <span>Catat Jalur Kabel Baru</span>
               </button>
             ) : (
               <button
@@ -772,7 +772,7 @@ export const LanView: React.FC<LanViewProps> = ({
                 className="w-full md:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
               >
                 <Plus className="w-4 h-4" />
-                <span>Tambah Perangkat Baru ({activeZone.name})</span>
+                <span>Tambah Perangkat Baru</span>
               </button>
             )}
           </div>
