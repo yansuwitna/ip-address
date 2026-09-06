@@ -36,7 +36,7 @@ import {
   LanCableType, 
   CableRunStatus 
 } from '../types/utilityNetworks';
-import { showConfirm, showSuccess } from '../utils/swal';
+import { showConfirm, showSuccess, showWarning } from '../utils/swal';
 
 interface LanViewProps {
   locations: LanLocation[];
@@ -207,9 +207,26 @@ export const LanView: React.FC<LanViewProps> = ({
 
   const handleDeleteLocationItem = async (loc: LanLocation) => {
     const locZones = zones.filter(z => z.locationId === loc.id);
+    const locDevs = devices.filter(d => d.locationId === loc.id);
+    const locCbls = cables.filter(c => c.locationId === loc.id);
+
+    // Proteksi: Jika lokasi sudah memiliki jaringan lab, perangkat, atau kabel, tidak bisa dihapus
+    if (locZones.length > 0 || locDevs.length > 0 || locCbls.length > 0) {
+      const details = [];
+      if (locZones.length > 0) details.push(`${locZones.length} jaringan lab`);
+      if (locDevs.length > 0) details.push(`${locDevs.length} perangkat`);
+      if (locCbls.length > 0) details.push(`${locCbls.length} jalur kabel`);
+
+      await showWarning(
+        'Lokasi Tidak Dapat Dihapus!',
+        `Lokasi "${loc.name}" masih memiliki ${details.join(', ')}. Hapus atau kosongkan terlebih dahulu data di dalamnya sebelum menghapus lokasi ini.`
+      );
+      return;
+    }
+
     const confirmed = await showConfirm({
       title: 'Hapus Lokasi / Sekolah?',
-      text: `Menghapus lokasi "${loc.name}" juga akan berdampak pada ${locZones.length} jaringan lab di dalamnya. Lanjutkan?`,
+      text: `Apakah Anda yakin ingin menghapus lokasi "${loc.name}"?`,
       confirmButtonText: 'Ya, Hapus Lokasi',
       cancelButtonText: 'Batal'
     });
@@ -226,9 +243,23 @@ export const LanView: React.FC<LanViewProps> = ({
   const handleDeleteZoneItem = async (zone: LanZone) => {
     const zoneDevs = devices.filter(d => d.zoneId === zone.id);
     const zoneCbls = cables.filter(c => c.zoneId === zone.id);
+
+    // Proteksi: Jika jaringan lab sudah memiliki perangkat atau jalur kabel, tidak bisa dihapus
+    if (zoneDevs.length > 0 || zoneCbls.length > 0) {
+      const details = [];
+      if (zoneDevs.length > 0) details.push(`${zoneDevs.length} perangkat`);
+      if (zoneCbls.length > 0) details.push(`${zoneCbls.length} jalur kabel`);
+
+      await showWarning(
+        'Jaringan Lab Tidak Dapat Dihapus!',
+        `Jaringan "${zone.name}" masih memiliki ${details.join(' dan ')}. Hapus terlebih dahulu perangkat dan kabel di dalam lab ini sebelum menghapus jaringan lab.`
+      );
+      return;
+    }
+
     const confirmed = await showConfirm({
       title: 'Hapus Jaringan Ruangan / Lab?',
-      text: `Menghapus lab "${zone.name}" (${zoneDevs.length} perangkat, ${zoneCbls.length} kabel). Lanjutkan?`,
+      text: `Apakah Anda yakin ingin menghapus lab "${zone.name}"?`,
       confirmButtonText: 'Ya, Hapus Lab',
       cancelButtonText: 'Batal'
     });
@@ -255,6 +286,21 @@ export const LanView: React.FC<LanViewProps> = ({
   };
 
   const handleDeleteDeviceItem = async (device: LanDevice) => {
+    // Proteksi: Jika komponen/perangkat sudah digunakan pada jalur kabel (baik titik asal maupun tujuan), tidak bisa dihapus
+    const connectedCables = cables.filter(c => 
+      c.sourceDeviceId === device.id || 
+      c.targetDeviceId === device.id ||
+      (device.name && (c.sourceDeviceName?.toLowerCase() === device.name.toLowerCase() || c.targetDeviceName?.toLowerCase() === device.name.toLowerCase()))
+    );
+
+    if (connectedCables.length > 0) {
+      await showWarning(
+        'Perangkat Tidak Dapat Dihapus!',
+        `Perangkat "${device.name}" sedang digunakan pada ${connectedCables.length} jalur kabel (sebagai titik asal atau titik tujuan: ${connectedCables.map(c => c.cableCode).slice(0, 3).join(', ')}${connectedCables.length > 3 ? '...' : ''}). Hapus atau alihkan jalur kabel terkait terlebih dahulu.`
+      );
+      return;
+    }
+
     const confirmed = await showConfirm({
       title: 'Hapus Perangkat LAN?',
       text: `Hapus perangkat "${device.name}"?`,
@@ -343,16 +389,25 @@ export const LanView: React.FC<LanViewProps> = ({
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteLocationItem(loc);
-                            }}
-                            title="Hapus Lokasi"
-                            className="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          {(() => {
+                            const hasLocData = locZones.length > 0 || locDevices.length > 0 || locCables.length > 0;
+                            return (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteLocationItem(loc);
+                                }}
+                                title={hasLocData ? `Tidak dapat dihapus: masih ada ${locZones.length} lab / ${locDevices.length} perangkat / ${locCables.length} kabel` : "Hapus Lokasi"}
+                                className={`p-1.5 rounded-lg transition-colors ${
+                                  hasLocData 
+                                    ? 'text-slate-300 dark:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-not-allowed opacity-60' 
+                                    : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer'
+                                }`}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            );
+                          })()}
                         </div>
                       </div>
 
@@ -502,16 +557,25 @@ export const LanView: React.FC<LanViewProps> = ({
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteZoneItem(zone);
-                            }}
-                            title="Hapus Lab"
-                            className="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          {(() => {
+                            const hasZoneData = zoneDevCount > 0 || zoneCableCount > 0;
+                            return (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteZoneItem(zone);
+                                }}
+                                title={hasZoneData ? `Tidak dapat dihapus: masih ada ${zoneDevCount} perangkat / ${zoneCableCount} kabel di dalam lab ini` : "Hapus Lab"}
+                                className={`p-1.5 rounded-lg transition-colors ${
+                                  hasZoneData 
+                                    ? 'text-slate-300 dark:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-not-allowed opacity-60' 
+                                    : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer'
+                                }`}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            );
+                          })()}
                         </div>
                       </div>
 
@@ -1046,13 +1110,26 @@ export const LanView: React.FC<LanViewProps> = ({
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
                               </button>
-                              <button
-                                onClick={() => handleDeleteDeviceItem(dev)}
-                                title="Hapus Perangkat"
-                                className="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                              {(() => {
+                                const isDeviceInUse = cables.some(c => 
+                                  c.sourceDeviceId === dev.id || 
+                                  c.targetDeviceId === dev.id ||
+                                  (dev.name && (c.sourceDeviceName?.toLowerCase() === dev.name.toLowerCase() || c.targetDeviceName?.toLowerCase() === dev.name.toLowerCase()))
+                                );
+                                return (
+                                  <button
+                                    onClick={() => handleDeleteDeviceItem(dev)}
+                                    title={isDeviceInUse ? "Tidak dapat dihapus: perangkat ini sedang digunakan pada jalur kabel" : "Hapus Perangkat"}
+                                    className={`p-1.5 rounded-lg transition-colors ${
+                                      isDeviceInUse 
+                                        ? 'text-slate-300 dark:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-not-allowed opacity-60' 
+                                        : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer'
+                                    }`}
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                );
+                              })()}
                             </div>
                           </td>
                         </tr>

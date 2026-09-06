@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Network, Save, AlertCircle, Building2 } from 'lucide-react';
+import { X, Network, Save, AlertCircle, Building2, Lock } from 'lucide-react';
 import { LanZone, LanLocation } from '../types/utilityNetworks';
 
 interface LanZoneModalProps {
@@ -113,14 +113,27 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
           )}
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Lokasi Induk / Sekolah <span className="text-rose-500">*</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Lokasi Induk / Sekolah <span className="text-rose-500">*</span>
+              </label>
+              {editZone && (
+                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  <span>Lokasi induk terkunci saat mode edit</span>
+                </span>
+              )}
+            </div>
             <div className="relative">
               <select
                 value={locationId}
                 onChange={e => setLocationId(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                disabled={Boolean(editZone)}
+                className={`w-full px-3.5 py-2.5 text-xs rounded-xl border transition-all ${
+                  editZone 
+                    ? 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 cursor-not-allowed select-none opacity-80' 
+                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer'
+                }`}
                 required
               >
                 <option value="" disabled>-- Pilih Lokasi / Sekolah --</option>
