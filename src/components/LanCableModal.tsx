@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Cable, Save, AlertCircle, ArrowRight } from 'lucide-react';
-import { LanCableRun, LanCableType, CableRunStatus, LanDevice } from '../types/utilityNetworks';
+import { X, Cable, Save, AlertCircle } from 'lucide-react';
+import { LanCableRun, LanCableType, CableRunStatus, LanDevice, LanLocation, LanZone } from '../types/utilityNetworks';
 
 interface LanCableModalProps {
   isOpen: boolean;
@@ -8,6 +8,10 @@ interface LanCableModalProps {
   onSave: (cable: Partial<LanCableRun>) => void;
   editCable?: LanCableRun | null;
   devices: LanDevice[];
+  locations?: LanLocation[];
+  zones?: LanZone[];
+  presetLocationId?: string;
+  presetZoneId?: string;
 }
 
 export const LanCableModal: React.FC<LanCableModalProps> = ({
@@ -15,18 +19,24 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
   onClose,
   onSave,
   editCable,
-  devices
+  devices,
+  locations = [],
+  zones = [],
+  presetLocationId,
+  presetZoneId
 }) => {
+  const [locationId, setLocationId] = useState('');
+  const [zoneId, setZoneId] = useState('');
   const [cableCode, setCableCode] = useState('');
   const [cableType, setCableType] = useState<LanCableType>('cat6_utp');
   
-  // Titik Asal
+  // Titik Asal (Arah Dari)
   const [sourceDeviceId, setSourceDeviceId] = useState('');
   const [sourceDeviceName, setSourceDeviceName] = useState('');
   const [sourcePort, setSourcePort] = useState('');
   const [sourceLocation, setSourceLocation] = useState('');
 
-  // Titik Tujuan
+  // Titik Tujuan (Arah Ke)
   const [targetDeviceId, setTargetDeviceId] = useState('');
   const [targetDeviceName, setTargetDeviceName] = useState('');
   const [targetPort, setTargetPort] = useState('');
@@ -45,6 +55,8 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     if (editCable) {
+      setLocationId(editCable.locationId || '');
+      setZoneId(editCable.zoneId || '');
       setCableCode(editCable.cableCode || '');
       setCableType(editCable.cableType);
       setSourceDeviceId(editCable.sourceDeviceId || '');
@@ -63,17 +75,26 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
       setPic(editCable.pic || '');
       setNotes(editCable.notes || '');
     } else {
-      setCableCode(`CBL-LAN-${String(Date.now()).slice(-4)}`);
+      const initLoc = presetLocationId || (locations[0]?.id || '');
+      setLocationId(initLoc);
+      const availableZones = zones.filter(z => z.locationId === initLoc);
+      const initZone = presetZoneId || (availableZones[0]?.id || '');
+      setZoneId(initZone);
+
+      const zoneDevices = devices.filter(d => (!initZone || d.zoneId === initZone));
+      const firstDev = zoneDevices[0] || devices[0];
+
+      setCableCode("CBL-LAB-" + String(Date.now()).slice(-4));
       setCableType('cat6_utp');
-      setSourceDeviceId(devices[0]?.id || '');
-      setSourceDeviceName(devices[0]?.name || '');
-      setSourcePort('Port 1');
-      setSourceLocation(devices[0]?.location || '');
+      setSourceDeviceId(firstDev?.id || '');
+      setSourceDeviceName(firstDev?.name || 'Switch Lab');
+      setSourcePort('Port 01');
+      setSourceLocation(firstDev?.location || 'Rack Depan Lab');
       setTargetDeviceId('');
-      setTargetDeviceName('');
-      setTargetPort('');
-      setTargetLocation('');
-      setPathwayRoute('');
+      setTargetDeviceName('Komputer Siswa PC-01');
+      setTargetPort('LAN Port PC');
+      setTargetLocation('Meja Siswa Baris 1 No 01');
+      setPathwayRoute('Tray Plafon Lab -> Conduit Turun ke Lantai');
       setLengthMeter('15');
       setColor('Biru (Blue)');
       setSpeedMbps(1000);
@@ -82,9 +103,12 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
       setNotes('');
     }
     setError(null);
-  }, [isOpen, editCable, devices]);
+  }, [isOpen, editCable, devices, locations, zones, presetLocationId, presetZoneId]);
 
   if (!isOpen) return null;
+
+  const filteredZones = locationId ? zones.filter(z => z.locationId === locationId) : zones;
+  const filteredDevices = zoneId ? devices.filter(d => d.zoneId === zoneId) : devices;
 
   const handleSourceSelect = (devId: string) => {
     setSourceDeviceId(devId);
@@ -107,16 +131,18 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!cableCode.trim()) {
-      setError('Kode / Label kabel wajib diisi!');
+      setError('Kode / Label tarikan kabel wajib diisi!');
       return;
     }
     if (!sourceLocation.trim() || !targetLocation.trim()) {
-      setError('Lokasi asal dan lokasi tujuan kabel wajib diisi!');
+      setError('Lokasi asal dan lokasi tujuan jalur kabel wajib diisi!');
       return;
     }
 
     onSave({
       id: editCable?.id,
+      locationId: locationId || undefined,
+      zoneId: zoneId || undefined,
       cableCode: cableCode.trim().toUpperCase(),
       cableType,
       sourceDeviceId: sourceDeviceId || undefined,
@@ -139,336 +165,368 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8 font-poppins">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto font-poppins animate-in fade-in duration-150">
+      <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8 animate-in zoom-in-95 duration-150">
         
         {/* Header Modal */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-blue-500/10 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-blue-600/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-blue-600 text-white rounded-2xl shadow-md shadow-blue-500/20">
               <Cable className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-bold text-base text-slate-900 dark:text-white">
-                {editCable ? 'Edit Data Jalur Kabel LAN' : 'Tambah Jalur Penarikan Kabel LAN Baru'}
+                {editCable ? 'Edit Jalur Kabel & Arah Tarikan' : 'Catat Jalur Kabel & Arah Tarikan Baru'}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Pencatatan rute kabel, titik asal port, tujuan arah tarikan, dan media fisik
+                Pencatatan rute dari Titik Asal (Switch/Port) menuju Titik Tujuan (PC Siswa/Meja/Server)
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-xl flex items-center gap-2 text-rose-700 dark:text-rose-400 text-xs font-semibold">
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Kode Kabel */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Kode / Label Labeling Kabel *
+          {/* HIRARKI LOKASI & RUANG LAB */}
+          <div className="p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Lokasi / Sekolah
+              </label>
+              <select
+                value={locationId}
+                onChange={e => {
+                  const newLoc = e.target.value;
+                  setLocationId(newLoc);
+                  const matchingZones = zones.filter(z => z.locationId === newLoc);
+                  setZoneId(matchingZones[0]?.id || '');
+                }}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">-- Tanpa Lokasi Tertentu --</option>
+                {locations.map(loc => (
+                  <option key={loc.id} value={loc.id}>
+                    {loc.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Jaringan Ruang / Lab
+              </label>
+              <select
+                value={zoneId}
+                onChange={e => setZoneId(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">-- Tanpa Ruang Tertentu --</option>
+                {filteredZones.map(zone => (
+                  <option key={zone.id} value={zone.id}>
+                    {zone.name} ({zone.code})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-2 space-y-1">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Kode / Label Kabel <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
-                placeholder="CBL-LAN-001"
+                placeholder="misal: CBL-LAB1-MEJA-01"
                 value={cableCode}
                 onChange={e => setCableCode(e.target.value)}
-                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-slate-800 dark:text-slate-100"
+                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 uppercase font-mono focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
-            {/* Tipe Kabel */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Tipe / Standar Kabel
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Jenis Kabel
               </label>
               <select
                 value={cableType}
                 onChange={e => setCableType(e.target.value as LanCableType)}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-slate-100"
+                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
               >
-                <option value="cat6_utp">UTP Cat6 (1 Gbps - 100m)</option>
-                <option value="cat6a_stp">STP/FTP Cat6A (Shielded 10G)</option>
-                <option value="cat5e_utp">UTP Cat5e (1 Gbps)</option>
-                <option value="fiber_sm">Fiber Optic Single Mode (9/125)</option>
-                <option value="fiber_mm">Fiber Optic Multi Mode (OM3/OM4)</option>
-                <option value="dac_sfp">Direct Attach Copper (DAC 10G)</option>
-                <option value="other">Lainnya</option>
-              </select>
-            </div>
-
-            {/* Status Koneksi */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Status Konektivitas
-              </label>
-              <select
-                value={status}
-                onChange={e => setStatus(e.target.value as CableRunStatus)}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-slate-100"
-              >
-                <option value="connected">Terhubung & Aktif (Connected)</option>
-                <option value="idle">Siaga / Kosong (Standby / Idle)</option>
-                <option value="fault">Kabel Putus / Rusak (Fault)</option>
-                <option value="maintenance">Dalam Perbaikan</option>
+                <option value="cat6_utp">UTP Cat6 (Standar Lab)</option>
+                <option value="cat6a_stp">STP Cat6A (Shielded Riser)</option>
+                <option value="cat5e_utp">UTP Cat5e</option>
+                <option value="cat7_stp">STP Cat7</option>
+                <option value="fiber_sm">Fiber Optic Single Mode</option>
+                <option value="fiber_mm">Fiber Optic Multi Mode</option>
+                <option value="dac_sfp">Direct Attach Copper SFP+</option>
+                <option value="other">Kabel Lainnya</option>
               </select>
             </div>
           </div>
 
-          {/* BOX 1: TITIK ASAL (SOURCE) */}
-          <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200/80 dark:border-slate-700 space-y-3">
-            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-              <span className="w-2 h-2 rounded-full bg-blue-600" />
-              <h4 className="text-xs font-bold uppercase tracking-wider">
-                Titik Awal (Dari Mana / Source Node)
-              </h4>
-            </div>
+          {/* ARAH TARIKAN: TITIK ASAL & TITIK TUJUAN */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* BOX KIRI: TITIK ASAL (SOURCE) */}
+            <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/60 space-y-3">
+              <div className="flex items-center gap-2 pb-1 border-b border-blue-200 dark:border-blue-900/60">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                <h4 className="text-xs font-bold text-blue-900 dark:text-blue-200 uppercase tracking-wider">
+                  Titik Asal (Arah Dari)
+                </h4>
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Pilih Perangkat Asal
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                  Pilih Perangkat Asal di Lab
                 </label>
                 <select
                   value={sourceDeviceId}
                   onChange={e => handleSourceSelect(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">-- Input Manual / Bebas --</option>
-                  {devices.map(d => (
+                  <option value="">-- Ketik manual atau pilih perangkat --</option>
+                  {filteredDevices.map(d => (
                     <option key={d.id} value={d.id}>
-                      {d.code ? `[${d.code}] ` : ''}{d.name} ({d.location})
+                      {d.name} ({d.code}) - {d.location}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Nama Perangkat Asal
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                    Nama Perangkat Asal
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="misal: Switch Lab 1"
+                    value={sourceDeviceName}
+                    onChange={e => setSourceDeviceName(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                    Port Asal
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="misal: Port 01"
+                    value={sourcePort}
+                    onChange={e => setSourcePort(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                  Lokasi / Posisi Asal <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="Switch Core 01"
-                  value={sourceDeviceName}
-                  onChange={e => setSourceDeviceName(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Nomor Port Asal
-                </label>
-                <input
-                  type="text"
-                  placeholder="Port 1 / G0/1 / SFP 1"
-                  value={sourcePort}
-                  onChange={e => setSourcePort(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-slate-800 dark:text-slate-100"
+                  placeholder="misal: Rak Wallmount Depan Meja Guru"
+                  value={sourceLocation}
+                  onChange={e => setSourceLocation(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
+                  required
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                Lokasi Fisik Asal *
-              </label>
-              <input
-                type="text"
-                placeholder="Contoh: Ruang Server Lt 2, Rack 01 U24"
-                value={sourceLocation}
-                onChange={e => setSourceLocation(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
-                required
-              />
-            </div>
-          </div>
+            {/* BOX KANAN: TITIK TUJUAN (TARGET) */}
+            <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/60 space-y-3">
+              <div className="flex items-center gap-2 pb-1 border-b border-emerald-200 dark:border-emerald-900/60">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                <h4 className="text-xs font-bold text-emerald-900 dark:text-emerald-200 uppercase tracking-wider">
+                  Titik Tujuan (Arah Ke)
+                </h4>
+              </div>
 
-          {/* BOX 2: TITIK TUJUAN (TARGET) */}
-          <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200/80 dark:border-slate-700 space-y-3">
-            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
-              <ArrowRight className="w-4 h-4 text-indigo-600" />
-              <h4 className="text-xs font-bold uppercase tracking-wider">
-                Titik Tujuan (Arah Ke Mana / Target Node)
-              </h4>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Pilih Perangkat Tujuan
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                  Pilih Perangkat Tujuan (Opsional)
                 </label>
                 <select
                   value={targetDeviceId}
                   onChange={e => handleTargetSelect(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500"
                 >
-                  <option value="">-- Input Manual / Wallplate --</option>
-                  {devices.map(d => (
+                  <option value="">-- Ketik manual atau pilih perangkat --</option>
+                  {filteredDevices.map(d => (
                     <option key={d.id} value={d.id}>
-                      {d.code ? `[${d.code}] ` : ''}{d.name} ({d.location})
+                      {d.name} ({d.code}) - {d.location}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Nama Perangkat / Jack Tujuan
-                </label>
-                <input
-                  type="text"
-                  placeholder="Wallplate Meja 12 / AP-Lobby"
-                  value={targetDeviceName}
-                  onChange={e => setTargetDeviceName(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
-                />
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                    Nama Tujuan / User / PC
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="misal: Komputer Siswa PC-01"
+                    value={targetDeviceName}
+                    onChange={e => setTargetDeviceName(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                    Port / Jack Tujuan
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="misal: LAN Port PC / Jack #01"
+                    value={targetPort}
+                    onChange={e => setTargetPort(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Nomor Port Tujuan
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                  Lokasi / Meja Tujuan <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="Port 24 / Uplink / Jack RJ45"
-                  value={targetPort}
-                  onChange={e => setTargetPort(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-slate-800 dark:text-slate-100"
+                  placeholder="misal: Meja Siswa Baris 1 No 01 Lab 1"
+                  value={targetLocation}
+                  onChange={e => setTargetLocation(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500"
+                  required
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                Lokasi Fisik Tujuan *
-              </label>
-              <input
-                type="text"
-                placeholder="Contoh: Ruang Kerja Lantai 1, Meja Staff Staf HRD"
-                value={targetLocation}
-                onChange={e => setTargetLocation(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
-                required
-              />
-            </div>
           </div>
 
-          {/* Rute & Jalur Fisik Kabel */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Panjang Kabel (Meter)
+          {/* SPESIFIKASI RUTE & KABEL */}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Rute Jalur Kabel (Pathway / Conduit / Tray)
+            </label>
+            <input
+              type="text"
+              placeholder="misal: Tray Plafon Lab 1 -> Pipa Conduit Turun ke Floor Duct Baris A"
+              value={pathwayRoute}
+              onChange={e => setPathwayRoute(e.target.value)}
+              className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Panjang (Meter)
               </label>
               <input
                 type="number"
-                placeholder="Meter"
+                placeholder="15"
                 value={lengthMeter}
                 onChange={e => setLengthMeter(e.target.value)}
-                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-slate-800 dark:text-slate-100"
+                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Kecepatan Tautan (Link Speed)
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Warna Kabel
+              </label>
+              <input
+                type="text"
+                placeholder="Biru (Blue)"
+                value={color}
+                onChange={e => setColor(e.target.value)}
+                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Kapasitas Speed
               </label>
               <select
                 value={speedMbps}
                 onChange={e => setSpeedMbps(Number(e.target.value))}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
+                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
               >
                 <option value={100}>100 Mbps (Fast Ethernet)</option>
                 <option value={1000}>1 Gbps (Gigabit Ethernet)</option>
                 <option value={2500}>2.5 Gbps (Multi-Gig)</option>
-                <option value={10000}>10 Gbps (10G Optical / SFP+)</option>
+                <option value={10000}>10 Gbps (10G SFP+/Fiber)</option>
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Warna Kabel / Jacket
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Status Sambungan
               </label>
-              <input
-                type="text"
-                placeholder="Biru, Abu-abu, Kuning FO"
-                value={color}
-                onChange={e => setColor(e.target.value)}
-                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
-              />
+              <select
+                value={status}
+                onChange={e => setStatus(e.target.value as CableRunStatus)}
+                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="connected">🟢 Terhubung Aktif (Connected)</option>
+                <option value="idle">🟡 Cadangan / Menganggur (Idle)</option>
+                <option value="fault">🔴 Putus / Gangguan (Fault)</option>
+                <option value="maintenance">🟠 Pemeliharaan (Maintenance)</option>
+              </select>
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Rute Penarikan Kabel (Tray / Conduit / Shaft)
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Catatan Jalur Kabel
             </label>
-            <input
-              type="text"
-              placeholder="Contoh: Cable Tray Plafon Lt 2 -> Shaft Riser Kabel -> Conduit PVC Meja"
-              value={pathwayRoute}
-              onChange={e => setPathwayRoute(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
+            <textarea
+              rows={2}
+              placeholder="misal: Kabel nomor 01 Baris A, terminasi ke Patch Panel Port 1"
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Teknisi / PIC Penarikan Kabel
-              </label>
-              <input
-                type="text"
-                placeholder="Contoh: Rian IT Network / Vendor Cabling"
-                value={pic}
-                onChange={e => setPic(e.target.value)}
-                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Catatan Teknis / Keterangan
-              </label>
-              <input
-                type="text"
-                placeholder="Catatan tambahan..."
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
-              />
-            </div>
-          </div>
-
           {/* Action Buttons */}
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2.5">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md shadow-blue-600/20 transition-all flex items-center gap-1.5 cursor-pointer"
             >
-              <Save className="w-4 h-4" />
-              <span>{editCable ? 'Simpan Perubahan' : 'Tambah Jalur Kabel'}</span>
+              <Save className="w-3.5 h-3.5" />
+              <span>Simpan Jalur Kabel</span>
             </button>
           </div>
         </form>

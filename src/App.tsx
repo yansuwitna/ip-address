@@ -49,16 +49,20 @@ import {
   saveWaterDevices,
   saveLanDevices,
   saveLanCables,
+  saveLanLocations,
+  saveLanZones,
   INITIAL_ELECTRICITY_DEVICES,
   INITIAL_CCTV_DEVICES,
   INITIAL_WATER_DEVICES,
   INITIAL_LAN_DEVICES,
-  INITIAL_LAN_CABLES
+  INITIAL_LAN_CABLES,
+  INITIAL_LAN_LOCATIONS,
+  INITIAL_LAN_ZONES
 } from './utils/storage';
 import { exportToXlsx } from './utils/exportImport';
 import { parseCidr } from './utils/ipCalculator';
 import { showConfirm, showSuccess } from './utils/swal';
-import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from './types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun, LanLocation, LanZone } from './types/utilityNetworks';
 
 import { HomeView } from './components/HomeView';
 import { Login } from './components/Login';
@@ -87,6 +91,8 @@ import { WaterModal } from './components/WaterModal';
 import { LanView } from './components/LanView';
 import { LanCableModal } from './components/LanCableModal';
 import { LanDeviceModal } from './components/LanDeviceModal';
+import { LanLocationModal } from './components/LanLocationModal';
+import { LanZoneModal } from './components/LanZoneModal';
 
 export const App: React.FC = () => {
   // Map pathname to internal tab
@@ -215,6 +221,8 @@ export const App: React.FC = () => {
   const [electricityDevices, setElectricityDevices] = useState<ElectricityDevice[]>([]);
   const [cctvDevices, setCctvDevices] = useState<CctvDevice[]>([]);
   const [waterDevices, setWaterDevices] = useState<WaterDevice[]>([]);
+  const [lanLocations, setLanLocations] = useState<LanLocation[]>([]);
+  const [lanZones, setLanZones] = useState<LanZone[]>([]);
   const [lanDevices, setLanDevices] = useState<LanDevice[]>([]);
   const [lanCables, setLanCables] = useState<LanCableRun[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
@@ -240,7 +248,21 @@ export const App: React.FC = () => {
         if (data['netipam_dns_records_v1']) setDnsRecords(data['netipam_dns_records_v1']);
         if (data['netipam_sub_domains_v1']) setSubDomains(data['netipam_sub_domains_v1']);
 
-        // Sektor LAN (Fisik & Jalur Kabel)
+        // Sektor LAN (Lokasi/Sekolah, Ruangan/Lab, Fisik & Jalur Kabel)
+        if (data['netipam_lan_locations_v1'] && data['netipam_lan_locations_v1'].length > 0) {
+          setLanLocations(data['netipam_lan_locations_v1']);
+        } else {
+          setLanLocations(INITIAL_LAN_LOCATIONS);
+          saveLanLocations(INITIAL_LAN_LOCATIONS);
+        }
+
+        if (data['netipam_lan_zones_v1'] && data['netipam_lan_zones_v1'].length > 0) {
+          setLanZones(data['netipam_lan_zones_v1']);
+        } else {
+          setLanZones(INITIAL_LAN_ZONES);
+          saveLanZones(INITIAL_LAN_ZONES);
+        }
+
         if (data['netipam_lan_devices_v1'] && data['netipam_lan_devices_v1'].length > 0) {
           setLanDevices(data['netipam_lan_devices_v1']);
         } else {
@@ -417,12 +439,23 @@ export const App: React.FC = () => {
   const [isWaterModalOpen, setIsWaterModalOpen] = useState(false);
   const [editingWaterDevice, setEditingWaterDevice] = useState<WaterDevice | null>(null);
 
-  // LAN Modals
+  // LAN Modals (Lokasi Sekolah, Ruangan Lab, Perangkat, Jalur Kabel)
+  const [isLanLocationModalOpen, setIsLanLocationModalOpen] = useState(false);
+  const [editingLanLocation, setEditingLanLocation] = useState<LanLocation | null>(null);
+
+  const [isLanZoneModalOpen, setIsLanZoneModalOpen] = useState(false);
+  const [editingLanZone, setEditingLanZone] = useState<LanZone | null>(null);
+  const [lanZoneDefaultLocationId, setLanZoneDefaultLocationId] = useState<string | undefined>(undefined);
+
   const [isLanDeviceModalOpen, setIsLanDeviceModalOpen] = useState(false);
   const [editingLanDevice, setEditingLanDevice] = useState<LanDevice | null>(null);
+  const [lanDeviceDefaultLocationId, setLanDeviceDefaultLocationId] = useState<string | undefined>(undefined);
+  const [lanDeviceDefaultZoneId, setLanDeviceDefaultZoneId] = useState<string | undefined>(undefined);
 
   const [isLanCableModalOpen, setIsLanCableModalOpen] = useState(false);
   const [editingLanCable, setEditingLanCable] = useState<LanCableRun | null>(null);
+  const [lanCableDefaultLocationId, setLanCableDefaultLocationId] = useState<string | undefined>(undefined);
+  const [lanCableDefaultZoneId, setLanCableDefaultZoneId] = useState<string | undefined>(undefined);
 
   // Print Modal state
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
@@ -483,6 +516,18 @@ export const App: React.FC = () => {
       saveWaterDevices(waterDevices);
     }
   }, [waterDevices, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveLanLocations(lanLocations);
+    }
+  }, [lanLocations, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveLanZones(lanZones);
+    }
+  }, [lanZones, isSyncing]);
 
   useEffect(() => {
     if (!isSyncing) {
@@ -595,11 +640,15 @@ export const App: React.FC = () => {
     setElectricityDevices([]);
     setCctvDevices([]);
     setWaterDevices([]);
+    setLanLocations([]);
+    setLanZones([]);
     setLanDevices([]);
     setLanCables([]);
     saveElectricityDevices([]);
     saveCctvDevices([]);
     saveWaterDevices([]);
+    saveLanLocations([]);
+    saveLanZones([]);
     saveLanDevices([]);
     saveLanCables([]);
     saveSubDomains([]);
@@ -621,9 +670,19 @@ export const App: React.FC = () => {
     electricityDevices?: ElectricityDevice[];
     cctvDevices?: CctvDevice[];
     waterDevices?: WaterDevice[];
+    lanLocations?: LanLocation[];
+    lanZones?: LanZone[];
     lanDevices?: LanDevice[];
     lanCables?: LanCableRun[];
   }) => {
+    if (data.lanLocations) {
+      setLanLocations(data.lanLocations);
+      saveLanLocations(data.lanLocations);
+    }
+    if (data.lanZones) {
+      setLanZones(data.lanZones);
+      saveLanZones(data.lanZones);
+    }
     if (data.groups) {
       setGroups(data.groups);
       saveGroups(data.groups);
@@ -1006,6 +1065,63 @@ export const App: React.FC = () => {
     setWaterDevices(prev => prev.filter(d => d.id !== id));
   };
 
+  // LAN: Lokasi & Sekolah Handlers
+  const handleSaveLanLocation = (locData: Partial<LanLocation>) => {
+    const now = new Date().toISOString();
+    if (locData.id) {
+      setLanLocations(prev => prev.map(l => l.id === locData.id ? { ...l, ...locData, updatedAt: now } as LanLocation : l));
+    } else {
+      const newLoc: LanLocation = {
+        id: `loc-${Date.now()}`,
+        name: locData.name || 'Lokasi Baru',
+        code: locData.code || '',
+        address: locData.address,
+        pic: locData.pic,
+        phone: locData.phone,
+        notes: locData.notes,
+        createdAt: now,
+        updatedAt: now
+      };
+      setLanLocations(prev => [...prev, newLoc]);
+    }
+  };
+
+  const handleDeleteLanLocation = (id: string) => {
+    setLanLocations(prev => prev.filter(l => l.id !== id));
+    // cascade delete zones, devices, cables associated with this location
+    setLanZones(prev => prev.filter(z => z.locationId !== id));
+    setLanDevices(prev => prev.filter(d => d.locationId !== id));
+    setLanCables(prev => prev.filter(c => c.locationId !== id));
+  };
+
+  // LAN: Jaringan Ruang / Lab Handlers
+  const handleSaveLanZone = (zoneData: Partial<LanZone>) => {
+    const now = new Date().toISOString();
+    if (zoneData.id) {
+      setLanZones(prev => prev.map(z => z.id === zoneData.id ? { ...z, ...zoneData, updatedAt: now } as LanZone : z));
+    } else {
+      const newZone: LanZone = {
+        id: `zone-${Date.now()}`,
+        locationId: zoneData.locationId || '',
+        name: zoneData.name || 'Jaringan Lab Baru',
+        code: zoneData.code || '',
+        floor: zoneData.floor,
+        roomType: zoneData.roomType,
+        pic: zoneData.pic,
+        notes: zoneData.notes,
+        createdAt: now,
+        updatedAt: now
+      };
+      setLanZones(prev => [...prev, newZone]);
+    }
+  };
+
+  const handleDeleteLanZone = (id: string) => {
+    setLanZones(prev => prev.filter(z => z.id !== id));
+    setLanDevices(prev => prev.filter(d => d.zoneId !== id));
+    setLanCables(prev => prev.filter(c => c.zoneId !== id));
+  };
+
   const handleSaveLanDevice = (devData: Partial<LanDevice>) => {
     const now = new Date().toISOString();
     if (devData.id) {
@@ -1020,6 +1136,8 @@ export const App: React.FC = () => {
         model: devData.model,
         ipAddress: devData.ipAddress,
         macAddress: devData.macAddress,
+        locationId: devData.locationId,
+        zoneId: devData.zoneId,
         location: devData.location || '',
         rackNumber: devData.rackNumber,
         totalPorts: devData.totalPorts || 24,
@@ -1044,6 +1162,8 @@ export const App: React.FC = () => {
     } else {
       const newCable: LanCableRun = {
         id: `cable-${Date.now()}`,
+        locationId: cableData.locationId,
+        zoneId: cableData.zoneId,
         cableCode: cableData.cableCode || `CBL-${Date.now().toString().slice(-4)}`,
         cableType: cableData.cableType || 'cat6_utp',
         sourceDeviceId: cableData.sourceDeviceId,
@@ -1177,26 +1297,58 @@ export const App: React.FC = () => {
           {/* TAB: JARINGAN LAN (JALUR KABEL & PERANGKAT FISIK) */}
           {currentTab === 'lan' && (
             <LanView
+              locations={lanLocations}
+              zones={lanZones}
               devices={lanDevices}
               cables={lanCables}
+              onSaveLocation={handleSaveLanLocation}
+              onDeleteLocation={handleDeleteLanLocation}
+              onSaveZone={handleSaveLanZone}
+              onDeleteZone={handleDeleteLanZone}
               onSaveDevice={handleSaveLanDevice}
               onDeleteDevice={handleDeleteLanDevice}
               onSaveCable={handleSaveLanCable}
               onDeleteCable={handleDeleteLanCable}
-              onOpenAddDeviceModal={() => {
+              onOpenAddLocationModal={() => {
+                setEditingLanLocation(null);
+                setIsLanLocationModalOpen(true);
+              }}
+              onOpenEditLocationModal={(loc) => {
+                setEditingLanLocation(loc);
+                setIsLanLocationModalOpen(true);
+              }}
+              onOpenAddZoneModal={(locId) => {
+                setEditingLanZone(null);
+                setLanZoneDefaultLocationId(locId);
+                setIsLanZoneModalOpen(true);
+              }}
+              onOpenEditZoneModal={(zone) => {
+                setEditingLanZone(zone);
+                setLanZoneDefaultLocationId(zone.locationId);
+                setIsLanZoneModalOpen(true);
+              }}
+              onOpenAddDeviceModal={(locId, zId) => {
                 setEditingLanDevice(null);
+                setLanDeviceDefaultLocationId(locId);
+                setLanDeviceDefaultZoneId(zId);
                 setIsLanDeviceModalOpen(true);
               }}
               onOpenEditDeviceModal={(dev) => {
                 setEditingLanDevice(dev);
+                setLanDeviceDefaultLocationId(dev.locationId);
+                setLanDeviceDefaultZoneId(dev.zoneId);
                 setIsLanDeviceModalOpen(true);
               }}
-              onOpenAddCableModal={() => {
+              onOpenAddCableModal={(locId, zId) => {
                 setEditingLanCable(null);
+                setLanCableDefaultLocationId(locId);
+                setLanCableDefaultZoneId(zId);
                 setIsLanCableModalOpen(true);
               }}
               onOpenEditCableModal={(cable) => {
                 setEditingLanCable(cable);
+                setLanCableDefaultLocationId(cable.locationId);
+                setLanCableDefaultZoneId(cable.zoneId);
                 setIsLanCableModalOpen(true);
               }}
             />
@@ -1916,6 +2068,8 @@ export const App: React.FC = () => {
               services={services}
               dnsRecords={dnsRecords}
               subDomains={subDomains}
+              lanLocations={lanLocations}
+              lanZones={lanZones}
               lanDevices={lanDevices}
               lanCables={lanCables}
               electricityDevices={electricityDevices}
@@ -2059,15 +2213,48 @@ export const App: React.FC = () => {
         />
       )}
 
+      {isLanLocationModalOpen && (
+        <LanLocationModal
+          isOpen={isLanLocationModalOpen}
+          onClose={() => {
+            setIsLanLocationModalOpen(false);
+            setEditingLanLocation(null);
+          }}
+          onSave={handleSaveLanLocation}
+          editLocation={editingLanLocation}
+        />
+      )}
+
+      {isLanZoneModalOpen && (
+        <LanZoneModal
+          isOpen={isLanZoneModalOpen}
+          onClose={() => {
+            setIsLanZoneModalOpen(false);
+            setEditingLanZone(null);
+            setLanZoneDefaultLocationId(undefined);
+          }}
+          onSave={handleSaveLanZone}
+          editZone={editingLanZone}
+          locations={lanLocations}
+          presetLocationId={lanZoneDefaultLocationId}
+        />
+      )}
+
       {isLanDeviceModalOpen && (
         <LanDeviceModal
           isOpen={isLanDeviceModalOpen}
           onClose={() => {
             setIsLanDeviceModalOpen(false);
             setEditingLanDevice(null);
+            setLanDeviceDefaultLocationId(undefined);
+            setLanDeviceDefaultZoneId(undefined);
           }}
           onSave={handleSaveLanDevice}
           editDevice={editingLanDevice}
+          locations={lanLocations}
+          zones={lanZones}
+          presetLocationId={lanDeviceDefaultLocationId}
+          presetZoneId={lanDeviceDefaultZoneId}
         />
       )}
 
@@ -2077,10 +2264,16 @@ export const App: React.FC = () => {
           onClose={() => {
             setIsLanCableModalOpen(false);
             setEditingLanCable(null);
+            setLanCableDefaultLocationId(undefined);
+            setLanCableDefaultZoneId(undefined);
           }}
           onSave={handleSaveLanCable}
           editCable={editingLanCable}
           devices={lanDevices}
+          locations={lanLocations}
+          zones={lanZones}
+          presetLocationId={lanCableDefaultLocationId}
+          presetZoneId={lanCableDefaultZoneId}
         />
       )}
 

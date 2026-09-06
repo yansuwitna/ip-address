@@ -20,7 +20,7 @@ import {
   Users
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from '../types/ipam';
-import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun, LanLocation, LanZone } from '../types/utilityNetworks';
 import { UserAccount } from '../types/auth';
 import { exportBackupJson, parseImportJson, exportToXlsx } from '../utils/exportImport';
 import { showConfirm, showSuccess, showError, showWarning } from '../utils/swal';
@@ -36,6 +36,8 @@ interface BackupViewProps {
   electricityDevices?: ElectricityDevice[];
   cctvDevices?: CctvDevice[];
   waterDevices?: WaterDevice[];
+  lanLocations?: LanLocation[];
+  lanZones?: LanZone[];
   lanDevices?: LanDevice[];
   lanCables?: LanCableRun[];
   onImportData: (data: {
@@ -49,6 +51,8 @@ interface BackupViewProps {
     electricityDevices?: ElectricityDevice[];
     cctvDevices?: CctvDevice[];
     waterDevices?: WaterDevice[];
+    lanLocations?: LanLocation[];
+    lanZones?: LanZone[];
     lanDevices?: LanDevice[];
     lanCables?: LanCableRun[];
   }) => void;
@@ -66,6 +70,8 @@ export const BackupView: React.FC<BackupViewProps> = ({
   electricityDevices = [],
   cctvDevices = [],
   waterDevices = [],
+  lanLocations = [],
+  lanZones = [],
   lanDevices = [],
   lanCables = [],
   onImportData,
@@ -103,7 +109,9 @@ export const BackupView: React.FC<BackupViewProps> = ({
       cctvDevices,
       waterDevices,
       lanDevices,
-      lanCables
+      lanCables,
+      lanLocations,
+      lanZones
     );
     setHasBackedUp(true);
     showSuccess('Cadangan Berhasil Diunduh', 'Berkas cadangan format JSON berhasil disimpan.');
@@ -158,6 +166,8 @@ export const BackupView: React.FC<BackupViewProps> = ({
     
     const dataToRestore: any = {};
     if (restoreLan) {
+      dataToRestore.lanLocations = pendingRestoreData.lanLocations;
+      dataToRestore.lanZones = pendingRestoreData.lanZones;
       dataToRestore.lanDevices = pendingRestoreData.lanDevices;
       dataToRestore.lanCables = pendingRestoreData.lanCables;
     }

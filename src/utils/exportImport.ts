@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from '../types/ipam';
-import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun, LanLocation, LanZone } from '../types/utilityNetworks';
 import { UserAccount } from '../types/auth';
 
 export function exportToXlsx(
