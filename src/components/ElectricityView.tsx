@@ -602,6 +602,13 @@ export const ElectricityView: React.FC<ElectricityViewProps> = ({
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+              <button
+                onClick={() => setSelectedZoneId(null)}
+                className="w-full sm:w-auto px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-md shadow-red-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Kembali</span>
+              </button>
               {onOpenPrintDetail && activeLocation && activeZone && (
                 <button
                   onClick={() => onOpenPrintDetail(activeLocation, activeZone)}
@@ -611,13 +618,6 @@ export const ElectricityView: React.FC<ElectricityViewProps> = ({
                   <span>Cetak Detail</span>
                 </button>
               )}
-              <button
-                onClick={() => setSelectedZoneId(null)}
-                className="w-full sm:w-auto px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-md shadow-red-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Kembali</span>
-              </button>
             </div>
           </div>
 
