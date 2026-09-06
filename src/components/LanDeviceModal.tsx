@@ -359,18 +359,19 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
             </div>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Catatan / Fungsi Khusus di Lab
-            </label>
-            <textarea
-              rows={2}
-              placeholder="misal: Melayani jalur kabel PC Siswa Baris 1-3 dan Server CBT"
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 resize-none"
-            />
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Catatan / Fungsi Khusus di Lab
+              </label>
+              <textarea
+                rows={2}
+                placeholder="misal: Melayani jalur kabel PC Siswa Baris 1-3 dan Server CBT"
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 resize-none"
+              />
             </div>
+          </div>
 
             {/* Action Buttons */}
             <div className="p-4 sm:px-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 flex-shrink-0">
