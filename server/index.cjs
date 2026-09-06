@@ -167,7 +167,10 @@ async function startServer() {
         categories,
         services,
         dnsRecords,
-        subDomains
+        subDomains,
+        electricityDevices,
+        cctvDevices,
+        waterDevices
       ] = await Promise.all([
         prisma.user.findMany(),
         prisma.iPGroup.findMany(),
@@ -175,7 +178,10 @@ async function startServer() {
         prisma.deviceCategory.findMany(),
         prisma.iPService.findMany(),
         prisma.dnsRecord.findMany(),
-        prisma.subDomainRecord.findMany()
+        prisma.subDomainRecord.findMany(),
+        prisma.electricityDevice.findMany(),
+        prisma.cctvDevice.findMany(),
+        prisma.waterDevice.findMany()
       ]);
       
       res.json({
@@ -185,7 +191,10 @@ async function startServer() {
         'netipam_device_categories_v1': categories,
         'netipam_services_v1': services,
         'netipam_dns_records_v1': dnsRecords,
-        'netipam_sub_domains_v1': subDomains
+        'netipam_sub_domains_v1': subDomains,
+        'netipam_electricity_devices_v1': electricityDevices,
+        'netipam_cctv_devices_v1': cctvDevices,
+        'netipam_water_devices_v1': waterDevices
       });
     } catch (error) {
       console.error(error);
@@ -234,6 +243,15 @@ async function startServer() {
         case 'netipam_sub_domains_v1':
           await replaceTable(prisma.subDomainRecord, data);
           break;
+        case 'netipam_electricity_devices_v1':
+          await replaceTable(prisma.electricityDevice, data);
+          break;
+        case 'netipam_cctv_devices_v1':
+          await replaceTable(prisma.cctvDevice, data);
+          break;
+        case 'netipam_water_devices_v1':
+          await replaceTable(prisma.waterDevice, data);
+          break;
         default:
           return res.status(400).json({ error: 'Unknown key' });
       }
@@ -254,7 +272,10 @@ async function startServer() {
         prisma.deviceCategory.deleteMany({}),
         prisma.iPService.deleteMany({}),
         prisma.dnsRecord.deleteMany({}),
-        prisma.subDomainRecord.deleteMany({})
+        prisma.subDomainRecord.deleteMany({}),
+        prisma.electricityDevice.deleteMany({}),
+        prisma.cctvDevice.deleteMany({}),
+        prisma.waterDevice.deleteMany({})
       ]);
       res.json({ success: true });
     } catch (error) {

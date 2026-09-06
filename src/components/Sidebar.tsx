@@ -11,14 +11,26 @@ import {
   ShieldCheck, 
   X, 
   ChevronRight,
-  ServerCog,
   Sun,
-  Moon
+  Moon,
+  Zap,
+  Video,
+  Droplets
 } from 'lucide-react';
 import { User } from '../types/auth';
 import { showConfirm } from '../utils/swal';
 
-export type NavTab = 'dashboard' | 'groups' | 'dns' | 'services' | 'categories' | 'users' | 'backup';
+export type NavTab = 
+  | 'dashboard' 
+  | 'groups' 
+  | 'electricity' 
+  | 'cctv' 
+  | 'water' 
+  | 'dns' 
+  | 'services' 
+  | 'categories' 
+  | 'users' 
+  | 'backup';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -29,6 +41,9 @@ interface SidebarProps {
   onLogout: () => void;
   totalGroups: number;
   totalUsedIps: number;
+  totalElectricityDevices?: number;
+  totalCctvDevices?: number;
+  totalWaterDevices?: number;
   totalDnsRecords?: number;
   totalCategories?: number;
   totalUsers?: number;
@@ -46,6 +61,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLogout,
   totalGroups,
   totalUsedIps,
+  totalElectricityDevices = 0,
+  totalCctvDevices = 0,
+  totalWaterDevices = 0,
   totalDnsRecords,
   totalCategories,
   totalUsers,
@@ -60,22 +78,50 @@ export const Sidebar: React.FC<SidebarProps> = ({
     description: string;
     badge?: string;
     badgeColor?: string;
+    activeColor?: string;
   }
 
-  const navItems: NavItem[] = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-      description: 'Ringkasan Utama'
-    },
+  // 4 Menu Utama Jaringan Infrastruktur
+  const mainNetworkItems: NavItem[] = [
     {
       id: 'groups',
-      label: 'Grup IP (Subnet)',
-      icon: Layers,
-      description: 'Kelola Subnet & VLAN',
-      badge: totalGroups.toString()
+      label: 'Jaringan LAN',
+      icon: Network,
+      description: 'Komputer, Host & Subnet IP',
+      badge: totalGroups.toString(),
+      activeColor: 'bg-blue-600'
     },
+    {
+      id: 'electricity',
+      label: 'Jaringan Listrik',
+      icon: Zap,
+      description: 'Panel, Genset, Trafo & UPS',
+      badge: totalElectricityDevices.toString(),
+      badgeColor: 'bg-amber-50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+      activeColor: 'bg-amber-500'
+    },
+    {
+      id: 'cctv',
+      label: 'Jaringan CCTV',
+      icon: Video,
+      description: 'Kamera IP, NVR & PoE',
+      badge: totalCctvDevices.toString(),
+      badgeColor: 'bg-rose-50 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-900',
+      activeColor: 'bg-rose-600'
+    },
+    {
+      id: 'water',
+      label: 'Jaringan AIR',
+      icon: Droplets,
+      description: 'Irigasi, Pompa & Toren',
+      badge: totalWaterDevices.toString(),
+      badgeColor: 'bg-cyan-50 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800',
+      activeColor: 'bg-cyan-600'
+    }
+  ];
+
+  // Menu Pendukung Sistem
+  const systemItems: NavItem[] = [
     {
       id: 'dns',
       label: 'Manajemen DNS',
@@ -86,7 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'categories',
-      label: 'Kategori Perangkat',
+      label: 'Kategori Hardware',
       icon: Cpu,
       description: 'Kelola Tipe Hardware',
       badge: totalCategories !== undefined ? totalCategories.toString() : undefined
@@ -113,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const handleLogoutClick = async () => {
     const confirmed = await showConfirm({
       title: 'Konfirmasi Logout',
-      text: 'Apakah Anda yakin ingin keluar dari sistem manajemen IP & DNS?',
+      text: 'Apakah Anda yakin ingin keluar dari sistem manajemen jaringan?',
       confirmButtonText: 'Ya, Keluar',
       cancelButtonText: 'Batal',
       isDanger: false
@@ -142,15 +188,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Brand Header */}
         <div className="h-16 px-5 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between flex-shrink-0 bg-white dark:bg-slate-900">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
+            <div className="p-2.5 bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
               <Network className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-slate-100">IP & DNS</span>
+                <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-slate-100">INFRA NET</span>
               </div>
               <p className="text-[10px] text-slate-400 font-medium">
-                Manajemen Jaringan & DNS
+                LAN • Listrik • CCTV • AIR
               </p>
             </div>
           </div>
@@ -165,60 +211,122 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation Menu */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-            <span>Navigasi Menu</span>
-            {onToggleTheme && (
-              <button
-                type="button"
-                onClick={onToggleTheme}
-                title={`Ganti ke mode ${theme === 'dark' ? 'Terang (Light)' : 'Gelap (Dark)'}`}
-                className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors cursor-pointer"
-              >
-                {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />}
-              </button>
-            )}
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+          
+          {/* Dashboard Tab */}
+          <div>
+            <button
+              onClick={() => handleNavClick('dashboard')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                currentTab === 'dashboard'
+                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20 font-bold'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <LayoutDashboard className={`w-4 h-4 transition-colors ${
+                  currentTab === 'dashboard' ? 'text-white' : 'text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                }`} />
+                <span>Dashboard Ringkasan</span>
+              </div>
+            </button>
           </div>
 
-          {navItems.map(item => {
-            const Icon = item.icon;
-            const isActive = currentTab === item.id || (currentTab === 'services' && item.id === 'groups');
+          {/* SEKTOR JARINGAN UTAMA (LAN, LISTRIK, CCTV, AIR) */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>Sektor Jaringan</span>
+              <span className="text-[9px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500">4 Sektor</span>
+            </div>
 
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
-                  isActive
-                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20 font-bold'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 transition-colors ${
-                    isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400'
-                  }`} />
-                  <div className="text-left">
-                    <div>{item.label}</div>
+            {mainNetworkItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id || (currentTab === 'services' && item.id === 'groups');
+              const activeBg = item.activeColor || 'bg-blue-600';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? `${activeBg} text-white shadow-sm font-bold`
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                {item.badge ? (
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                    isActive 
-                      ? 'bg-blue-700/80 text-white border-blue-500' 
-                      : item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-                  }`}>
-                    {item.badge}
-                  </span>
-                ) : (
-                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
-                    isActive ? 'opacity-100' : ''
-                  }`} />
-                )}
-              </button>
-            );
-          })}
+                  {item.badge && (
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                      isActive 
+                        ? 'bg-white/20 text-white border-white/30' 
+                        : item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* MENU SISTEM & PENDUKUNG */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>Sistem & Utilitas</span>
+            </div>
+
+            {systemItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20 font-bold'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                    </div>
+                  </div>
+
+                  {item.badge ? (
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                      isActive 
+                        ? 'bg-blue-700/80 text-white border-blue-500' 
+                        : item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  ) : (
+                    <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                      isActive ? 'opacity-100' : ''
+                    }`} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
         </div>
 
         {/* User Profile & Logout */}

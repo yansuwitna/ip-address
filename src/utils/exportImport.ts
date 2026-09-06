@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from '../types/ipam';
+import { ElectricityDevice, CctvDevice, WaterDevice } from '../types/utilityNetworks';
 import { UserAccount } from '../types/auth';
 
 export function exportToXlsx(
@@ -55,7 +56,7 @@ export function exportToXlsx(
 
   // Informative header rows in sheet
   const summaryRows = [
-    ['LAPORAN ALOKASI IP HOST & INFRASTRUKTUR - IP & DNS'],
+    ['LAPORAN ALOKASI IP HOST & INFRASTRUKTUR LAN'],
     ['Nama Subnet / Grup', group.name],
     ['Subnet CIDR', group.cidr],
     ['Default Gateway', group.gateway],
@@ -89,7 +90,7 @@ export function exportToXlsx(
   const safeSheetName = (group.name.replace(/[:\\/?*\[\]]/g, '').slice(0, 31)) || 'Alokasi IP';
   XLSX.utils.book_append_sheet(workbook, worksheet, safeSheetName);
 
-  const fileName = `IP_DNS_${group.name.replace(/[^a-zA-Z0-9_-]/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const fileName = `LAN_IP_${group.name.replace(/[^a-zA-Z0-9_-]/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(workbook, fileName);
 }
 
@@ -104,11 +105,14 @@ export function exportBackupJson(
   users?: UserAccount[],
   services?: IPService[],
   dnsRecords?: DnsRecord[],
-  subDomains?: SubDomainRecord[]
+  subDomains?: SubDomainRecord[],
+  electricityDevices?: ElectricityDevice[],
+  cctvDevices?: CctvDevice[],
+  waterDevices?: WaterDevice[]
 ): void {
   const backupData = {
-    appName: 'IP & DNS',
-    version: '2.2.0',
+    appName: 'Infrastruktur Jaringan Terpadu (LAN, Listrik, CCTV, AIR)',
+    version: '3.0.0',
     exportDate: new Date().toISOString(),
     totalData: {
       groups: groups.length,
@@ -117,7 +121,10 @@ export function exportBackupJson(
       users: users?.length || 0,
       services: services?.length || 0,
       dnsRecords: dnsRecords?.length || 0,
-      subDomains: subDomains?.length || 0
+      subDomains: subDomains?.length || 0,
+      electricityDevices: electricityDevices?.length || 0,
+      cctvDevices: cctvDevices?.length || 0,
+      waterDevices: waterDevices?.length || 0
     },
     groups,
     allocations,
@@ -125,7 +132,10 @@ export function exportBackupJson(
     users: users || [],
     services: services || [],
     dnsRecords: dnsRecords || [],
-    subDomains: subDomains || []
+    subDomains: subDomains || [],
+    electricityDevices: electricityDevices || [],
+    cctvDevices: cctvDevices || [],
+    waterDevices: waterDevices || []
   };
 
   const jsonStr = JSON.stringify(backupData, null, 2);
@@ -133,7 +143,7 @@ export function exportBackupJson(
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `IP_DNS_Cadangan_Lengkap_${new Date().toISOString().slice(0, 10)}.json`);
+  link.setAttribute('download', `Infrastruktur_Cadangan_Lengkap_${new Date().toISOString().slice(0, 10)}.json`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -148,6 +158,9 @@ export function parseImportJson(fileContent: string): {
   services?: IPService[];
   dnsRecords?: DnsRecord[];
   subDomains?: SubDomainRecord[];
+  electricityDevices?: ElectricityDevice[];
+  cctvDevices?: CctvDevice[];
+  waterDevices?: WaterDevice[];
 } {
   const parsed = JSON.parse(fileContent);
   if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.allocations)) {
@@ -160,6 +173,9 @@ export function parseImportJson(fileContent: string): {
     users: Array.isArray(parsed.users) ? parsed.users : undefined,
     services: Array.isArray(parsed.services) ? parsed.services : undefined,
     dnsRecords: Array.isArray(parsed.dnsRecords) ? parsed.dnsRecords : undefined,
-    subDomains: Array.isArray(parsed.subDomains) ? parsed.subDomains : undefined
+    subDomains: Array.isArray(parsed.subDomains) ? parsed.subDomains : undefined,
+    electricityDevices: Array.isArray(parsed.electricityDevices) ? parsed.electricityDevices : undefined,
+    cctvDevices: Array.isArray(parsed.cctvDevices) ? parsed.cctvDevices : undefined,
+    waterDevices: Array.isArray(parsed.waterDevices) ? parsed.waterDevices : undefined
   };
 }

@@ -868,3 +868,272 @@ export function saveSubDomains(records: SubDomainRecord[]): void {
   syncToServer(STORAGE_KEY_SUBDOMAINS, records);
 }
 
+
+import { ElectricityDevice, CctvDevice, WaterDevice } from '../types/utilityNetworks';
+
+export const STORAGE_KEY_ELECTRICITY = 'netipam_electricity_devices_v1';
+export const STORAGE_KEY_CCTV = 'netipam_cctv_devices_v1';
+export const STORAGE_KEY_WATER = 'netipam_water_devices_v1';
+
+export function saveElectricityDevices(devices: ElectricityDevice[]): void {
+  syncToServer(STORAGE_KEY_ELECTRICITY, devices);
+}
+
+export function saveCctvDevices(devices: CctvDevice[]): void {
+  syncToServer(STORAGE_KEY_CCTV, devices);
+}
+
+export function saveWaterDevices(devices: WaterDevice[]): void {
+  syncToServer(STORAGE_KEY_WATER, devices);
+}
+
+export const INITIAL_ELECTRICITY_DEVICES: ElectricityDevice[] = [
+  {
+    id: 'elec-1',
+    name: 'Panel Distribusi Utama (MDP)',
+    code: 'MDP-PLN-01',
+    type: 'panel_mdp',
+    brand: 'Schneider Electric',
+    model: 'PrismaSeT G 630A',
+    location: 'Ruang Trafo & MDP Lt. Basement',
+    phase: '3_phase',
+    voltage: 380,
+    currentAmpere: 400,
+    capacityWatt: 197000,
+    currentLoadWatt: 85400,
+    status: 'normal',
+    installationDate: '2025-08-10',
+    lastMaintenance: '2026-02-15',
+    pic: 'Pak Hendro (ME Spv)',
+    notes: 'Suplai utama dari Trafo PLN 200 kVA dengan ATS otomatis ke Genset.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'elec-2',
+    name: 'UPS Server & Data Center',
+    code: 'UPS-DC-01',
+    type: 'ups',
+    brand: 'APC by Schneider',
+    model: 'Smart-UPS On-Line SRT 10kVA',
+    location: 'Ruang Server DC Lt. 2',
+    phase: '1_phase',
+    voltage: 220,
+    currentAmpere: 45,
+    capacityWatt: 10000,
+    currentLoadWatt: 4200,
+    status: 'normal',
+    sourcePanelId: 'elec-1',
+    installationDate: '2025-10-05',
+    lastMaintenance: '2026-01-20',
+    pic: 'Arya SysAdmin',
+    notes: 'Membackup 3 Rack Server utama dan Core Switch dengan backup time 45 menit.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'elec-3',
+    name: 'Genset Cadangan 150 kVA',
+    code: 'GEN-CUMMINS-01',
+    type: 'genset',
+    brand: 'Cummins',
+    model: '6BTA5.9-G2',
+    location: 'Area Power House Luar Gedung',
+    phase: '3_phase',
+    voltage: 380,
+    currentAmpere: 228,
+    capacityWatt: 120000,
+    currentLoadWatt: 0,
+    status: 'normal',
+    installationDate: '2025-06-12',
+    lastMaintenance: '2026-02-28',
+    pic: 'Pak Hendro (ME Spv)',
+    notes: 'Kapasitas tangki solar 800 Liter. Auto warm-up setiap hari Sabtu jam 09:00.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'elec-4',
+    name: 'Sub Distribution Panel (SDP) Kantor Lt. 1',
+    code: 'SDP-LT1-01',
+    type: 'panel_sdp',
+    brand: 'ABB',
+    model: 'System Pro E Comfort 100A',
+    location: 'Ruang Panel Koridor Lt. 1',
+    phase: '3_phase',
+    voltage: 380,
+    currentAmpere: 100,
+    capacityWatt: 45000,
+    currentLoadWatt: 18600,
+    status: 'normal',
+    sourcePanelId: 'elec-1',
+    installationDate: '2025-08-15',
+    lastMaintenance: '2026-02-10',
+    pic: 'Joko Teknisi',
+    notes: 'Menyuplai stop kontak workstation, pencahayaan, dan AC Cassette Lt 1.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  }
+];
+
+export const INITIAL_CCTV_DEVICES: CctvDevice[] = [
+  {
+    id: 'cctv-1',
+    name: 'NVR Central 32 Channel Data Center',
+    type: 'nvr',
+    ipAddress: '172.16.50.10',
+    macAddress: '48:EA:63:12:34:56',
+    location: 'Ruang Server Rack 3',
+    brand: 'Hikvision',
+    model: 'DS-7732NI-I4',
+    resolution: '4K H.265+',
+    channelNumber: 32,
+    storageDays: 60,
+    status: 'recording',
+    installationDate: '2025-09-01',
+    pic: 'Bambang Security',
+    notes: 'Dilengkapi 4x 8TB Seagate SkyHawk AI HDD (Total 32TB).',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'cctv-2',
+    name: 'CAM-01 Lobby Utama & Resepsionis',
+    type: 'camera_ip_dome',
+    ipAddress: '172.16.50.21',
+    macAddress: '48:EA:63:78:90:AB',
+    location: 'Lobby Gedung Utama Lantai 1',
+    brand: 'Hikvision',
+    model: 'DS-2CD2143G2-I (Dome 4MP)',
+    resolution: '4MP (2560x1440)',
+    channelNumber: 1,
+    nvrId: 'cctv-1',
+    poePort: 'Port 1 - SW-POE-LOBBY',
+    rtspUrl: 'rtsp://admin:pass@172.16.50.21:554/Streaming/Channels/101',
+    status: 'online',
+    installationDate: '2025-09-02',
+    pic: 'Bambang Security',
+    notes: 'Kamera Wide Angle mengarah ke pintu masuk dan meja tamu.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'cctv-3',
+    name: 'CAM-02 Gerbang Masuk Kendaraan (PTZ)',
+    type: 'camera_ip_ptz',
+    ipAddress: '172.16.50.22',
+    macAddress: '48:EA:63:CD:EF:12',
+    location: 'Pos Satpam Gerbang Barat',
+    brand: 'Dahua',
+    model: 'SD49225XA-HNR (25x Optical Zoom)',
+    resolution: '2MP Starlight 60fps',
+    channelNumber: 2,
+    nvrId: 'cctv-1',
+    poePort: 'Port 2 - SW-POE-OUTDOOR',
+    rtspUrl: 'rtsp://admin:pass@172.16.50.22:554/cam/realmonitor?channel=1&subtype=0',
+    status: 'online',
+    installationDate: '2025-09-05',
+    pic: 'Bambang Security',
+    notes: 'Dilengkapi fitur ANPR (Automatic Number Plate Recognition) untuk pelat nomor.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'cctv-4',
+    name: 'CAM-03 Koridor & Ruang Data Center',
+    type: 'camera_ip_bullet',
+    ipAddress: '172.16.50.23',
+    macAddress: '48:EA:63:99:88:77',
+    location: 'Ruang Server DC Lt. 2',
+    brand: 'Hikvision',
+    model: 'DS-2CD2043G2-I (ColorVu)',
+    resolution: '4MP ColorVu Night Vision',
+    channelNumber: 3,
+    nvrId: 'cctv-1',
+    poePort: 'Port 8 - SW-CORE-POE',
+    rtspUrl: 'rtsp://admin:pass@172.16.50.23:554/Streaming/Channels/101',
+    status: 'online',
+    installationDate: '2025-09-02',
+    pic: 'Arya SysAdmin',
+    notes: '24/7 Full Color monitoring menghadap barisan rack server 1-4.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  }
+];
+
+export const INITIAL_WATER_DEVICES: WaterDevice[] = [
+  {
+    id: 'water-1',
+    name: 'Pompa Submersible Sumur Dalam',
+    code: 'PMP-DEEP-01',
+    type: 'pump_submersible',
+    location: 'Rumah Pompa Sumur Timur (Kedalaman 60m)',
+    pipeDiameter: '2 inch',
+    flowRateLpm: 180,
+    pressureBar: 4.5,
+    powerWatt: 2200,
+    zoneArea: 'Sumber Suplai Utama',
+    status: 'active',
+    sourceSupply: 'Sumur Dalam (Deep Well)',
+    installationDate: '2025-07-20',
+    pic: 'Sujono (Pengelola Air & Irigasi)',
+    notes: 'Pompa otomatis menyala jika level Toren Utama di bawah 40%.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'water-2',
+    name: 'Toren Penampungan Air Utama (5.000L)',
+    code: 'TRN-ROOF-01',
+    type: 'water_tank',
+    location: 'Roof Top Tower Gedung A',
+    pipeDiameter: '3 inch',
+    tankCapacityLiter: 5000,
+    currentWaterLevelPct: 82,
+    zoneArea: 'Distribusi Gedung & Irigasi',
+    status: 'active',
+    sourceSupply: 'Pompa Submersible PMP-DEEP-01',
+    installationDate: '2025-07-25',
+    pic: 'Sujono (Pengelola Air & Irigasi)',
+    notes: 'Dilengkapi pelampung radar otomatis dan sensor ultrasonik level air.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'water-3',
+    name: 'Solenoid Valve Zona Irigasi Taman Depan',
+    code: 'VALV-SOL-01',
+    type: 'valve_solenoid',
+    location: 'Taman Depan Gedung & Resepsionis',
+    pipeDiameter: '1 inch',
+    flowRateLpm: 60,
+    pressureBar: 2.8,
+    powerWatt: 18,
+    zoneArea: 'Zona Irigasi 1 (Taman Barat)',
+    status: 'active',
+    sourceSupply: 'Toren Roof Top TRN-ROOF-01',
+    installationDate: '2025-08-01',
+    pic: 'Sujono (Pengelola Air & Irigasi)',
+    notes: 'Katup solenoid 24V DC tersambung ke Smart Timer Irigasi (ON: 06:30 & 16:30).',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  },
+  {
+    id: 'water-4',
+    name: 'Sprinkler System Zona Lapangan & Kebun',
+    code: 'SPRNK-ZONA-B',
+    type: 'sprinkler_zone',
+    location: 'Area Kebun Belakang & Lapangan Terbuka',
+    pipeDiameter: '1.5 inch',
+    flowRateLpm: 120,
+    pressureBar: 3.2,
+    zoneArea: 'Zona Irigasi 2 (Kebun Belakang)',
+    status: 'standby',
+    sourceSupply: 'Pompa Booster PMP-BOOST-02',
+    installationDate: '2025-08-05',
+    pic: 'Sujono (Pengelola Air & Irigasi)',
+    notes: '12 titik impact sprinkler pop-up radius 8 meter per nozzle.',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z'
+  }
+];

@@ -43,11 +43,18 @@ import {
   saveServices,
   loadDnsRecords,
   saveDnsRecords,
-  saveSubDomains
+  saveSubDomains,
+  saveElectricityDevices,
+  saveCctvDevices,
+  saveWaterDevices,
+  INITIAL_ELECTRICITY_DEVICES,
+  INITIAL_CCTV_DEVICES,
+  INITIAL_WATER_DEVICES
 } from './utils/storage';
 import { exportToXlsx } from './utils/exportImport';
 import { parseCidr } from './utils/ipCalculator';
 import { showConfirm, showSuccess } from './utils/swal';
+import { ElectricityDevice, CctvDevice, WaterDevice } from './types/utilityNetworks';
 
 import { HomeView } from './components/HomeView';
 import { Login } from './components/Login';
@@ -67,12 +74,21 @@ import { GroupModal } from './components/GroupModal';
 import { IPAllocationModal } from './components/IPAllocationModal';
 import { BatchReserveModal } from './components/BatchReserveModal';
 import { PingSimulatorModal } from './components/PingSimulatorModal';
+import { ElectricityView } from './components/ElectricityView';
+import { ElectricityModal } from './components/ElectricityModal';
+import { CctvView } from './components/CctvView';
+import { CctvModal } from './components/CctvModal';
+import { WaterView } from './components/WaterView';
+import { WaterModal } from './components/WaterModal';
 
 export const App: React.FC = () => {
   // Map pathname to internal tab
   const getTabFromPath = (path: string): NavTab => {
     const clean = path.replace(/\/+$/, '').toLowerCase();
-    if (clean === '/admin/ip' || clean === '/admin/groups') return 'groups';
+    if (clean === '/admin/ip' || clean === '/admin/groups' || clean === '/admin/lan') return 'groups';
+    if (clean === '/admin/listrik' || clean === '/admin/electricity') return 'electricity';
+    if (clean === '/admin/cctv') return 'cctv';
+    if (clean === '/admin/air' || clean === '/admin/water') return 'water';
     if (clean === '/admin/dns') return 'dns';
     if (clean === '/admin/services') return 'services';
     if (clean === '/admin/categories') return 'categories';
@@ -86,6 +102,9 @@ export const App: React.FC = () => {
     switch (tab) {
       case 'dashboard': return '/admin';
       case 'groups': return '/admin/ip';
+      case 'electricity': return '/admin/listrik';
+      case 'cctv': return '/admin/cctv';
+      case 'water': return '/admin/air';
       case 'dns': return '/admin/dns';
       case 'services': return '/admin/services';
       case 'categories': return '/admin/categories';
@@ -184,6 +203,9 @@ export const App: React.FC = () => {
   const [categories, setCategories] = useState<DeviceCategory[]>([]);
   const [dnsRecords, setDnsRecords] = useState<DnsRecord[]>([]);
   const [subDomains, setSubDomains] = useState<SubDomainRecord[]>([]);
+  const [electricityDevices, setElectricityDevices] = useState<ElectricityDevice[]>([]);
+  const [cctvDevices, setCctvDevices] = useState<CctvDevice[]>([]);
+  const [waterDevices, setWaterDevices] = useState<WaterDevice[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
   const [selectedServiceIp, setSelectedServiceIp] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'matrix' | 'table'>('matrix');
@@ -206,6 +228,28 @@ export const App: React.FC = () => {
         if (data['netipam_device_categories_v1']) setCategories(data['netipam_device_categories_v1']);
         if (data['netipam_dns_records_v1']) setDnsRecords(data['netipam_dns_records_v1']);
         if (data['netipam_sub_domains_v1']) setSubDomains(data['netipam_sub_domains_v1']);
+        
+        // Sektor Listrik, CCTV, AIR
+        if (data['netipam_electricity_devices_v1'] && data['netipam_electricity_devices_v1'].length > 0) {
+          setElectricityDevices(data['netipam_electricity_devices_v1']);
+        } else {
+          setElectricityDevices(INITIAL_ELECTRICITY_DEVICES);
+          saveElectricityDevices(INITIAL_ELECTRICITY_DEVICES);
+        }
+
+        if (data['netipam_cctv_devices_v1'] && data['netipam_cctv_devices_v1'].length > 0) {
+          setCctvDevices(data['netipam_cctv_devices_v1']);
+        } else {
+          setCctvDevices(INITIAL_CCTV_DEVICES);
+          saveCctvDevices(INITIAL_CCTV_DEVICES);
+        }
+
+        if (data['netipam_water_devices_v1'] && data['netipam_water_devices_v1'].length > 0) {
+          setWaterDevices(data['netipam_water_devices_v1']);
+        } else {
+          setWaterDevices(INITIAL_WATER_DEVICES);
+          saveWaterDevices(INITIAL_WATER_DEVICES);
+        }
         
         const serverUsers: UserAccount[] = data['netipam_users_list_v1'] || [];
         setUsers(serverUsers);
@@ -337,6 +381,16 @@ export const App: React.FC = () => {
   const [isDnsModalOpen, setIsDnsModalOpen] = useState(false);
   const [editingDnsRecord, setEditingDnsRecord] = useState<DnsRecord | null>(null);
 
+  // Listrik, CCTV, AIR Modals
+  const [isElectricityModalOpen, setIsElectricityModalOpen] = useState(false);
+  const [editingElectricityDevice, setEditingElectricityDevice] = useState<ElectricityDevice | null>(null);
+
+  const [isCctvModalOpen, setIsCctvModalOpen] = useState(false);
+  const [editingCctvDevice, setEditingCctvDevice] = useState<CctvDevice | null>(null);
+
+  const [isWaterModalOpen, setIsWaterModalOpen] = useState(false);
+  const [editingWaterDevice, setEditingWaterDevice] = useState<WaterDevice | null>(null);
+
   // Print Modal state
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [printType, setPrintType] = useState<'allocations' | 'dns' | 'services'>('allocations');
@@ -378,6 +432,24 @@ export const App: React.FC = () => {
       saveSubDomains(subDomains);
     }
   }, [subDomains, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveElectricityDevices(electricityDevices);
+    }
+  }, [electricityDevices, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveCctvDevices(cctvDevices);
+    }
+  }, [cctvDevices, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveWaterDevices(waterDevices);
+    }
+  }, [waterDevices, isSyncing]);
 
 
 
@@ -475,6 +547,12 @@ export const App: React.FC = () => {
     saveServices([]);
     saveDeviceCategories([]);
     saveDnsRecords([]);
+    setElectricityDevices([]);
+    setCctvDevices([]);
+    setWaterDevices([]);
+    saveElectricityDevices([]);
+    saveCctvDevices([]);
+    saveWaterDevices([]);
     saveSubDomains([]);
     await wipeAllUsers();
     setUsers([]);
@@ -491,6 +569,9 @@ export const App: React.FC = () => {
     services?: IPService[];
     dnsRecords?: DnsRecord[];
     subDomains?: SubDomainRecord[];
+    electricityDevices?: ElectricityDevice[];
+    cctvDevices?: CctvDevice[];
+    waterDevices?: WaterDevice[];
   }) => {
     if (data.groups) {
       setGroups(data.groups);
@@ -499,6 +580,18 @@ export const App: React.FC = () => {
     if (data.allocations) {
       setAllocations(data.allocations);
       saveAllocations(data.allocations);
+    }
+    if (data.electricityDevices) {
+      setElectricityDevices(data.electricityDevices);
+      saveElectricityDevices(data.electricityDevices);
+    }
+    if (data.cctvDevices) {
+      setCctvDevices(data.cctvDevices);
+      saveCctvDevices(data.cctvDevices);
+    }
+    if (data.waterDevices) {
+      setWaterDevices(data.waterDevices);
+      saveWaterDevices(data.waterDevices);
     }
     if (data.categories) {
       setCategories(data.categories);
@@ -575,6 +668,9 @@ export const App: React.FC = () => {
         categories={categories}
         dnsRecords={dnsRecords}
         subDomains={subDomains}
+        electricityDevices={electricityDevices}
+        cctvDevices={cctvDevices}
+        waterDevices={waterDevices}
         currentUser={null}
         onNavigateToLogin={() => setAuthView('login')}
         theme={theme}
@@ -592,6 +688,9 @@ export const App: React.FC = () => {
         categories={categories}
         dnsRecords={dnsRecords}
         subDomains={subDomains}
+        electricityDevices={electricityDevices}
+        cctvDevices={cctvDevices}
+        waterDevices={waterDevices}
         currentUser={currentUser}
         onNavigateToLogin={() => setIsViewingPublicHome(false)}
         onNavigateToDashboard={() => setIsViewingPublicHome(false)}
@@ -740,14 +839,121 @@ export const App: React.FC = () => {
     }));
   };
 
+  const handleSaveElectricityDevice = (devData: Partial<ElectricityDevice>) => {
+    const now = new Date().toISOString();
+    if (devData.id) {
+      setElectricityDevices(prev => prev.map(d => d.id === devData.id ? { ...d, ...devData, updatedAt: now } as ElectricityDevice : d));
+    } else {
+      const newDev: ElectricityDevice = {
+        id: `elec-${Date.now()}`,
+        name: devData.name || 'Perangkat Listrik',
+        code: devData.code || '',
+        type: devData.type || 'panel_sdp',
+        brand: devData.brand,
+        model: devData.model,
+        location: devData.location || '',
+        phase: devData.phase || '1_phase',
+        voltage: devData.voltage || 220,
+        currentAmpere: devData.currentAmpere,
+        capacityWatt: devData.capacityWatt,
+        currentLoadWatt: devData.currentLoadWatt || 0,
+        status: devData.status || 'normal',
+        sourcePanelId: devData.sourcePanelId,
+        installationDate: devData.installationDate,
+        lastMaintenance: devData.lastMaintenance,
+        pic: devData.pic,
+        notes: devData.notes,
+        createdAt: now,
+        updatedAt: now
+      };
+      setElectricityDevices(prev => [...prev, newDev]);
+    }
+  };
+
+  const handleDeleteElectricityDevice = (id: string) => {
+    setElectricityDevices(prev => prev.filter(d => d.id !== id));
+  };
+
+  const handleSaveCctvDevice = (devData: Partial<CctvDevice>) => {
+    const now = new Date().toISOString();
+    if (devData.id) {
+      setCctvDevices(prev => prev.map(d => d.id === devData.id ? { ...d, ...devData, updatedAt: now } as CctvDevice : d));
+    } else {
+      const newDev: CctvDevice = {
+        id: `cctv-${Date.now()}`,
+        name: devData.name || 'Kamera CCTV',
+        type: devData.type || 'camera_ip_bullet',
+        ipAddress: devData.ipAddress,
+        macAddress: devData.macAddress,
+        location: devData.location || '',
+        brand: devData.brand,
+        model: devData.model,
+        resolution: devData.resolution,
+        channelNumber: devData.channelNumber,
+        nvrId: devData.nvrId,
+        poePort: devData.poePort,
+        rtspUrl: devData.rtspUrl,
+        storageDays: devData.storageDays,
+        status: devData.status || 'online',
+        installationDate: devData.installationDate,
+        pic: devData.pic,
+        notes: devData.notes,
+        createdAt: now,
+        updatedAt: now
+      };
+      setCctvDevices(prev => [...prev, newDev]);
+    }
+  };
+
+  const handleDeleteCctvDevice = (id: string) => {
+    setCctvDevices(prev => prev.filter(d => d.id !== id));
+  };
+
+  const handleSaveWaterDevice = (devData: Partial<WaterDevice>) => {
+    const now = new Date().toISOString();
+    if (devData.id) {
+      setWaterDevices(prev => prev.map(d => d.id === devData.id ? { ...d, ...devData, updatedAt: now } as WaterDevice : d));
+    } else {
+      const newDev: WaterDevice = {
+        id: `water-${Date.now()}`,
+        name: devData.name || 'Perangkat Air / Irigasi',
+        code: devData.code || '',
+        type: devData.type || 'pump_submersible',
+        location: devData.location || '',
+        pipeDiameter: devData.pipeDiameter,
+        flowRateLpm: devData.flowRateLpm,
+        pressureBar: devData.pressureBar,
+        tankCapacityLiter: devData.tankCapacityLiter,
+        currentWaterLevelPct: devData.currentWaterLevelPct,
+        powerWatt: devData.powerWatt,
+        zoneArea: devData.zoneArea,
+        status: devData.status || 'active',
+        sourceSupply: devData.sourceSupply,
+        installationDate: devData.installationDate,
+        pic: devData.pic,
+        notes: devData.notes,
+        createdAt: now,
+        updatedAt: now
+      };
+      setWaterDevices(prev => [...prev, newDev]);
+    }
+  };
+
+  const handleDeleteWaterDevice = (id: string) => {
+    setWaterDevices(prev => prev.filter(d => d.id !== id));
+  };
+
   const totalUsedIps = allocations.filter(a => a.status === 'used').length;
 
   const getTabTitle = (tab: NavTab) => {
     switch (tab) {
-      case 'dashboard': return 'Dashboard';
-      case 'groups': return 'Grup IP (Subnet)';
-      case 'dns': return 'Manajemen DNS';
-      case 'services': return 'Layanan & Port';
+      case 'dashboard': return 'Dashboard Infrastruktur';
+      case 'groups': return 'Jaringan LAN (Subnet & Host)';
+      case 'electricity': return 'Jaringan Listrik (Panel & Daya)';
+      case 'cctv': return 'Jaringan CCTV (Kamera & Video)';
+      case 'water': return 'Jaringan AIR (Irigasi & Pompa)';
+      case 'dns': return 'Manajemen DNS Server';
+      case 'services': return 'Layanan & Port IP';
       case 'categories': return 'Kategori Perangkat';
       case 'users': return 'Akun Pengguna';
       case 'backup': return 'Cadangan & Data';
@@ -775,6 +981,9 @@ export const App: React.FC = () => {
         onLogout={handleLogout}
         totalGroups={groups.length}
         totalUsedIps={totalUsedIps}
+        totalElectricityDevices={electricityDevices.length}
+        totalCctvDevices={cctvDevices.length}
+        totalWaterDevices={waterDevices.length}
         totalDnsRecords={dnsRecords.length}
         totalCategories={categories.length}
         totalUsers={users.length}
@@ -821,23 +1030,12 @@ export const App: React.FC = () => {
               groups={groups}
               allocations={allocations}
               categories={categories}
-              onNavigateToGroups={() => {
-                setIsViewingGroupAllocations(false);
-                setCurrentTab('groups');
-              }}
-              onNavigateToAllocations={(groupId) => {
-                if (groupId) setSelectedGroupId(groupId);
-                setIsViewingGroupAllocations(true);
-                setCurrentTab('groups');
-              }}
-              onAddGroup={() => {
-                setEditingGroup(null);
-                setIsGroupModalOpen(true);
-              }}
-              onAddAllocation={() => {
-                setEditingAlloc(null);
-                setPresetIp(undefined);
-                setIsAllocModalOpen(true);
+              electricityDevices={electricityDevices}
+              cctvDevices={cctvDevices}
+              waterDevices={waterDevices}
+              onNavigateToTab={(tab) => {
+                if (tab === 'groups') setIsViewingGroupAllocations(false);
+                setCurrentTab(tab);
               }}
             />
           )}
@@ -1475,6 +1673,57 @@ export const App: React.FC = () => {
             />
           )}
 
+          {/* TAB: JARINGAN LISTRIK */}
+          {currentTab === 'electricity' && (
+            <ElectricityView
+              devices={electricityDevices}
+              onSaveDevice={handleSaveElectricityDevice}
+              onDeleteDevice={handleDeleteElectricityDevice}
+              onOpenAddModal={() => {
+                setEditingElectricityDevice(null);
+                setIsElectricityModalOpen(true);
+              }}
+              onOpenEditModal={(device) => {
+                setEditingElectricityDevice(device);
+                setIsElectricityModalOpen(true);
+              }}
+            />
+          )}
+
+          {/* TAB: JARINGAN CCTV */}
+          {currentTab === 'cctv' && (
+            <CctvView
+              devices={cctvDevices}
+              onSaveDevice={handleSaveCctvDevice}
+              onDeleteDevice={handleDeleteCctvDevice}
+              onOpenAddModal={() => {
+                setEditingCctvDevice(null);
+                setIsCctvModalOpen(true);
+              }}
+              onOpenEditModal={(device) => {
+                setEditingCctvDevice(device);
+                setIsCctvModalOpen(true);
+              }}
+            />
+          )}
+
+          {/* TAB: JARINGAN AIR (IRIGASI) */}
+          {currentTab === 'water' && (
+            <WaterView
+              devices={waterDevices}
+              onSaveDevice={handleSaveWaterDevice}
+              onDeleteDevice={handleDeleteWaterDevice}
+              onOpenAddModal={() => {
+                setEditingWaterDevice(null);
+                setIsWaterModalOpen(true);
+              }}
+              onOpenEditModal={(device) => {
+                setEditingWaterDevice(device);
+                setIsWaterModalOpen(true);
+              }}
+            />
+          )}
+
           {/* TAB 3: KATEGORI PERANGKAT */}
           {currentTab === 'categories' && (
             <CategoriesView
@@ -1505,6 +1754,9 @@ export const App: React.FC = () => {
               services={services}
               dnsRecords={dnsRecords}
               subDomains={subDomains}
+              electricityDevices={electricityDevices}
+              cctvDevices={cctvDevices}
+              waterDevices={waterDevices}
               onImportData={handleImportData}
               onWipeAllData={handleWipeAllData}
             />
@@ -1604,6 +1856,44 @@ export const App: React.FC = () => {
       )}
 
 
+
+      {isElectricityModalOpen && (
+        <ElectricityModal
+          isOpen={isElectricityModalOpen}
+          onClose={() => {
+            setIsElectricityModalOpen(false);
+            setEditingElectricityDevice(null);
+          }}
+          onSave={handleSaveElectricityDevice}
+          editDevice={editingElectricityDevice}
+          existingDevices={electricityDevices}
+        />
+      )}
+
+      {isCctvModalOpen && (
+        <CctvModal
+          isOpen={isCctvModalOpen}
+          onClose={() => {
+            setIsCctvModalOpen(false);
+            setEditingCctvDevice(null);
+          }}
+          onSave={handleSaveCctvDevice}
+          editDevice={editingCctvDevice}
+          existingNvrList={cctvDevices.filter(d => d.type === 'nvr' || d.type === 'dvr')}
+        />
+      )}
+
+      {isWaterModalOpen && (
+        <WaterModal
+          isOpen={isWaterModalOpen}
+          onClose={() => {
+            setIsWaterModalOpen(false);
+            setEditingWaterDevice(null);
+          }}
+          onSave={handleSaveWaterDevice}
+          editDevice={editingWaterDevice}
+        />
+      )}
 
       {isPrintModalOpen && (
         <PrintModal

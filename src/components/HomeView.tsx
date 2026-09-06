@@ -11,9 +11,15 @@ import {
   Activity, 
   Sparkles, 
   HardDrive,
-  Globe
+  Globe,
+  Zap,
+  Video,
+  Droplets,
+  ShieldCheck,
+  CheckCircle2
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory, DnsRecord, SubDomainRecord } from '../types/ipam';
+import { ElectricityDevice, CctvDevice, WaterDevice } from '../types/utilityNetworks';
 import { User } from '../types/auth';
 
 interface HomeViewProps {
@@ -22,6 +28,9 @@ interface HomeViewProps {
   categories: DeviceCategory[];
   dnsRecords?: DnsRecord[];
   subDomains?: SubDomainRecord[];
+  electricityDevices?: ElectricityDevice[];
+  cctvDevices?: CctvDevice[];
+  waterDevices?: WaterDevice[];
   currentUser: User | null;
   onNavigateToLogin: () => void;
   onNavigateToDashboard?: () => void;
@@ -35,6 +44,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
   categories,
   dnsRecords = [],
   subDomains = [],
+  electricityDevices = [],
+  cctvDevices = [],
+  waterDevices = [],
   currentUser,
   onNavigateToLogin,
   onNavigateToDashboard,
@@ -43,7 +55,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
 }) => {
   // Global statistics
   const totalUsedAll = allocations.filter(a => a.status === 'used').length;
-  const totalReservedAll = allocations.filter(a => a.status === 'reserved' || a.status === 'dhcp').length;
+  const totalElec = electricityDevices.length;
+  const totalCctv = cctvDevices.length;
+  const totalWater = waterDevices.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-sky-50/30 to-slate-100/70 text-slate-800 dark:text-slate-200 font-poppins selection:bg-blue-600 selection:text-white relative overflow-hidden">
@@ -58,20 +72,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
           
           {/* Brand Logo */}
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-gradient-to-tr from-blue-600 via-blue-500 to-indigo-600 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
+            <div className="p-2.5 bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 rounded-xl shadow-md shadow-blue-500/20 text-white flex items-center justify-center">
               <Network className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-slate-100">IP & DNS</span>
+                <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-slate-100">INFRA NET</span>
               </div>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 hidden sm:block">
-                Sistem Manajemen Alamat IP & Server DNS Terintegrasi
+                Manajemen 4 Sektor: LAN • Listrik • CCTV • AIR
               </p>
             </div>
           </div>
-
-
 
           {/* Right Action: Login or Dashboard Button */}
           <div className="flex items-center gap-3">
@@ -111,15 +123,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
         
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/80 text-xs font-semibold shadow-xs">
           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-          <span>Sistem Manajemen IP & DNS Terintegrasi</span>
+          <span>Sistem Manajemen Infrastruktur Jaringan Terpadu (SQLite Backend)</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-slate-100 tracking-tight max-w-4xl mx-auto leading-tight sm:leading-tight">
-          Visualisasi & Manajemen Alamat IP Terpadu Secara <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Realtime</span>
+          Sentralisasi Data <span className="bg-gradient-to-r from-blue-600 via-amber-500 to-cyan-500 bg-clip-text text-transparent">LAN, Listrik, CCTV, & AIR</span> Dalam Satu Platform
         </h1>
 
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          Monitor alokasi host, pemanfaatan subnet CIDR, pemetaan VLAN, dan ketersediaan IP secara terpusat dan akurat.
+          Monitor perangkat komputer, kapasitas panel kelistrikan, kamera CCTV & NVR, serta sistem irigasi air secara terintegrasi dan tersimpan aman di database SQLite server.
         </p>
 
         {/* Action Button */}
@@ -144,113 +156,110 @@ export const HomeView: React.FC<HomeViewProps> = ({
           )}
         </div>
 
-        {/* Highlight KPI Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-5xl mx-auto pt-6">
+        {/* Highlight 4 Sektor Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto pt-6">
           <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs text-left">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Subnet IP</span>
-              <Layers className="w-4 h-4 text-blue-600" />
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Jaringan LAN</span>
+              <Network className="w-4 h-4 text-blue-600" />
             </div>
-            <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{groups.length}</div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Segmen Jaringan Aktif</div>
+            <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{groups.length} Subnet</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{totalUsedAll} Host IP Terhubung</div>
           </div>
 
           <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs text-left">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Host Digunakan</span>
-              <Activity className="w-4 h-4 text-emerald-600" />
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Jaringan Listrik</span>
+              <Zap className="w-4 h-4 text-amber-500" />
             </div>
-            <div className="text-2xl font-black text-emerald-600 mt-1">{totalUsedAll}</div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">IP Terhubung Aktif</div>
+            <div className="text-2xl font-black text-amber-500 mt-1">{totalElec} Unit</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">MDP, SDP, Genset, UPS</div>
           </div>
 
           <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs text-left">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Reserved & DHCP</span>
-              <Cpu className="w-4 h-4 text-purple-600" />
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Jaringan CCTV</span>
+              <Video className="w-4 h-4 text-rose-600" />
             </div>
-            <div className="text-2xl font-black text-purple-600 mt-1">{totalReservedAll}</div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Kolam DHCP / Cadangan</div>
+            <div className="text-2xl font-black text-rose-600 mt-1">{totalCctv} Unit</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">IP Cam & NVR Recording</div>
           </div>
 
           <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs text-left">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Kategori Device</span>
-              <HardDrive className="w-4 h-4 text-amber-600" />
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Jaringan AIR</span>
+              <Droplets className="w-4 h-4 text-cyan-600" />
             </div>
-            <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{categories.length}</div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Hardware Tervalidasi</div>
-          </div>
-
-          {/* New Cards */}
-          <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs text-left">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Domain Utama</span>
-              <Globe className="w-4 h-4 text-indigo-600" />
-            </div>
-            <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{dnsRecords?.length || 0}</div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Record DNS Server</div>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-xs text-left">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Sub Domain</span>
-              <Layers className="w-4 h-4 text-pink-600" />
-            </div>
-            <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{subDomains.length}</div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Virtual Host / Reverse Proxy</div>
+            <div className="text-2xl font-black text-cyan-600 mt-1">{totalWater} Titik</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Pompa, Toren & Irigasi</div>
           </div>
         </div>
 
       </section>
 
-      {/* 3. PLATFORM FEATURES & ARCHITECTURE */}
+      {/* 3. 4 SEKTOR OVERVIEW CARDS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
         <div className="text-center space-y-2 max-w-2xl mx-auto mb-8">
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
-            Fitur Utama IP & DNS
+            Cakupan Infrastruktur Terkelola
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Didesain untuk efisiensi pengelolaan infrastruktur jaringan komputer dan nama domain.
+            Arsitektur pendataan lengkap yang mudah dipahami dan siap diimplementasikan di lapangan.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
+          {/* Sektor 1 */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all space-y-3">
             <div className="p-3 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-2xl w-fit">
-              <Layers className="w-6 h-6" />
+              <Network className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
-              Kalkulator CIDR & Subnetting Otomatis
+              LAN: Jaringan Komputer
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Penghitungan kapasitas usable host, network IP, broadcast address, netmask, serta pemetaan VLAN ID secara presisi dan instan.
+              Mendata PC workstation, laptop, server farm, router Mikrotik, switch PoE, dan access point beserta alokasi IP CIDR dan DNS.
             </p>
           </div>
 
+          {/* Sektor 2 */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all space-y-3">
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-2xl w-fit">
-              <Activity className="w-6 h-6" />
+            <div className="p-3 bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-2xl w-fit">
+              <Zap className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
-              Manajemen Alokasi & Pelacakan Host
+              Listrik: Jaringan Kelistrikan
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Pencatatan alokasi alamat IP host, hostname, tipe perangkat, MAC Address, departemen, dan proteksi hapus jika ada layanan aktif.
+              Mendata Panel MDP & SDP, Trafo PLN, Genset cadangan, UPS data center, MCB breaker, daya kVA / Watt, dan fasa 1P/3P.
             </p>
           </div>
 
+          {/* Sektor 3 */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all space-y-3">
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-2xl w-fit">
-              <Database className="w-6 h-6" />
+            <div className="p-3 bg-rose-50 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 rounded-2xl w-fit">
+              <Video className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
-              Server DNS & Cadangan Lengkap
+              CCTV: Jaringan Keamanan
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Pencatatan direktori DNS (A, AAAA, CNAME, MX, TXT), simulasi resolusi nama, cetak dokumen A4, dan ekspor XLSX & JSON.
+              Mendata IP Camera (Dome, Bullet, PTZ), NVR Server, Switch PoE kamera, resolusi, port feed RTSP, dan hari retensi rekaman.
+            </p>
+          </div>
+
+          {/* Sektor 4 */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all space-y-3">
+            <div className="p-3 bg-cyan-50 dark:bg-cyan-900/40 text-cyan-600 dark:text-cyan-400 rounded-2xl w-fit">
+              <Droplets className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
+              AIR: Irigasi & Suplai Air
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Mendata Pompa Celup Sumur Bor, Booster, Toren penampungan air, Katup Solenoid, zona irigasi taman, dan debit aliran pipa.
             </p>
           </div>
 
@@ -260,14 +269,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
       {/* 4. BOTTOM CALL TO ACTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="relative rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-8 sm:p-12 shadow-2xl shadow-blue-600/20 overflow-hidden text-center space-y-6">
+        <div className="relative rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white p-8 sm:p-12 shadow-2xl shadow-blue-600/20 overflow-hidden text-center space-y-6">
           
           <div className="relative z-10 max-w-2xl mx-auto space-y-3">
             <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
-              Siap Mengelola Infrastruktur Jaringan & DNS Anda?
+              Mulai Kelola Seluruh Jaringan Utilitas Anda
             </h2>
             <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-              Masuk sekarang dengan akun pengguna untuk mengalokasikan host baru, mengelola server DNS, atau mencetak laporan.
+              Masuk dengan akun pengguna untuk mengelola aset infrastruktur, alokasi IP, dan status kelistrikan & irigasi secara realtime.
             </p>
 
             <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
@@ -282,34 +291,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
               ) : (
                 <button
                   onClick={onNavigateToDashboard}
-                  className="px-6 py-3.5 bg-white dark:bg-slate-900 hover:bg-blue-50 text-blue-700 font-bold rounded-xl text-sm shadow-lg active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-3.5 bg-white dark:bg-slate-900 hover:bg-blue-50 text-blue-700 font-bold rounded-xl text-sm shadow-lg active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer group"
                 >
-                  <span>Buka Dashboard IP & DNS</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 text-blue-600 group-hover:translate-x-0.5 transition-transform" />
+                  <span>Buka Panel Kontrol</span>
                 </button>
               )}
             </div>
           </div>
-
         </div>
       </section>
-
-      {/* 5. FOOTER */}
-      <footer className="border-t border-slate-200/80 bg-white dark:bg-slate-900/70 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-800 dark:text-slate-200">IP & DNS</span>
-            <span>•</span>
-            <span>Sistem Manajemen Jaringan, IP Host & DNS Server Terpadu</span>
-          </div>
-
-          <div className="flex items-center gap-3 text-slate-400">
-            <span>Versi 2.0.0</span>
-            <span>•</span>
-            <span>Enterprise Suite</span>
-          </div>
-        </div>
-      </footer>
 
     </div>
   );

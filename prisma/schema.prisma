@@ -106,3 +106,71 @@ model SubDomainRecord {
   forward        String?
   createdAt      String
 }
+
+model ElectricityDevice {
+  id              String   @id
+  name            String
+  code            String   @default("")
+  type            String   @default("other")
+  brand           String?
+  model           String?
+  location        String   @default("")
+  phase           String   @default("1_phase")
+  voltage         Float    @default(220)
+  currentAmpere   Float?
+  capacityWatt    Float?
+  currentLoadWatt Float?
+  status          String   @default("normal")
+  sourcePanelId   String?
+  installationDate String?
+  lastMaintenance String?
+  pic             String?
+  notes           String?
+  createdAt       String
+  updatedAt       String
+}
+
+model CctvDevice {
+  id               String   @id
+  name             String
+  type             String   @default("camera_ip_bullet")
+  ipAddress        String?
+  macAddress       String?
+  location         String   @default("")
+  brand            String?
+  model            String?
+  resolution       String?
+  channelNumber    Int?
+  nvrId            String?
+  poePort          String?
+  rtspUrl          String?
+  storageDays      Int?
+  status           String   @default("online")
+  installationDate String?
+  pic              String?
+  notes            String?
+  createdAt        String
+  updatedAt        String
+}
+
+model WaterDevice {
+  id                   String   @id
+  name                 String
+  code                 String   @default("")
+  type                 String   @default("other")
+  location             String   @default("")
+  pipeDiameter         String?
+  flowRateLpm          Float?
+  pressureBar          Float?
+  tankCapacityLiter    Float?
+  currentWaterLevelPct Float?
+  powerWatt            Float?
+  zoneArea             String?
+  status               String   @default("active")
+  sourceSupply         String?
+  installationDate     String?
+  pic                  String?
+  notes                String?
+  createdAt            String
+  updatedAt            String
+}

@@ -1,10 +1,19 @@
 import React from 'react';
 import { 
+  Network, 
+  Zap, 
+  Video, 
+  Droplets, 
+  CheckCircle2, 
   Layers, 
-  CheckCircle2,
-  Cpu 
+  Cpu, 
+  ArrowRight,
+  Activity,
+  Gauge,
+  HardDrive
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory } from '../types/ipam';
+import { ElectricityDevice, CctvDevice, WaterDevice } from '../types/utilityNetworks';
 import { parseCidr } from '../utils/ipCalculator';
 import { getCategoryIconComponent } from './CategoriesView';
 
@@ -12,157 +21,226 @@ interface DashboardViewProps {
   groups: IPGroup[];
   allocations: IPAllocation[];
   categories?: DeviceCategory[];
-  onNavigateToGroups?: () => void;
-  onNavigateToAllocations?: (groupId?: string) => void;
-  onAddGroup?: () => void;
-  onAddAllocation?: () => void;
+  electricityDevices?: ElectricityDevice[];
+  cctvDevices?: CctvDevice[];
+  waterDevices?: WaterDevice[];
+  onNavigateToTab?: (tab: any) => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   groups,
   allocations,
-  categories = []
+  categories = [],
+  electricityDevices = [],
+  cctvDevices = [],
+  waterDevices = [],
+  onNavigateToTab
 }) => {
-  // 1. Total Grup IP
+  // 1. STATS LAN
   const totalGroups = groups.length;
-
-  // 2. Total IP yang Sudah Digunakan (status === 'used')
   const usedAllocations = allocations.filter(a => a.status === 'used');
   const totalUsedIps = usedAllocations.length;
-
-  // Total Host usable across all subnets
   let totalUsableHosts = 0;
   groups.forEach(g => {
     const sub = parseCidr(g.cidr);
     totalUsableHosts += sub ? sub.usableHosts : 254;
   });
-
   const overallUsedPct = totalUsableHosts > 0 
     ? ((totalUsedIps / totalUsableHosts) * 100).toFixed(1) 
     : '0';
 
+  // 2. STATS LISTRIK
+  const totalElec = electricityDevices.length;
+  const elecNormal = electricityDevices.filter(d => d.status === 'normal').length;
+  const totalCapWatt = electricityDevices.reduce((sum, d) => sum + (d.capacityWatt || 0), 0);
+  const totalLoadWatt = electricityDevices.reduce((sum, d) => sum + (d.currentLoadWatt || 0), 0);
+  const elecLoadPct = totalCapWatt > 0 ? Math.round((totalLoadWatt / totalCapWatt) * 100) : 0;
+
+  // 3. STATS CCTV
+  const totalCctv = cctvDevices.length;
+  const cctvOnline = cctvDevices.filter(d => d.status === 'online' || d.status === 'recording').length;
+  const cctvNvr = cctvDevices.filter(d => d.type === 'nvr' || d.type === 'dvr').length;
+
+  // 4. STATS AIR
+  const totalWater = waterDevices.length;
+  const waterActive = waterDevices.filter(d => d.status === 'active').length;
+  const totalTankCap = waterDevices.reduce((sum, d) => sum + (d.tankCapacityLiter || 0), 0);
+
   return (
     <div className="space-y-6 font-poppins animate-in fade-in duration-200">
-      {/* 3 MAIN KPI CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        
-        {/* KPI 1: JUMLAH GRUP IP */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-2xl border border-blue-100 dark:border-blue-800/60">
-                <Layers className="w-7 h-7" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Total Grup Jaringan
-                </span>
-                <h2 className="text-base font-bold text-slate-800 dark:text-slate-200">
-                  Jumlah Grup IP
-                </h2>
-              </div>
-            </div>
-            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-              Subnet Aktif
-            </span>
+      
+      {/* 4 KARTU SEKTOR INFRASTRUKTUR UTAMA */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              4 Sektor Manajemen Jaringan Terpadu
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Pantau status menyeluruh jaringan komputer LAN, distribusi listrik, kamera CCTV, dan sistem air irigasi
+            </p>
           </div>
-
-          <div className="mt-6 flex items-baseline gap-3">
-            <span className="text-5xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
-              {totalGroups}
-            </span>
-            <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-              Grup Subnet Terdaftar
-            </span>
-          </div>
-
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-            Mencakup segmen kantor, server DMZ, sistem CCTV, dan manajemen jaringan.
-          </p>
         </div>
 
-        {/* KPI 2: IP YANG SUDAH DIGUNAKAN */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-2xl border border-emerald-100 dark:border-emerald-800/60">
-                <CheckCircle2 className="w-7 h-7" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Utilisasi Alamat IP
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          {/* SEKTOR 1: LAN */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-blue-400 transition-all flex flex-col justify-between group">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="p-2.5 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-2xl border border-blue-100 dark:border-blue-800/60">
+                  <Network className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                  {overallUsedPct}% IP Terpakai
                 </span>
-                <h2 className="text-base font-bold text-slate-800 dark:text-slate-200">
-                  IP yang Sudah Digunakan
-                </h2>
+              </div>
+
+              <div className="mt-4">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Jaringan Komputer</span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Jaringan LAN</h3>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{totalGroups}</span>
+                  <span className="text-xs font-semibold text-slate-500">Subnet ({totalUsedIps} Host IP)</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">PC, Laptop, Server, Router & Switch</p>
               </div>
             </div>
-            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-              {overallUsedPct}% Terpakai
-            </span>
+
+            <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
+              <span className="text-xs font-bold text-blue-600 dark:text-blue-400">Buka Modul LAN</span>
+              {onNavigateToTab && (
+                <button 
+                  onClick={() => onNavigateToTab('groups')}
+                  className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-colors cursor-pointer"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="mt-6 flex items-baseline gap-3">
-            <span className="text-5xl font-black text-emerald-600 tracking-tight">
-              {totalUsedIps}
-            </span>
-            <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-              IP Aktif Digunakan
-            </span>
-          </div>
-
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-            Dari total <strong>{totalUsableHosts.toLocaleString()}</strong> host IP yang tersedia pada semua grup.
-          </p>
-        </div>
-
-        {/* KPI 3: KATEGORI PERANGKAT */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-100 dark:border-indigo-800/60">
-                <Cpu className="w-7 h-7" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Hardware & Device
+          {/* SEKTOR 2: LISTRIK */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-amber-400 transition-all flex flex-col justify-between group">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="p-2.5 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-2xl border border-amber-100 dark:border-amber-800/60">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                  {elecLoadPct}% Beban
                 </span>
-                <h2 className="text-base font-bold text-slate-800 dark:text-slate-200">
-                  Kategori Perangkat
-                </h2>
+              </div>
+
+              <div className="mt-4">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Kelistrikan & Power</span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Jaringan Listrik</h3>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{totalElec}</span>
+                  <span className="text-xs font-semibold text-slate-500">Unit ({elecNormal} Normal)</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">Panel MDP/SDP, Trafo, Genset & UPS</p>
               </div>
             </div>
-            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-              {categories.length} Tipe
-            </span>
+
+            <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-400">Buka Modul Listrik</span>
+              {onNavigateToTab && (
+                <button 
+                  onClick={() => onNavigateToTab('electricity')}
+                  className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 hover:bg-amber-500 hover:text-white transition-colors cursor-pointer"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="mt-6 flex items-baseline gap-3">
-            <span className="text-5xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
-              {categories.length}
-            </span>
-            <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-              Kategori Terdaftar
-            </span>
+          {/* SEKTOR 3: CCTV */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-rose-400 transition-all flex flex-col justify-between group">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="p-2.5 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-2xl border border-rose-100 dark:border-rose-900/60">
+                  <Video className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900">
+                  {cctvOnline} Online
+                </span>
+              </div>
+
+              <div className="mt-4">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Keamanan Video</span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Jaringan CCTV</h3>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{totalCctv}</span>
+                  <span className="text-xs font-semibold text-slate-500">Kamera ({cctvNvr} NVR)</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">IP Dome, Bullet, PTZ & PoE Switch</p>
+              </div>
+            </div>
+
+            <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
+              <span className="text-xs font-bold text-rose-600 dark:text-rose-400">Buka Modul CCTV</span>
+              {onNavigateToTab && (
+                <button 
+                  onClick={() => onNavigateToTab('cctv')}
+                  className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
 
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-            Klasifikasi tipe perangkat keras jaringan yang dikelola dalam sistem.
-          </p>
+          {/* SEKTOR 4: AIR & IRIGASI */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-cyan-400 transition-all flex flex-col justify-between group">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="p-2.5 bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 rounded-2xl border border-cyan-100 dark:border-cyan-800/60">
+                  <Droplets className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800">
+                  {waterActive} Aktif
+                </span>
+              </div>
+
+              <div className="mt-4">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Irigasi & Distribusi</span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Jaringan AIR</h3>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{totalWater}</span>
+                  <span className="text-xs font-semibold text-slate-500">Titik Jalur</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">Pompa, Toren {totalTankCap.toLocaleString()}L & Valve</p>
+              </div>
+            </div>
+
+            <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
+              <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">Buka Modul AIR</span>
+              {onNavigateToTab && (
+                <button 
+                  onClick={() => onNavigateToTab('water')}
+                  className="p-1.5 rounded-lg bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-600 hover:text-white transition-colors cursor-pointer"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
         </div>
-
       </div>
 
-      {/* Grid Kategori Perangkat */}
+      {/* Grid Kategori Hardware Komputer (LAN) */}
       {categories.length > 0 && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div>
               <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
-                Kategori Perangkat
+                Kategori Perangkat Keras Jaringan LAN
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Ringkasan kategori perangkat keras dan jumlah IP yang terhubung
+                Ringkasan kategori perangkat komputer & alokasi IP yang terhubung
               </p>
             </div>
           </div>
