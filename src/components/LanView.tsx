@@ -225,7 +225,7 @@ export const LanView: React.FC<LanViewProps> = ({
     }
 
     const confirmed = await showConfirm({
-      title: 'Hapus Lokasi / Sekolah?',
+      title: 'Hapus Lokasi?',
       text: `Apakah Anda yakin ingin menghapus lokasi "${loc.name}"?`,
       confirmButtonText: 'Ya, Hapus Lokasi',
       cancelButtonText: 'Batal'
@@ -321,26 +321,26 @@ export const LanView: React.FC<LanViewProps> = ({
       {/* ========================================================================= */}
       {selectedLocationId === null && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-slate-300 dark:bg-slate-800/95 border border-slate-400/80 dark:border-slate-700 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2.5">
                 <Building2 className="w-6 h-6 text-blue-600" />
                 <span>Daftar Lokasi Tempat Jaringan LAN</span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Pilih lokasi/sekolah (misal: Sekolah 1, Sekolah 2, Sekolah 3) untuk melihat daftar jaringan ruangan/lab di dalamnya
+                Pilih lokasi (misal: Kantor Pusat, Gedung A, Cabang 1) untuk melihat daftar jaringan ruangan/lab di dalamnya
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+              <span className="text-xs font-bold px-3 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-center sm:text-left">
                 {locations.length} Lokasi Terdata
               </span>
               <button
                 onClick={onOpenAddLocationModal}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Tambah Lokasi / Sekolah Baru</span>
+                <span>Tambah Lokasi</span>
               </button>
             </div>
           </div>
@@ -348,9 +348,9 @@ export const LanView: React.FC<LanViewProps> = ({
           {locations.length === 0 ? (
             <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-12 text-center text-slate-400 space-y-3">
               <Building2 className="w-14 h-14 mx-auto text-slate-300 dark:text-slate-600 opacity-60" />
-              <h4 className="text-base font-bold text-slate-700 dark:text-slate-300">Belum ada Lokasi / Sekolah</h4>
+              <h4 className="text-base font-bold text-slate-700 dark:text-slate-300">Belum ada Lokasi</h4>
               <p className="text-xs max-w-md mx-auto">
-                Mulai dengan menambahkan lokasi tempat jaringan komputer pertama Anda (misalnya: SMKN 1, Kampus Utama, Gedung Kantor).
+                Mulai dengan menambahkan lokasi tempat jaringan komputer pertama Anda (misalnya: Gedung Utama, Kantor Cabang, Kampus).
               </p>
               <button
                 onClick={onOpenAddLocationModal}
@@ -460,7 +460,7 @@ export const LanView: React.FC<LanViewProps> = ({
                       }}
                       className="mt-5 w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-blue-600/20"
                     >
-                      <span>Buka Jaringan {loc.name}</span>
+                      <span>Buka</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
@@ -492,23 +492,23 @@ export const LanView: React.FC<LanViewProps> = ({
                 Klik salah satu jaringan lab di bawah ini (misal: Jaringan Lab 1, Lab 2, Lab 3) untuk melihat perangkat & jalur kabelnya
               </p>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
               <button
                 onClick={() => {
                   setSelectedLocationId(null);
                   setSelectedZoneId(null);
                 }}
-                className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Kembali ke Daftar Lokasi</span>
+                <span>Kembali</span>
               </button>
               <button
                 onClick={() => onOpenAddZoneModal(selectedLocationId)}
-                className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/25 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Tambah Jaringan Lab Baru</span>
+                <span>Tambah</span>
               </button>
             </div>
           </div>
@@ -525,7 +525,7 @@ export const LanView: React.FC<LanViewProps> = ({
                 className="mt-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-600/25 transition-all cursor-pointer inline-flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
-                <span>Buat Jaringan Lab 1 Sekarang</span>
+                <span>Tambah Jaringan</span>
               </button>
             </div>
           ) : (
@@ -619,7 +619,7 @@ export const LanView: React.FC<LanViewProps> = ({
                       onClick={() => setSelectedZoneId(zone.id)}
                       className="mt-5 w-full py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-indigo-600/20"
                     >
-                      <span>Buka Perangkat & Jalur Kabel {zone.name}</span>
+                      <span>Buka</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
@@ -653,18 +653,18 @@ export const LanView: React.FC<LanViewProps> = ({
                 Data perangkat keras dan pencatatan jalur kabel dari titik asal ke titik tujuan di dalam {activeZone.name}
               </p>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
               <button
                 onClick={() => setSelectedZoneId(null)}
-                className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Kembali ke Daftar Lab</span>
+                <span>Kembali</span>
               </button>
               {activeSubTab === 'cables' ? (
                 <button
                   onClick={() => onOpenAddCableModal(selectedLocationId, selectedZoneId)}
-                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Catat Jalur Kabel ({activeZone.name})</span>
@@ -672,7 +672,7 @@ export const LanView: React.FC<LanViewProps> = ({
               ) : (
                 <button
                   onClick={() => onOpenAddDeviceModal(selectedLocationId, selectedZoneId)}
-                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah Perangkat ({activeZone.name})</span>
@@ -742,20 +742,20 @@ export const LanView: React.FC<LanViewProps> = ({
 
           {/* SUB-NAVIGASI: PENCATATAN JALUR KABEL VS PERANGKAT FISIK */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-4 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-700">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-700 w-full md:w-auto">
               <button
                 onClick={() => {
                   setActiveSubTab('cables');
                   setFilterType('all');
                 }}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   activeSubTab === 'cables'
                     ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 <Cable className="w-4 h-4" />
-                <span>Pencatatan Jalur Kabel & Arah ({contextCables.length})</span>
+                <span>Pencatatan Jalur Kabel ({contextCables.length})</span>
               </button>
 
               <button
@@ -763,14 +763,14 @@ export const LanView: React.FC<LanViewProps> = ({
                   setActiveSubTab('devices');
                   setFilterType('all');
                 }}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   activeSubTab === 'devices'
                     ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 <Server className="w-4 h-4" />
-                <span>Perangkat Fisik Lab & Switch ({contextDevices.length})</span>
+                <span>Perangkat Fisik Lab ({contextDevices.length})</span>
               </button>
             </div>
 
@@ -778,7 +778,7 @@ export const LanView: React.FC<LanViewProps> = ({
             {activeSubTab === 'cables' ? (
               <button
                 onClick={() => onOpenAddCableModal(selectedLocationId, selectedZoneId)}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
+                className="w-full md:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Catat Jalur Kabel Baru ({activeZone.name})</span>
@@ -786,7 +786,7 @@ export const LanView: React.FC<LanViewProps> = ({
             ) : (
               <button
                 onClick={() => onOpenAddDeviceModal(selectedLocationId, selectedZoneId)}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
+                className="w-full md:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Tambah Perangkat Baru ({activeZone.name})</span>
@@ -808,11 +808,11 @@ export const LanView: React.FC<LanViewProps> = ({
             </div>
 
             {activeSubTab === 'cables' ? (
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
                 <select
                   value={filterType}
                   onChange={e => setFilterType(e.target.value)}
-                  className="px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="w-full sm:w-auto px-3 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
                 >
                   <option value="all">Semua Tipe Kabel</option>
                   <option value="cat6_utp">UTP Cat6</option>
@@ -825,7 +825,7 @@ export const LanView: React.FC<LanViewProps> = ({
                 <select
                   value={filterStatus}
                   onChange={e => setFilterStatus(e.target.value)}
-                  className="px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="w-full sm:w-auto px-3 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
                 >
                   <option value="all">Semua Status</option>
                   <option value="connected">🟢 Connected</option>
@@ -835,11 +835,11 @@ export const LanView: React.FC<LanViewProps> = ({
                 </select>
               </div>
             ) : (
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
                 <select
                   value={filterType}
                   onChange={e => setFilterType(e.target.value)}
-                  className="px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="w-full sm:w-auto px-3 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
                 >
                   <option value="all">Semua Jenis Perangkat</option>
                   <option value="switch_distribution">Switch Distribusi Lab</option>

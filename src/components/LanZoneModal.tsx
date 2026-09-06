@@ -55,7 +55,7 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!locationId) {
-      setError('Pilih lokasi tempat jaringan (Sekolah/Gedung)!');
+      setError('Pilih lokasi tempat jaringan!');
       return;
     }
     if (!name.trim()) {
@@ -91,7 +91,7 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
                 {editZone ? 'Edit Jaringan Ruangan / Lab' : 'Tambah Jaringan Ruangan / Lab Baru'}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Tingkat 2: Area / Ruang di dalam sekolah (misal: Lab 1, Lab 2, Ruang Guru)
+                Tingkat 2: Area / Ruangan jaringan (misal: Lab 1, Ruang Server, Lantai 2)
               </p>
             </div>
           </div>
@@ -115,7 +115,7 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                Lokasi Induk / Sekolah <span className="text-rose-500">*</span>
+                Lokasi Induk <span className="text-rose-500">*</span>
               </label>
               {editZone && (
                 <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
@@ -136,7 +136,7 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
                 }`}
                 required
               >
-                <option value="" disabled>-- Pilih Lokasi / Sekolah --</option>
+                <option value="" disabled>-- Pilih Lokasi Induk --</option>
                 {locations.map(loc => (
                   <option key={loc.id} value={loc.id}>
                     {loc.name} {loc.code ? `(${loc.code})` : ''}
@@ -235,17 +235,17 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2.5">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer text-center"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 cursor-pointer"
+              className="w-full sm:w-auto px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Save className="w-3.5 h-3.5" />
               <span>Simpan Ruang / Lab</span>
