@@ -1,6 +1,6 @@
 import React from 'react';
 import { Printer, X, Download, Shield, Network, Globe, CheckCircle2, Zap, Video, Droplets, Cable, Layers } from 'lucide-react';
-import { IPGroup, IPAllocation, IPService, DnsRecord, DeviceCategory } from '../types/ipam';
+import { IPGroup, IPAllocation, IPService, DnsRecord, DeviceCategory, SubDomainRecord } from '../types/ipam';
 import { 
   LanLocation, 
   LanZone, 
@@ -19,11 +19,13 @@ interface PrintModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-  type: 'allocations' | 'dns' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail';
+  type: 'allocations' | 'dns' | 'sub_domains' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail';
   group?: IPGroup;
   groups?: IPGroup[];
   allocations?: IPAllocation[];
   dnsRecords?: DnsRecord[];
+  subDomains?: SubDomainRecord[];
+  parentDomain?: DnsRecord;
   services?: IPService[];
   categories?: DeviceCategory[];
   currentUser: User | null;
@@ -49,6 +51,8 @@ export const PrintModal: React.FC<PrintModalProps> = ({
   groups = [],
   allocations = [],
   dnsRecords = [],
+  subDomains = [],
+  parentDomain,
   services = [],
   categories = [],
   currentUser,
@@ -126,6 +130,9 @@ export const PrintModal: React.FC<PrintModalProps> = ({
     if (title === 'Laporan Jaringan') displayTitle = 'Detail Infrastruktur Air';
   } else if (type === 'lan_detail') {
     if (title === 'Laporan Jaringan') displayTitle = 'Detail Jaringan LAN';
+  } else if (type === 'sub_domains') {
+    if (title === 'Laporan Jaringan') displayTitle = parentDomain ? `Daftar Sub Domain: ${parentDomain.domain}` : 'Daftar Seluruh Sub Domain';
+    systemSubtitle = "Dokumentasi Inventaris Sub Domain, Konfigurasi Virtual Host & Port Aplikasi";
   } else if (type === 'allocations') {
     if (title === 'Laporan Jaringan') displayTitle = group ? `Laporan Alokasi Host Subnet: ${group.name}` : 'Laporan Alokasi Alamat IP';
   }
@@ -209,6 +216,11 @@ export const PrintModal: React.FC<PrintModalProps> = ({
               {group && (
                 <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mt-0.5">
                   Subnet: <span className="font-mono text-blue-800 font-bold">{group.name} ({group.cidr})</span> • Gateway: <span className="font-mono">{group.gateway}</span> {group.vlanId ? `• VLAN ${group.vlanId}` : ''}
+                </p>
+              )}
+              {parentDomain && type === 'sub_domains' && (
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mt-0.5">
+                  Domain Induk: <span className="font-mono text-blue-800 dark:text-blue-400 font-bold">{parentDomain.domain}</span> • IP Target: <span className="font-mono">{parentDomain.value}</span> • Tipe: <span className="font-mono">{parentDomain.type}</span>
                 </p>
               )}
             </div>
@@ -706,7 +718,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                           <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center text-slate-500 dark:text-slate-400">
                             {idx + 1}
                           </td>
-                          <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-mono font-bold text-blue-900">
+                          <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-mono font-bold text-blue-900 dark:text-blue-300">
                             {r.domain}
                           </td>
                           <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center font-bold font-mono">
@@ -723,6 +735,59 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                           </td>
                           <td className="py-1.5 px-2.5 text-slate-600 dark:text-slate-400 text-[10px]">
                             {r.description || '-'}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* TABEL: Sub Domain Records */}
+            {type === 'sub_domains' && (
+              <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg mb-8">
+                <table className="w-full text-left border-collapse text-[11px]">
+                  <thead>
+                    <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
+                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center w-8">No</th>
+                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">Sub Domain (FQDN)</th>
+                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">IP Address & Port</th>
+                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">Direktori / Folder Root</th>
+                      <th className="py-2 px-2.5 border-r border-slate-300 dark:border-slate-600">Database</th>
+                      <th className="py-2 px-2.5">Keterangan</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 text-slate-800 dark:text-slate-200">
+                    {subDomains.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-6 text-center text-slate-400">
+                          Tidak ada data sub domain terdaftar.
+                        </td>
+                      </tr>
+                    ) : (
+                      subDomains.map((s, idx) => (
+                        <tr key={s.id} className={idx % 2 === 1 ? 'bg-slate-50 dark:bg-slate-800/70' : 'bg-white dark:bg-slate-900'}>
+                          <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 text-center text-slate-500 dark:text-slate-400">
+                            {idx + 1}
+                          </td>
+                          <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-mono font-bold text-blue-900 dark:text-blue-300">
+                            <div>{s.subName}</div>
+                            <span className="text-[9px] uppercase px-1 py-0.2 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded font-semibold">
+                              {s.protocol || 'http'}
+                            </span>
+                          </td>
+                          <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-mono text-[10px]">
+                            {s.ipAddress ? `${s.ipAddress}${s.port ? `:${s.port}` : ''}` : '-'}
+                          </td>
+                          <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-mono text-[10px] text-slate-600 dark:text-slate-400">
+                            {s.folder || '-'}
+                          </td>
+                          <td className="py-1.5 px-2.5 border-r border-slate-300 dark:border-slate-600 font-mono text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">
+                            {s.database || '-'}
+                          </td>
+                          <td className="py-1.5 px-2.5 text-slate-600 dark:text-slate-400 text-[10px]">
+                            {s.description || '-'}
                           </td>
                         </tr>
                       ))

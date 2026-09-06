@@ -34,6 +34,7 @@ interface DnsViewProps {
   onOpenAddModal: () => void;
   onOpenEditModal: (record: DnsRecord) => void;
   onOpenPrintModal: () => void;
+  onOpenPrintSubDomain?: (parent: DnsRecord) => void;
 }
 
 export const DnsView: React.FC<DnsViewProps> = ({
@@ -46,7 +47,8 @@ export const DnsView: React.FC<DnsViewProps> = ({
   onSaveSubDomains,
   onOpenAddModal,
   onOpenEditModal,
-  onOpenPrintModal
+  onOpenPrintModal,
+  onOpenPrintSubDomain
 }) => {
   const [search, setSearch] = useState('');
   const [selectedDomainForSub, setSelectedDomainForSub] = useState<DnsRecord | null>(null);
@@ -151,7 +153,6 @@ export const DnsView: React.FC<DnsViewProps> = ({
     }
   };
 
-  
   if (selectedDomainForSub) {
     return (
       <SubDomainView 
@@ -161,6 +162,11 @@ export const DnsView: React.FC<DnsViewProps> = ({
           if (onSaveSubDomains) onSaveSubDomains(records);
         }}
         onBack={() => setSelectedDomainForSub(null)} 
+        onOpenPrintModal={() => {
+          if (onOpenPrintSubDomain) {
+            onOpenPrintSubDomain(selectedDomainForSub);
+          }
+        }}
       />
     );
   }

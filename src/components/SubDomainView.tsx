@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Search, Edit2, Trash2, Globe, Check, Database, Folder, Hash, Server, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Plus, Search, Edit2, Trash2, Globe, Check, Database, Folder, Hash, Server, ExternalLink, Printer } from 'lucide-react';
 import { DnsRecord, SubDomainRecord } from '../types/ipam';
 import Swal from 'sweetalert2';
 
@@ -8,13 +8,15 @@ interface SubDomainViewProps {
   subDomains: SubDomainRecord[];
   onSaveSubDomains: (records: SubDomainRecord[]) => void;
   onBack: () => void;
+  onOpenPrintModal?: () => void;
 }
 
 export const SubDomainView: React.FC<SubDomainViewProps> = ({ 
   parentDomain, 
   subDomains, 
   onSaveSubDomains, 
-  onBack 
+  onBack,
+  onOpenPrintModal
 }) => {
   const [search, setSearch] = useState('');
   
@@ -154,13 +156,26 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
           </div>
         </div>
 
-        <button
-          onClick={openAddModal}
-          className="flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer w-full sm:w-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tambah Sub Domain</span>
-        </button>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          {onOpenPrintModal && (
+            <button
+              onClick={onOpenPrintModal}
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer w-full sm:w-auto"
+              title="Cetak Daftar Sub Domain (A4)"
+            >
+              <Printer className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+              <span>Cetak Sub Domain</span>
+            </button>
+          )}
+
+          <button
+            onClick={openAddModal}
+            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/30 transition-all cursor-pointer w-full sm:w-auto"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tambah Sub Domain</span>
+          </button>
+        </div>
       </div>
 
       {/* Content */}

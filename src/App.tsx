@@ -469,9 +469,10 @@ export const App: React.FC = () => {
 
   // Print Modal state
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [printType, setPrintType] = useState<'allocations' | 'dns' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail'>('allocations');
+  const [printType, setPrintType] = useState<'allocations' | 'dns' | 'sub_domains' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail'>('allocations');
   const [printLocation, setPrintLocation] = useState<LanLocation | undefined>(undefined);
   const [printZone, setPrintZone] = useState<LanZone | undefined>(undefined);
+  const [printParentDomain, setPrintParentDomain] = useState<DnsRecord | undefined>(undefined);
 
 
   // Sync with Database via Server API
@@ -2205,6 +2206,12 @@ export const App: React.FC = () => {
               }}
               onOpenPrintModal={() => {
                 setPrintType('dns');
+                setPrintParentDomain(undefined);
+                setIsPrintModalOpen(true);
+              }}
+              onOpenPrintSubDomain={(parent) => {
+                setPrintType('sub_domains');
+                setPrintParentDomain(parent);
                 setIsPrintModalOpen(true);
               }}
             />
@@ -2722,6 +2729,8 @@ export const App: React.FC = () => {
           groups={groups}
           allocations={isViewingGroupAllocations && activeGroup ? allocations.filter(a => a.groupId === activeGroup.id) : allocations}
           dnsRecords={dnsRecords}
+          subDomains={printParentDomain ? subDomains.filter(s => s.parentDomainId === printParentDomain.id) : subDomains}
+          parentDomain={printParentDomain}
           services={services}
           categories={categories}
           currentUser={currentUser || users[0] || null}
