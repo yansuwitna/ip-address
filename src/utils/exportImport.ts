@@ -494,7 +494,9 @@ export function exportBackupJson(
   lanZones?: LanZone[],
   electricityCables?: ElectricityCableRun[],
   cctvCables?: CctvCableRun[],
-  waterPipes?: WaterPipeRun[]
+  waterPipes?: WaterPipeRun[],
+  lanDeviceTypes?: any[],
+  lanRoomTypes?: any[]
 ): void {
   const backupData = {
     appName: 'Infrastruktur Jaringan Terpadu (LAN, Listrik, CCTV, AIR)',
@@ -512,6 +514,8 @@ export function exportBackupJson(
       lanZones: lanZones?.length || 0,
       lanDevices: lanDevices?.length || 0,
       lanCables: lanCables?.length || 0,
+      lanDeviceTypes: lanDeviceTypes?.length || 0,
+      lanRoomTypes: lanRoomTypes?.length || 0,
       electricityDevices: electricityDevices?.length || 0,
       electricityCables: electricityCables?.length || 0,
       cctvDevices: cctvDevices?.length || 0,
@@ -530,6 +534,8 @@ export function exportBackupJson(
     lanZones: lanZones || [],
     lanDevices: lanDevices || [],
     lanCables: lanCables || [],
+    lanDeviceTypes: lanDeviceTypes || [],
+    lanRoomTypes: lanRoomTypes || [],
     electricityDevices: electricityDevices || [],
     electricityCables: electricityCables || [],
     cctvDevices: cctvDevices || [],
@@ -568,14 +574,16 @@ export function parseImportJson(fileContent: string): {
   lanZones?: LanZone[];
   lanDevices?: LanDevice[];
   lanCables?: LanCableRun[];
+  lanDeviceTypes?: any[];
+  lanRoomTypes?: any[];
 } {
   const parsed = JSON.parse(fileContent);
-  if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.allocations)) {
-    throw new Error('Format file backup JSON tidak valid! Wajib memiliki array groups dan allocations.');
+  if (!parsed || typeof parsed !== 'object') {
+    throw new Error('Format berkas backup JSON tidak valid!');
   }
   return {
-    groups: parsed.groups,
-    allocations: parsed.allocations,
+    groups: Array.isArray(parsed.groups) ? parsed.groups : [],
+    allocations: Array.isArray(parsed.allocations) ? parsed.allocations : [],
     categories: Array.isArray(parsed.categories) ? parsed.categories : undefined,
     users: Array.isArray(parsed.users) ? parsed.users : undefined,
     services: Array.isArray(parsed.services) ? parsed.services : undefined,
@@ -590,6 +598,8 @@ export function parseImportJson(fileContent: string): {
     lanLocations: Array.isArray(parsed.lanLocations) ? parsed.lanLocations : undefined,
     lanZones: Array.isArray(parsed.lanZones) ? parsed.lanZones : undefined,
     lanDevices: Array.isArray(parsed.lanDevices) ? parsed.lanDevices : undefined,
-    lanCables: Array.isArray(parsed.lanCables) ? parsed.lanCables : undefined
+    lanCables: Array.isArray(parsed.lanCables) ? parsed.lanCables : undefined,
+    lanDeviceTypes: Array.isArray(parsed.lanDeviceTypes) ? parsed.lanDeviceTypes : undefined,
+    lanRoomTypes: Array.isArray(parsed.lanRoomTypes) ? parsed.lanRoomTypes : undefined
   };
 }

@@ -12,10 +12,13 @@ import {
   Activity, 
   UserPlus, 
   AlertCircle, 
-  CheckCircle2 
+  CheckCircle2,
+  Upload,
+  FileJson
 } from 'lucide-react';
 import { loginUser } from '../utils/auth';
 import { User, UserAccount } from '../types/auth';
+import { parseImportJson } from '../utils/exportImport';
 
 interface LoginProps {
   users?: UserAccount[];
@@ -30,6 +33,7 @@ interface LoginProps {
     appLogo?: string;
     avatar?: string;
   }) => Promise<{ success: boolean; error?: string; user?: UserAccount }>;
+  onImportData?: (data: any, isDemo?: boolean) => void;
   onBackToHome?: () => void;
 }
 
@@ -37,9 +41,11 @@ export const Login: React.FC<LoginProps> = ({
   users = [],
   onLoginSuccess, 
   onRegisterUser,
+  onImportData,
   onBackToHome, 
   hasNoUsers: propHasNoUsers 
 }) => {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -352,6 +358,49 @@ export const Login: React.FC<LoginProps> = ({
                   <UserPlus className="w-4 h-4" />
                   <span>Daftar Akun & Masuk</span>
                 </button>
+
+                {/* Option to Restore Backup when database is empty */}
+                {onImportData && (
+                  <div className="pt-3 border-t border-slate-200/80 dark:border-slate-800 text-center">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                      Sudah memiliki berkas cadangan (backup JSON)?
+                    </p>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".json"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          try {
+                            const content = event.target?.result as string;
+                            const parsed = parseImportJson(content);
+                            onImportData(parsed);
+                            setRegSuccess('Data berhasil dipulihkan dari berkas cadangan! Silakan masuk dengan akun yang ada pada cadangan.');
+                            if (parsed.users && parsed.users.length > 0) {
+                              setHasNoUsers(false);
+                            }
+                          } catch (err: any) {
+                            setRegError(err?.message || 'Berkas cadangan JSON tidak valid atau rusak!');
+                          }
+                        };
+                        reader.readAsText(file);
+                        if (fileInputRef.current) fileInputRef.current.value = '';
+                      }}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border border-slate-200 dark:border-slate-700"
+                    >
+                      <Upload className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <span>Pulihkan / Restore dari Berkas Cadangan (.json)</span>
+                    </button>
+                  </div>
+                )}
               </form>
             </div>
           ) : (

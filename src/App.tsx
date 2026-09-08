@@ -727,6 +727,8 @@ export const App: React.FC = () => {
     setLanZones([]);
     setLanDevices([]);
     setLanCables([]);
+    setLanDeviceTypes([]);
+    setLanRoomTypes([]);
     setUsers([]);
     setCurrentUser(null);
     
@@ -740,7 +742,7 @@ export const App: React.FC = () => {
     // Hapus bersih seluruh data di backend SQLite
     await wipeServer();
 
-    setAuthView('home');
+    setAuthView('login');
     setIsViewingPublicHome(false);
     setIsSyncing(false);
   };
@@ -763,6 +765,8 @@ export const App: React.FC = () => {
     lanZones?: LanZone[];
     lanDevices?: LanDevice[];
     lanCables?: LanCableRun[];
+    lanDeviceTypes?: any[];
+    lanRoomTypes?: any[];
   }, isDemo: boolean = false) => {
     if (data.lanLocations) {
       setLanLocations(data.lanLocations);
@@ -771,6 +775,14 @@ export const App: React.FC = () => {
     if (data.lanZones) {
       setLanZones(data.lanZones);
       saveLanZones(data.lanZones);
+    }
+    if (data.lanDeviceTypes) {
+      setLanDeviceTypes(data.lanDeviceTypes);
+      saveLanDeviceTypes(data.lanDeviceTypes);
+    }
+    if (data.lanRoomTypes) {
+      setLanRoomTypes(data.lanRoomTypes);
+      saveLanRoomTypes(data.lanRoomTypes);
     }
     if (data.groups) {
       setGroups(data.groups);
@@ -881,6 +893,7 @@ export const App: React.FC = () => {
             }
             return res;
           }}
+          onImportData={handleImportData}
           onBackToHome={() => setAuthView('home')}
         />
       );
@@ -2595,6 +2608,8 @@ export const App: React.FC = () => {
               cctvCables={cctvCables}
               waterDevices={waterDevices}
               waterPipes={waterPipes}
+              lanDeviceTypes={lanDeviceTypes}
+              lanRoomTypes={lanRoomTypes}
               onImportData={handleImportData}
               onWipeAllData={handleWipeAllData}
             />

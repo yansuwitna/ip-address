@@ -58,6 +58,8 @@ interface BackupViewProps {
   lanZones?: LanZone[];
   lanDevices?: LanDevice[];
   lanCables?: LanCableRun[];
+  lanDeviceTypes?: any[];
+  lanRoomTypes?: any[];
   onImportData: (data: {
     groups?: IPGroup[];
     allocations?: IPAllocation[];
@@ -76,6 +78,8 @@ interface BackupViewProps {
     lanZones?: LanZone[];
     lanDevices?: LanDevice[];
     lanCables?: LanCableRun[];
+    lanDeviceTypes?: any[];
+    lanRoomTypes?: any[];
   }, isDemo?: boolean) => void;
   onWipeAllData: () => Promise<void> | void;
 }
@@ -98,6 +102,8 @@ export const BackupView: React.FC<BackupViewProps> = ({
   lanZones = [],
   lanDevices = [],
   lanCables = [],
+  lanDeviceTypes = [],
+  lanRoomTypes = [],
   onImportData,
   onWipeAllData
 }) => {
@@ -151,7 +157,9 @@ export const BackupView: React.FC<BackupViewProps> = ({
       lanZones,
       electricityCables,
       cctvCables,
-      waterPipes
+      waterPipes,
+      lanDeviceTypes,
+      lanRoomTypes
     );
     setHasBackedUp(true);
     showSuccess('Cadangan Berhasil Diunduh', 'Berkas cadangan format JSON berhasil disimpan.');
@@ -240,6 +248,8 @@ export const BackupView: React.FC<BackupViewProps> = ({
       dataToRestore.lanZones = pendingRestoreData.lanZones;
       dataToRestore.lanDevices = pendingRestoreData.lanDevices;
       dataToRestore.lanCables = pendingRestoreData.lanCables;
+      dataToRestore.lanDeviceTypes = pendingRestoreData.lanDeviceTypes;
+      dataToRestore.lanRoomTypes = pendingRestoreData.lanRoomTypes;
     }
     if (restoreIpam) {
       dataToRestore.groups = pendingRestoreData.groups;
