@@ -101,8 +101,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Jaringan LAN',
       icon: Network,
       description: 'Jalur Kabel, Switch & Arah',
-      badge: totalLanCables > 0 ? `${totalLanCables} Jalur` : (totalLanDevices > 0 ? `${totalLanDevices} Unit` : undefined),
-      badgeColor: 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
       activeColor: 'bg-blue-600'
     },
     {
@@ -110,8 +108,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Jaringan Listrik',
       icon: Zap,
       description: 'Panel, Genset, Trafo & UPS',
-      badge: totalElectricityDevices.toString(),
-      badgeColor: 'bg-amber-50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
       activeColor: 'bg-amber-500'
     },
     {
@@ -119,8 +115,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Jaringan CCTV',
       icon: Video,
       description: 'Kamera IP, NVR & PoE',
-      badge: totalCctvDevices.toString(),
-      badgeColor: 'bg-rose-50 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-900',
       activeColor: 'bg-rose-600'
     },
     {
@@ -128,8 +122,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Jaringan AIR',
       icon: Droplets,
       description: 'Irigasi, Pompa & Toren',
-      badge: totalWaterDevices.toString(),
-      badgeColor: 'bg-cyan-50 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800',
       activeColor: 'bg-cyan-600'
     }
   ];
@@ -141,8 +133,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Tipe Perangkat LAN',
       icon: Server,
       description: 'Master Jenis Alat LAN',
-      badge: totalLanDeviceTypes > 0 ? `${totalLanDeviceTypes} Tipe` : undefined,
-      badgeColor: 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
       activeColor: 'bg-blue-600'
     },
     {
@@ -150,8 +140,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Tipe Ruangan',
       icon: DoorOpen,
       description: 'Master Lokasi & Ruangan',
-      badge: totalLanRoomTypes > 0 ? `${totalLanRoomTypes} Tipe` : undefined,
-      badgeColor: 'bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
       activeColor: 'bg-emerald-600'
     }
   ];
@@ -163,8 +151,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Alamat IP',
       icon: Layers,
       description: 'Subnet CIDR & Alokasi Host IP',
-      badge: totalGroups.toString(),
-      badgeColor: 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
       activeColor: 'bg-indigo-600'
     },
     {
@@ -172,8 +158,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Manajemen DNS',
       icon: Globe,
       description: 'Domain & Record Server',
-      badge: totalDnsRecords !== undefined ? totalDnsRecords.toString() : undefined,
-      badgeColor: 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
       activeColor: 'bg-indigo-600'
     },
     {
@@ -181,7 +165,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Kategori Hardware',
       icon: Cpu,
       description: 'Kelola Tipe Hardware',
-      badge: totalCategories !== undefined ? totalCategories.toString() : undefined,
       activeColor: 'bg-indigo-600'
     }
   ];
