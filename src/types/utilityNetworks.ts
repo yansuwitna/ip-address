@@ -224,7 +224,31 @@ export type LanDeviceType =
   | 'otb_fiber' 
   | 'wallplate_jack' 
   | 'media_converter' 
-  | 'other';
+  | 'other'
+  | string;
+
+export interface LanDeviceTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  category?: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface LanRoomTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export type LanCableType = 
   | 'cat5e_utp' 
@@ -248,6 +272,7 @@ export interface LanLocation {
   pic?: string; // Penanggung Jawab Gedung / Sekolah
   phone?: string;
   notes?: string;
+  systemType?: string; // 'lan' | 'electricity' | 'cctv' | 'water'
   createdAt: string;
   updatedAt: string;
 }

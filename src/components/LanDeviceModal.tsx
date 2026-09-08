@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Server, Save, AlertCircle, Lock } from 'lucide-react';
-import { LanDevice, LanDeviceType, LanLocation, LanZone } from '../types/utilityNetworks';
+import { LanDevice, LanDeviceType, LanLocation, LanZone, LanDeviceTypeItem } from '../types/utilityNetworks';
 
 interface LanDeviceModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface LanDeviceModalProps {
   editDevice?: LanDevice | null;
   locations?: LanLocation[];
   zones?: LanZone[];
+  deviceTypes?: LanDeviceTypeItem[];
   presetLocationId?: string;
   presetZoneId?: string;
 }
@@ -20,6 +21,7 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
   editDevice,
   locations = [],
   zones = [],
+  deviceTypes = [],
   presetLocationId,
   presetZoneId
 }) => {
@@ -247,17 +249,27 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
                 onChange={e => setType(e.target.value as LanDeviceType)}
                 className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
               >
-                <option value="switch_distribution">Switch Distribusi Lab</option>
-                <option value="switch_access">Switch Access (Meja Siswa)</option>
-                <option value="switch_core">Switch Core Utama L3</option>
-                <option value="patch_panel">Patch Panel RJ45</option>
-                <option value="router_gateway">Router Gateway / Mikrotik</option>
-                <option value="server_host">Server Komputer / CBT</option>
-                <option value="access_point">Access Point Wi-Fi</option>
-                <option value="otb_fiber">OTB / Roset Fiber Optic</option>
-                <option value="wallplate_jack">Wallplate / Outlet Lantai</option>
-                <option value="media_converter">Media Converter FO</option>
-                <option value="other">Perangkat Lainnya</option>
+                {deviceTypes.length > 0 ? (
+                  deviceTypes.map(dt => (
+                    <option key={dt.id} value={dt.code}>
+                      {dt.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="switch_distribution">Switch Distribusi Lab</option>
+                    <option value="switch_access">Switch Access (Meja Siswa)</option>
+                    <option value="switch_core">Switch Core Utama L3</option>
+                    <option value="patch_panel">Patch Panel RJ45</option>
+                    <option value="router_gateway">Router Gateway / Mikrotik</option>
+                    <option value="server_host">Server Komputer / CBT</option>
+                    <option value="access_point">Access Point Wi-Fi</option>
+                    <option value="otb_fiber">OTB / Roset Fiber Optic</option>
+                    <option value="wallplate_jack">Wallplate / Outlet Lantai</option>
+                    <option value="media_converter">Media Converter FO</option>
+                    <option value="other">Perangkat Lainnya</option>
+                  </>
+                )}
               </select>
             </div>
 

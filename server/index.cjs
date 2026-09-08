@@ -21,7 +21,7 @@ async function startServer() {
   }
 
   // Direct login / token endpoint against Prisma database
-  app.post('/api/auth/login', async (req, res) => {
+  app.post(['/api/autentikasi/masuk', '/api/auth/login'], async (req, res) => {
     try {
       const { username, password, token } = req.body;
 
@@ -158,7 +158,7 @@ async function startServer() {
   });
 
   // GET all data
-  app.get('/api/store/all', async (req, res) => {
+  app.get(['/api/penyimpanan/semua', '/api/store/all'], async (req, res) => {
     try {
       const [
         users,
@@ -177,7 +177,9 @@ async function startServer() {
         lanLocations,
         lanZones,
         lanDevices,
-        lanCableRuns
+        lanCableRuns,
+        lanDeviceTypes,
+        lanRoomTypes
       ] = await Promise.all([
         prisma.user.findMany(),
         prisma.iPGroup.findMany(),
@@ -195,7 +197,9 @@ async function startServer() {
         prisma.lanLocation.findMany(),
         prisma.lanZone.findMany(),
         prisma.lanDevice.findMany(),
-        prisma.lanCableRun.findMany()
+        prisma.lanCableRun.findMany(),
+        prisma.lanDeviceType.findMany(),
+        prisma.lanRoomType.findMany()
       ]);
       
       res.json({
@@ -215,7 +219,9 @@ async function startServer() {
         'netipam_lan_locations_v1': lanLocations,
         'netipam_lan_zones_v1': lanZones,
         'netipam_lan_devices_v1': lanDevices,
-        'netipam_lan_cables_v1': lanCableRuns
+        'netipam_lan_cables_v1': lanCableRuns,
+        'netipam_lan_device_types_v1': lanDeviceTypes,
+        'netipam_lan_room_types_v1': lanRoomTypes
       });
     } catch (error) {
       console.error(error);
@@ -224,7 +230,7 @@ async function startServer() {
   });
 
   // POST to save specific entities
-  app.post('/api/store/:key', async (req, res) => {
+  app.post(['/api/penyimpanan/:key', '/api/store/:key'], async (req, res) => {
     const { key } = req.params;
     const data = req.body;
     
@@ -294,6 +300,12 @@ async function startServer() {
         case 'netipam_lan_cables_v1':
           await replaceTable(prisma.lanCableRun, data);
           break;
+        case 'netipam_lan_device_types_v1':
+          await replaceTable(prisma.lanDeviceType, data);
+          break;
+        case 'netipam_lan_room_types_v1':
+          await replaceTable(prisma.lanRoomType, data);
+          break;
         default:
           return res.status(400).json({ error: 'Unknown key' });
       }
@@ -305,7 +317,7 @@ async function startServer() {
   });
 
   // DELETE all
-  app.delete('/api/store/all', async (req, res) => {
+  app.delete(['/api/penyimpanan/semua', '/api/store/all'], async (req, res) => {
     try {
       await prisma.$transaction([
         prisma.user.deleteMany({}),
@@ -324,7 +336,9 @@ async function startServer() {
         prisma.lanCableRun.deleteMany({}),
         prisma.lanDevice.deleteMany({}),
         prisma.lanZone.deleteMany({}),
-        prisma.lanLocation.deleteMany({})
+        prisma.lanLocation.deleteMany({}),
+        prisma.lanDeviceType.deleteMany({}),
+        prisma.lanRoomType.deleteMany({})
       ]);
       res.json({ success: true });
     } catch (error) {

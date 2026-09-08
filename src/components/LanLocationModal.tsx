@@ -7,13 +7,15 @@ interface LanLocationModalProps {
   onClose: () => void;
   onSave: (location: Partial<LanLocation>) => void;
   editLocation?: LanLocation | null;
+  systemType?: string;
 }
 
 export const LanLocationModal: React.FC<LanLocationModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  editLocation
+  editLocation,
+  systemType = 'lan'
 }) => {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
@@ -22,6 +24,26 @@ export const LanLocationModal: React.FC<LanLocationModalProps> = ({
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const getNetworkTitle = () => {
+    switch (systemType) {
+      case 'electricity': return 'Lokasi Jaringan Listrik';
+      case 'cctv': return 'Lokasi Jaringan CCTV';
+      case 'water': return 'Lokasi Jaringan Air / Irigasi';
+      case 'lan':
+      default: return 'Lokasi Jaringan LAN';
+    }
+  };
+
+  const getNetworkSubtitle = () => {
+    switch (systemType) {
+      case 'electricity': return 'Tingkat 1: Induk gedung, gardu, atau lokasi jaringan kelistrikan';
+      case 'cctv': return 'Tingkat 1: Induk gedung, pos pantau, atau area pengawasan CCTV';
+      case 'water': return 'Tingkat 1: Induk gedung, rumah pompa, toren, atau area distribusi air';
+      case 'lan':
+      default: return 'Tingkat 1: Induk tempat atau gedung jaringan LAN (misal: Gedung A, Kampus Utama)';
+    }
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -59,7 +81,8 @@ export const LanLocationModal: React.FC<LanLocationModalProps> = ({
       address: address.trim() || undefined,
       pic: pic.trim() || undefined,
       phone: phone.trim() || undefined,
-      notes: notes.trim() || undefined
+      notes: notes.trim() || undefined,
+      systemType: editLocation?.systemType || systemType || 'lan'
     });
     onClose();
   };
@@ -76,10 +99,10 @@ export const LanLocationModal: React.FC<LanLocationModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-base text-slate-900 dark:text-slate-100">
-                {editLocation ? 'Edit Lokasi' : 'Tambah Lokasi'}
+                {editLocation ? `Edit ${getNetworkTitle()}` : `Tambah ${getNetworkTitle()}`}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Tingkat 1: Induk tempat atau gedung jaringan (misal: Gedung A, Kantor Pusat, Cabang 1)
+                {getNetworkSubtitle()}
               </p>
             </div>
           </div>

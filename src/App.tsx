@@ -56,6 +56,8 @@ import {
   saveLanCables,
   saveLanLocations,
   saveLanZones,
+  saveLanDeviceTypes,
+  saveLanRoomTypes,
   INITIAL_ELECTRICITY_DEVICES,
   INITIAL_ELECTRICITY_CABLES,
   INITIAL_CCTV_DEVICES,
@@ -65,7 +67,9 @@ import {
   INITIAL_LAN_DEVICES,
   INITIAL_LAN_CABLES,
   INITIAL_LAN_LOCATIONS,
-  INITIAL_LAN_ZONES
+  INITIAL_LAN_ZONES,
+  INITIAL_LAN_DEVICE_TYPES,
+  INITIAL_LAN_ROOM_TYPES
 } from './utils/storage';
 import { exportToXlsx } from './utils/exportImport';
 import { parseCidr } from './utils/ipCalculator';
@@ -80,7 +84,9 @@ import {
   LanDevice, 
   LanCableRun, 
   LanLocation, 
-  LanZone 
+  LanZone,
+  LanDeviceTypeItem,
+  LanRoomTypeItem
 } from './types/utilityNetworks';
 
 import { HomeView } from './components/HomeView';
@@ -117,44 +123,44 @@ import { LanLocationModal } from './components/LanLocationModal';
 import { LanZoneModal } from './components/LanZoneModal';
 
 export const App: React.FC = () => {
-  // Map pathname to internal tab
+  // Map pathname to internal tab (Bahasa Indonesia dengan dukungan URL sebelumnya)
   const getTabFromPath = (path: string): NavTab => {
     const clean = path.replace(/\/+$/, '').toLowerCase();
-    if (clean === '/admin/lan') return 'lan';
-    if (clean === '/admin/ip' || clean === '/admin/groups') return 'groups';
-    if (clean === '/admin/listrik' || clean === '/admin/electricity') return 'electricity';
-    if (clean === '/admin/cctv') return 'cctv';
-    if (clean === '/admin/air' || clean === '/admin/water') return 'water';
-    if (clean === '/admin/dns') return 'dns';
-    if (clean === '/admin/services') return 'services';
-    if (clean === '/admin/categories') return 'categories';
-    if (clean === '/admin/users') return 'users';
-    if (clean === '/admin/backup') return 'backup';
+    if (clean === '/admin/jaringan-lan' || clean === '/admin/lan') return 'lan';
+    if (clean === '/admin/alokasi-ip' || clean === '/admin/ip' || clean === '/admin/groups') return 'groups';
+    if (clean === '/admin/jaringan-listrik' || clean === '/admin/listrik' || clean === '/admin/electricity') return 'electricity';
+    if (clean === '/admin/jaringan-cctv' || clean === '/admin/cctv') return 'cctv';
+    if (clean === '/admin/jaringan-air' || clean === '/admin/air' || clean === '/admin/water') return 'water';
+    if (clean === '/admin/rekaman-dns' || clean === '/admin/dns') return 'dns';
+    if (clean === '/admin/layanan-ip' || clean === '/admin/services') return 'services';
+    if (clean === '/admin/kategori-perangkat' || clean === '/admin/kategori' || clean === '/admin/categories') return 'categories';
+    if (clean === '/admin/manajemen-pengguna' || clean === '/admin/pengguna' || clean === '/admin/users') return 'users';
+    if (clean === '/admin/cadangan-pemulihan' || clean === '/admin/cadangan' || clean === '/admin/backup') return 'backup';
     return 'dashboard';
   };
 
-  // Map internal tab to pathname
+  // Map internal tab to pathname (URL Bahasa Indonesia)
   const getPathFromTab = (tab: NavTab): string => {
     switch (tab) {
-      case 'dashboard': return '/admin';
-      case 'lan': return '/admin/lan';
-      case 'groups': return '/admin/ip';
-      case 'electricity': return '/admin/listrik';
-      case 'cctv': return '/admin/cctv';
-      case 'water': return '/admin/air';
-      case 'dns': return '/admin/dns';
-      case 'services': return '/admin/services';
-      case 'categories': return '/admin/categories';
-      case 'users': return '/admin/users';
-      case 'backup': return '/admin/backup';
-      default: return '/admin';
+      case 'dashboard': return '/admin/dasbor';
+      case 'lan': return '/admin/jaringan-lan';
+      case 'groups': return '/admin/alokasi-ip';
+      case 'electricity': return '/admin/jaringan-listrik';
+      case 'cctv': return '/admin/jaringan-cctv';
+      case 'water': return '/admin/jaringan-air';
+      case 'dns': return '/admin/rekaman-dns';
+      case 'services': return '/admin/layanan-ip';
+      case 'categories': return '/admin/kategori-perangkat';
+      case 'users': return '/admin/manajemen-pengguna';
+      case 'backup': return '/admin/cadangan-pemulihan';
+      default: return '/admin/dasbor';
     }
   };
 
   // Navigation & UI State initialized from URL
   const initialPath = window.location.pathname.replace(/\/+$/, '') || '/';
   const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser);
-  const [authView, setAuthView] = useState<'home' | 'login'>(initialPath === '/login' ? 'login' : 'home');
+  const [authView, setAuthView] = useState<'home' | 'login'>(initialPath === '/masuk' || initialPath === '/login' ? 'login' : 'home');
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [isViewingPublicHome, setIsViewingPublicHome] = useState(initialPath === '/' || initialPath === '');
   const [currentTab, setCurrentTab] = useState<NavTab>(getTabFromPath(initialPath));
@@ -169,14 +175,14 @@ export const App: React.FC = () => {
   };
 
   // Handle auto-routing rules:
-  // 1. If at /login and already logged in, redirect directly to /admin
+  // 1. If at /masuk or /login and already logged in, redirect directly to /admin/dasbor
   useEffect(() => {
     if (currentUser) {
       const path = window.location.pathname.replace(/\/+$/, '') || '/';
-      if (path === '/login') {
+      if (path === '/masuk' || path === '/login') {
         setIsViewingPublicHome(false);
         setAuthView('home');
-        syncBrowserUrl('/admin');
+        syncBrowserUrl('/admin/dasbor');
       }
     }
   }, [currentUser]);
@@ -185,7 +191,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (!currentUser) {
       if (authView === 'login') {
-        syncBrowserUrl('/login');
+        syncBrowserUrl('/masuk');
       } else {
         syncBrowserUrl('/');
       }
@@ -202,11 +208,11 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname.replace(/\/+$/, '') || '/';
-      if (path === '/login') {
+      if (path === '/masuk' || path === '/login') {
         if (currentUser) {
           setIsViewingPublicHome(false);
           setAuthView('home');
-          syncBrowserUrl('/admin');
+          syncBrowserUrl('/admin/dasbor');
         } else {
           setAuthView('login');
           setIsViewingPublicHome(false);
@@ -229,6 +235,7 @@ export const App: React.FC = () => {
       }
     };
 
+
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [currentUser]);
@@ -250,6 +257,8 @@ export const App: React.FC = () => {
   const [lanZones, setLanZones] = useState<LanZone[]>([]);
   const [lanDevices, setLanDevices] = useState<LanDevice[]>([]);
   const [lanCables, setLanCables] = useState<LanCableRun[]>([]);
+  const [lanDeviceTypes, setLanDeviceTypes] = useState<LanDeviceTypeItem[]>([]);
+  const [lanRoomTypes, setLanRoomTypes] = useState<LanRoomTypeItem[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
   const [selectedServiceIp, setSelectedServiceIp] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'matrix' | 'table'>('matrix');
@@ -278,6 +287,22 @@ export const App: React.FC = () => {
         setLanZones(data['netipam_lan_zones_v1'] || []);
         setLanDevices(data['netipam_lan_devices_v1'] || []);
         setLanCables(data['netipam_lan_cables_v1'] || []);
+        
+        const serverDeviceTypes = data['netipam_lan_device_types_v1'];
+        if (serverDeviceTypes && serverDeviceTypes.length > 0) {
+          setLanDeviceTypes(serverDeviceTypes);
+        } else {
+          setLanDeviceTypes(INITIAL_LAN_DEVICE_TYPES);
+          saveLanDeviceTypes(INITIAL_LAN_DEVICE_TYPES);
+        }
+
+        const serverRoomTypes = data['netipam_lan_room_types_v1'];
+        if (serverRoomTypes && serverRoomTypes.length > 0) {
+          setLanRoomTypes(serverRoomTypes);
+        } else {
+          setLanRoomTypes(INITIAL_LAN_ROOM_TYPES);
+          saveLanRoomTypes(INITIAL_LAN_ROOM_TYPES);
+        }
         
         // Sektor Listrik, CCTV, AIR
         setElectricityDevices(data['netipam_electricity_devices_v1'] || []);
@@ -451,6 +476,7 @@ export const App: React.FC = () => {
   // LAN Modals (Lokasi Sekolah, Ruangan Lab, Perangkat, Jalur Kabel)
   const [isLanLocationModalOpen, setIsLanLocationModalOpen] = useState(false);
   const [editingLanLocation, setEditingLanLocation] = useState<LanLocation | null>(null);
+  const [lanLocationSystemType, setLanLocationSystemType] = useState<string>('lan');
 
   const [isLanZoneModalOpen, setIsLanZoneModalOpen] = useState(false);
   const [editingLanZone, setEditingLanZone] = useState<LanZone | null>(null);
@@ -571,6 +597,18 @@ export const App: React.FC = () => {
       saveLanCables(lanCables);
     }
   }, [lanCables, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing && lanDeviceTypes.length > 0) {
+      saveLanDeviceTypes(lanDeviceTypes);
+    }
+  }, [lanDeviceTypes, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing && lanRoomTypes.length > 0) {
+      saveLanRoomTypes(lanRoomTypes);
+    }
+  }, [lanRoomTypes, isSyncing]);
 
 
 
@@ -801,7 +839,7 @@ export const App: React.FC = () => {
       setCurrentUser(null);
       setAuthView('login');
       setIsViewingPublicHome(false);
-      syncBrowserUrl('/login');
+      syncBrowserUrl('/masuk');
     }
   };
 
@@ -1296,6 +1334,7 @@ export const App: React.FC = () => {
         pic: locData.pic,
         phone: locData.phone,
         notes: locData.notes,
+        systemType: locData.systemType || lanLocationSystemType,
         createdAt: now,
         updatedAt: now
       };
@@ -1524,7 +1563,7 @@ export const App: React.FC = () => {
           {/* TAB: JARINGAN LAN (JALUR KABEL & PERANGKAT FISIK) */}
           {currentTab === 'lan' && (
             <LanView
-              locations={lanLocations}
+              locations={lanLocations.filter(loc => loc.systemType === 'lan' || !loc.systemType)}
               zones={lanZones}
               devices={lanDevices}
               cables={lanCables}
@@ -1538,10 +1577,12 @@ export const App: React.FC = () => {
               onDeleteCable={handleDeleteLanCable}
               onOpenAddLocationModal={() => {
                 setEditingLanLocation(null);
+                setLanLocationSystemType('lan');
                 setIsLanLocationModalOpen(true);
               }}
               onOpenEditLocationModal={(loc) => {
                 setEditingLanLocation(loc);
+                setLanLocationSystemType(loc.systemType || 'lan');
                 setIsLanLocationModalOpen(true);
               }}
               onOpenAddZoneModal={(locId) => {
@@ -2257,7 +2298,7 @@ export const App: React.FC = () => {
           {/* TAB: JARINGAN LISTRIK */}
           {currentTab === 'electricity' && (
             <ElectricityView
-              locations={lanLocations}
+              locations={lanLocations.filter(loc => loc.systemType === 'electricity')}
               zones={lanZones}
               devices={electricityDevices}
               cables={electricityCables}
@@ -2271,10 +2312,12 @@ export const App: React.FC = () => {
               onDeleteCable={handleDeleteElectricityCable}
               onOpenAddLocationModal={() => {
                 setEditingLanLocation(null);
+                setLanLocationSystemType('electricity');
                 setIsLanLocationModalOpen(true);
               }}
               onOpenEditLocationModal={(loc) => {
                 setEditingLanLocation(loc);
+                setLanLocationSystemType(loc.systemType || 'electricity');
                 setIsLanLocationModalOpen(true);
               }}
               onOpenAddZoneModal={(locId) => {
@@ -2319,7 +2362,7 @@ export const App: React.FC = () => {
           {/* TAB: JARINGAN CCTV */}
           {currentTab === 'cctv' && (
             <CctvView
-              locations={lanLocations}
+              locations={lanLocations.filter(loc => loc.systemType === 'cctv')}
               zones={lanZones}
               devices={cctvDevices}
               cables={cctvCables}
@@ -2333,10 +2376,12 @@ export const App: React.FC = () => {
               onDeleteCable={handleDeleteCctvCable}
               onOpenAddLocationModal={() => {
                 setEditingLanLocation(null);
+                setLanLocationSystemType('cctv');
                 setIsLanLocationModalOpen(true);
               }}
               onOpenEditLocationModal={(loc) => {
                 setEditingLanLocation(loc);
+                setLanLocationSystemType(loc.systemType || 'cctv');
                 setIsLanLocationModalOpen(true);
               }}
               onOpenAddZoneModal={(locId) => {
@@ -2381,7 +2426,7 @@ export const App: React.FC = () => {
           {/* TAB: JARINGAN AIR (IRIGASI) */}
           {currentTab === 'water' && (
             <WaterView
-              locations={lanLocations}
+              locations={lanLocations.filter(loc => loc.systemType === 'water')}
               zones={lanZones}
               devices={waterDevices}
               pipes={waterPipes}
@@ -2395,10 +2440,12 @@ export const App: React.FC = () => {
               onDeletePipe={handleDeleteWaterPipe}
               onOpenAddLocationModal={() => {
                 setEditingLanLocation(null);
+                setLanLocationSystemType('water');
                 setIsLanLocationModalOpen(true);
               }}
               onOpenEditLocationModal={(loc) => {
                 setEditingLanLocation(loc);
+                setLanLocationSystemType(loc.systemType || 'water');
                 setIsLanLocationModalOpen(true);
               }}
               onOpenAddZoneModal={(locId) => {
@@ -2594,7 +2641,7 @@ export const App: React.FC = () => {
           onSave={handleSaveElectricityDevice}
           editDevice={editingElectricityDevice}
           existingDevices={electricityDevices}
-          locations={lanLocations}
+          locations={lanLocations.filter(loc => loc.systemType === 'electricity')}
           zones={lanZones}
           presetLocationId={electricityDeviceDefaultLocationId}
           presetZoneId={electricityDeviceDefaultZoneId}
@@ -2612,7 +2659,7 @@ export const App: React.FC = () => {
           }}
           onSave={handleSaveElectricityCable}
           editCable={editingElectricityCable}
-          locations={lanLocations}
+          locations={lanLocations.filter(loc => loc.systemType === 'electricity')}
           zones={lanZones}
           electricityDevices={electricityDevices}
           presetLocationId={electricityCableDefaultLocationId}
@@ -2632,7 +2679,7 @@ export const App: React.FC = () => {
           onSave={handleSaveCctvDevice}
           editDevice={editingCctvDevice}
           existingNvrList={cctvDevices.filter(d => d.type === 'nvr' || d.type === 'dvr')}
-          locations={lanLocations}
+          locations={lanLocations.filter(loc => loc.systemType === 'cctv')}
           zones={lanZones}
           presetLocationId={cctvDeviceDefaultLocationId}
           presetZoneId={cctvDeviceDefaultZoneId}
@@ -2650,7 +2697,7 @@ export const App: React.FC = () => {
           }}
           onSave={handleSaveCctvCable}
           editCable={editingCctvCable}
-          locations={lanLocations}
+          locations={lanLocations.filter(loc => loc.systemType === 'cctv')}
           zones={lanZones}
           cctvDevices={cctvDevices}
           presetLocationId={cctvCableDefaultLocationId}
@@ -2669,7 +2716,7 @@ export const App: React.FC = () => {
           }}
           onSave={handleSaveWaterDevice}
           editDevice={editingWaterDevice}
-          locations={lanLocations}
+          locations={lanLocations.filter(loc => loc.systemType === 'water')}
           zones={lanZones}
           presetLocationId={waterDeviceDefaultLocationId}
           presetZoneId={waterDeviceDefaultZoneId}
@@ -2687,7 +2734,7 @@ export const App: React.FC = () => {
           }}
           onSave={handleSaveWaterPipe}
           editPipe={editingWaterPipe}
-          locations={lanLocations}
+          locations={lanLocations.filter(loc => loc.systemType === 'water')}
           zones={lanZones}
           waterDevices={waterDevices}
           presetLocationId={waterPipeDefaultLocationId}
@@ -2704,6 +2751,7 @@ export const App: React.FC = () => {
           }}
           onSave={handleSaveLanLocation}
           editLocation={editingLanLocation}
+          systemType={lanLocationSystemType}
         />
       )}
 
@@ -2717,7 +2765,8 @@ export const App: React.FC = () => {
           }}
           onSave={handleSaveLanZone}
           editZone={editingLanZone}
-          locations={lanLocations}
+          locations={lanLocations.filter(loc => loc.systemType === 'lan' || !loc.systemType)}
+          roomTypes={lanRoomTypes}
           presetLocationId={lanZoneDefaultLocationId}
         />
       )}
@@ -2733,8 +2782,9 @@ export const App: React.FC = () => {
           }}
           onSave={handleSaveLanDevice}
           editDevice={editingLanDevice}
-          locations={lanLocations}
+          locations={lanLocations.filter(loc => loc.systemType === 'lan' || !loc.systemType)}
           zones={lanZones}
+          deviceTypes={lanDeviceTypes}
           presetLocationId={lanDeviceDefaultLocationId}
           presetZoneId={lanDeviceDefaultZoneId}
         />
@@ -2752,7 +2802,7 @@ export const App: React.FC = () => {
           onSave={handleSaveLanCable}
           editCable={editingLanCable}
           devices={lanDevices}
-          locations={lanLocations}
+          locations={lanLocations.filter(loc => loc.systemType === 'lan' || !loc.systemType)}
           zones={lanZones}
           presetLocationId={lanCableDefaultLocationId}
           presetZoneId={lanCableDefaultZoneId}

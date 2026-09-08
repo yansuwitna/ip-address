@@ -1,6 +1,6 @@
 export async function syncToServer(key: string, data: any) {
   try {
-    await fetch(`/api/store/${key}`, {
+    await fetch(`/api/penyimpanan/${key}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -14,7 +14,7 @@ export async function syncToServer(key: string, data: any) {
 
 export async function loginDirectToServer(username: string, password: string): Promise<{ success: boolean; user?: any; error?: string }> {
   try {
-    const res = await fetch('/api/auth/login', {
+    const res = await fetch('/api/autentikasi/masuk', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -30,7 +30,7 @@ export async function loginDirectToServer(username: string, password: string): P
 
 export async function loginWithTokenDirectToServer(token: string): Promise<{ success: boolean; user?: any; error?: string }> {
   try {
-    const res = await fetch('/api/auth/login', {
+    const res = await fetch('/api/autentikasi/masuk', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -46,7 +46,7 @@ export async function loginWithTokenDirectToServer(token: string): Promise<{ suc
 
 export async function fetchFromServer() {
   try {
-    const res = await fetch('/api/store/all');
+    const res = await fetch('/api/penyimpanan/semua');
     if (res.ok) {
       return await res.json();
     }
@@ -58,7 +58,7 @@ export async function fetchFromServer() {
 
 export async function wipeServer() {
   try {
-    await fetch('/api/store/all', {
+    await fetch('/api/penyimpanan/semua', {
       method: 'DELETE'
     });
   } catch (error) {

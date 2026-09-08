@@ -8,314 +8,376 @@ generator client {
 }
 
 model User {
-  id         String   @id
-  username   String   @unique
-  name       String
-  email      String
-  password   String
-  role       String?
-  avatar     String?
-  appName    String?
-  appLogo    String?
-  lastLogin  String?
-  createdAt  String
-  magicToken String?
+  id         String   @id @map("id")
+  username   String   @unique @map("nama_pengguna")
+  name       String   @map("nama_lengkap")
+  email      String   @map("email")
+  password   String   @map("kata_sandi")
+  role       String?  @map("peran")
+  avatar     String?  @map("avatar")
+  appName    String?  @map("nama_aplikasi")
+  appLogo    String?  @map("logo_aplikasi")
+  lastLogin  String?  @map("terakhir_masuk")
+  createdAt  String   @map("dibuat_pada")
+  magicToken String?  @map("token_ajaib")
+
+  @@map("pengguna")
 }
 
 model IPGroup {
-  id          String   @id
-  name        String
-  cidr        String
-  gateway     String
-  vlanId      Int?
-  description String?
-  location    String?
-  pic         String?
-  color       String?
-  createdAt   String
-  updatedAt   String
+  id          String   @id @map("id")
+  name        String   @map("nama_grup")
+  cidr        String   @map("cidr")
+  gateway     String   @map("gateway")
+  vlanId      Int?     @map("id_vlan")
+  description String?  @map("deskripsi")
+  location    String?  @map("lokasi")
+  pic         String?  @map("penanggung_jawab")
+  color       String?  @map("warna")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("grup_ip")
 }
 
 model IPAllocation {
-  id              String   @id
-  groupId         String   @default("")
-  ip              String   @default("")
-  hostname        String?
-  deviceType      String?
-  macAddress      String?
-  assignedTo      String?
-  department      String?
-  status          String   @default("used")
-  assignedDate    String?
-  notes           String?
-  lastPingStatus  String?
-  lastPingLatency Float?
+  id              String   @id @map("id")
+  groupId         String   @default("") @map("id_grup")
+  ip              String   @default("") @map("alamat_ip")
+  hostname        String?  @map("nama_host")
+  deviceType      String?  @map("tipe_perangkat")
+  macAddress      String?  @map("alamat_mac")
+  assignedTo      String?  @map("diberikan_kepada")
+  department      String?  @map("departemen")
+  status          String   @default("used") @map("status")
+  assignedDate    String?  @map("tanggal_alokasi")
+  notes           String?  @map("catatan")
+  lastPingStatus  String?  @map("status_ping_terakhir")
+  lastPingLatency Float?   @map("latensi_ping_terakhir")
+
+  @@map("alokasi_ip")
 }
 
 model DeviceCategory {
-  id          String   @id
-  name        String
-  icon        String
-  description String?
-  isDefault   Boolean?
+  id          String   @id @map("id")
+  name        String   @map("nama_kategori")
+  icon        String   @map("ikon")
+  description String?  @map("deskripsi")
+  isDefault   Boolean? @map("apakah_standar")
+
+  @@map("kategori_perangkat")
 }
 
 model IPService {
-  id           String   @id
-  allocationId String   @default("")
-  ip           String   @default("")
-  name         String
-  port         Int
-  protocol     String
-  category     String
-  status       String
-  version      String?
-  url          String?
-  description  String?
-  lastChecked  String?
-  checkStatus  String?
-  checkLatency Float?
-  createdAt    String
-  updatedAt    String
+  id           String   @id @map("id")
+  allocationId String   @default("") @map("id_alokasi")
+  ip           String   @default("") @map("alamat_ip")
+  name         String   @map("nama_layanan")
+  port         Int      @map("port")
+  protocol     String   @map("protokol")
+  category     String   @map("kategori")
+  status       String   @map("status")
+  version      String?  @map("versi")
+  url          String?  @map("url")
+  description  String?  @map("deskripsi")
+  lastChecked  String?  @map("terakhir_diperiksa")
+  checkStatus  String?  @map("status_pemeriksaan")
+  checkLatency Float?   @map("latensi_pemeriksaan")
+  createdAt    String   @map("dibuat_pada")
+  updatedAt    String   @map("diperbarui_pada")
+
+  @@map("layanan_ip")
 }
 
 model DnsRecord {
-  id          String   @id
-  domain      String
-  type        String
-  value       String
-  ttl         Int
-  priority    Int?
-  ip          String?
-  groupId     String?
-  status      String   @default("active")
-  description String?
-  protocol    String?  @default("http")
-  createdAt   String
-  updatedAt   String
+  id          String   @id @map("id")
+  domain      String   @map("nama_domain")
+  type        String   @map("tipe_rekaman")
+  value       String   @map("nilai")
+  ttl         Int      @map("ttl")
+  priority    Int?     @map("prioritas")
+  ip          String?  @map("alamat_ip")
+  groupId     String?  @map("id_grup")
+  status      String   @default("active") @map("status")
+  description String?  @map("deskripsi")
+  protocol    String?  @default("http") @map("protokol")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("rekaman_dns")
 }
 
 model SubDomainRecord {
-  id             String   @id
-  parentDomainId String   @default("")
-  subName        String
-  ipAddress      String?
-  port           String?
-  folder         String?
-  database       String?
-  description    String?
-  protocol       String?  @default("http")
-  forward        String?
-  createdAt      String
+  id             String   @id @map("id")
+  parentDomainId String   @default("") @map("id_domain_induk")
+  subName        String   @map("nama_sub")
+  ipAddress      String?  @map("alamat_ip")
+  port           String?  @map("port")
+  folder         String?  @map("direktori")
+  database       String?  @map("basis_data")
+  description    String?  @map("deskripsi")
+  protocol       String?  @default("http") @map("protokol")
+  forward        String?  @map("pengalihan")
+  createdAt      String   @map("dibuat_pada")
+
+  @@map("sub_domain")
 }
 
 model ElectricityDevice {
-  id              String   @id
-  name            String
-  code            String   @default("")
-  type            String   @default("other")
-  brand           String?
-  model           String?
-  location        String   @default("")
-  phase           String   @default("1_phase")
-  voltage         Float    @default(220)
-  currentAmpere   Float?
-  capacityWatt    Float?
-  currentLoadWatt Float?
-  status          String   @default("normal")
-  sourcePanelId   String?
-  installationDate String?
-  lastMaintenance String?
-  pic             String?
-  notes           String?
-  createdAt       String
-  updatedAt       String
+  id               String   @id @map("id")
+  name             String   @map("nama_perangkat")
+  code             String   @default("") @map("kode")
+  type             String   @default("other") @map("tipe")
+  brand            String?  @map("merek")
+  model            String?  @map("model")
+  location         String   @default("") @map("lokasi")
+  phase            String   @default("1_phase") @map("fasa")
+  voltage          Float    @default(220) @map("tegangan")
+  currentAmpere    Float?   @map("arus_ampere")
+  capacityWatt     Float?   @map("kapasitas_watt")
+  currentLoadWatt  Float?   @map("beban_saat_ini_watt")
+  status           String   @default("normal") @map("status")
+  sourcePanelId    String?  @map("id_panel_sumber")
+  installationDate String?  @map("tanggal_instalasi")
+  lastMaintenance  String?  @map("pemeliharaan_terakhir")
+  pic              String?  @map("penanggung_jawab")
+  notes            String?  @map("catatan")
+  createdAt        String   @map("dibuat_pada")
+  updatedAt        String   @map("diperbarui_pada")
+
+  @@map("perangkat_listrik")
 }
 
 model CctvDevice {
-  id               String   @id
-  name             String
-  type             String   @default("camera_ip_bullet")
-  ipAddress        String?
-  macAddress       String?
-  location         String   @default("")
-  brand            String?
-  model            String?
-  resolution       String?
-  channelNumber    Int?
-  nvrId            String?
-  poePort          String?
-  rtspUrl          String?
-  storageDays      Int?
-  status           String   @default("online")
-  installationDate String?
-  pic              String?
-  notes            String?
-  createdAt        String
-  updatedAt        String
+  id               String   @id @map("id")
+  name             String   @map("nama_perangkat")
+  type             String   @default("camera_ip_bullet") @map("tipe")
+  ipAddress        String?  @map("alamat_ip")
+  macAddress       String?  @map("alamat_mac")
+  location         String   @default("") @map("lokasi")
+  brand            String?  @map("merek")
+  model            String?  @map("model")
+  resolution       String?  @map("resolusi")
+  channelNumber    Int?     @map("nomor_saluran")
+  nvrId            String?  @map("id_nvr")
+  poePort          String?  @map("port_poe")
+  rtspUrl          String?  @map("url_rtsp")
+  storageDays      Int?     @map("hari_penyimpanan")
+  status           String   @default("online") @map("status")
+  installationDate String?  @map("tanggal_instalasi")
+  pic              String?  @map("penanggung_jawab")
+  notes            String?  @map("catatan")
+  createdAt        String   @map("dibuat_pada")
+  updatedAt        String   @map("diperbarui_pada")
+
+  @@map("perangkat_cctv")
 }
 
 model WaterDevice {
-  id                   String   @id
-  name                 String
-  code                 String   @default("")
-  type                 String   @default("other")
-  location             String   @default("")
-  pipeDiameter         String?
-  flowRateLpm          Float?
-  pressureBar          Float?
-  tankCapacityLiter    Float?
-  currentWaterLevelPct Float?
-  powerWatt            Float?
-  zoneArea             String?
-  status               String   @default("active")
-  sourceSupply         String?
-  installationDate     String?
-  pic                  String?
-  notes                String?
-  createdAt            String
-  updatedAt            String
+  id                   String   @id @map("id")
+  name                 String   @map("nama_perangkat")
+  code                 String   @default("") @map("kode")
+  type                 String   @default("other") @map("tipe")
+  location             String   @default("") @map("lokasi")
+  pipeDiameter         String?  @map("diameter_pipa")
+  flowRateLpm          Float?   @map("debit_aliran_lpm")
+  pressureBar          Float?   @map("tekanan_bar")
+  tankCapacityLiter    Float?   @map("kapasitas_tangki_liter")
+  currentWaterLevelPct Float?   @map("tingkat_air_persen")
+  powerWatt            Float?   @map("daya_watt")
+  zoneArea             String?  @map("area_zona")
+  status               String   @default("active") @map("status")
+  sourceSupply         String?  @map("sumber_pasokan")
+  installationDate     String?  @map("tanggal_instalasi")
+  pic                  String?  @map("penanggung_jawab")
+  notes                String?  @map("catatan")
+  createdAt            String   @map("dibuat_pada")
+  updatedAt            String   @map("diperbarui_pada")
+
+  @@map("perangkat_air")
 }
 
 model LanLocation {
-  id          String   @id
-  name        String
-  code        String   @default("")
-  address     String?
-  pic         String?
-  phone       String?
-  notes       String?
-  createdAt   String
-  updatedAt   String
+  id         String   @id @map("id")
+  name       String   @map("nama_lokasi")
+  code       String   @default("") @map("kode")
+  address    String?  @map("alamat")
+  pic        String?  @map("penanggung_jawab")
+  phone      String?  @map("telepon")
+  notes      String?  @map("catatan")
+  systemType String   @default("lan") @map("tipe_sistem")
+  createdAt  String   @map("dibuat_pada")
+  updatedAt  String   @map("diperbarui_pada")
+
+  @@map("lokasi_lan")
 }
 
 model LanZone {
-  id          String   @id
-  locationId  String
-  name        String
-  code        String   @default("")
-  floor       String?
-  roomType    String?  @default("lab")
-  pic         String?
-  notes       String?
-  systemType  String   @default("lan")
-  createdAt   String
-  updatedAt   String
+  id         String   @id @map("id")
+  locationId String   @map("id_lokasi")
+  name       String   @map("nama_zona")
+  code       String   @default("") @map("kode")
+  floor      String?  @map("lantai")
+  roomType   String?  @default("lab") @map("tipe_ruangan")
+  pic        String?  @map("penanggung_jawab")
+  notes      String?  @map("catatan")
+  systemType String   @default("lan") @map("tipe_sistem")
+  createdAt  String   @map("dibuat_pada")
+  updatedAt  String   @map("diperbarui_pada")
+
+  @@map("zona_lan")
 }
 
 model LanDevice {
-  id              String   @id
-  locationId      String?
-  zoneId          String?
-  name            String
-  code            String   @default("")
-  type            String   @default("switch")
-  brand           String?
-  model           String?
-  location        String   @default("")
-  rackNumber      String?
-  totalPorts      Int?
-  ipAddress       String?
-  macAddress      String?
-  status          String   @default("active")
-  pic             String?
-  notes           String?
-  createdAt       String
-  updatedAt       String
+  id         String   @id @map("id")
+  locationId String?  @map("id_lokasi")
+  zoneId     String?  @map("id_zona")
+  name       String   @map("nama_perangkat")
+  code       String   @default("") @map("kode")
+  type       String   @default("switch") @map("tipe")
+  brand      String?  @map("merek")
+  model      String?  @map("model")
+  location   String   @default("") @map("lokasi")
+  rackNumber String?  @map("nomor_rak")
+  totalPorts Int?     @map("total_port")
+  ipAddress  String?  @map("alamat_ip")
+  macAddress String?  @map("alamat_mac")
+  status     String   @default("active") @map("status")
+  pic        String?  @map("penanggung_jawab")
+  notes      String?  @map("catatan")
+  createdAt  String   @map("dibuat_pada")
+  updatedAt  String   @map("diperbarui_pada")
+
+  @@map("perangkat_lan")
 }
 
 model LanCableRun {
-  id              String   @id
-  locationId      String?
-  zoneId          String?
-  cableCode       String   @default("")
-  cableType       String   @default("cat6_utp")
-  sourceDeviceId  String?
-  sourceDeviceName String?
-  sourcePort      String?
-  sourceLocation  String   @default("")
-  targetDeviceId  String?
-  targetDeviceName String?
-  targetPort      String?
-  targetLocation  String   @default("")
-  pathwayRoute    String?
-  lengthMeter     Float?
-  color           String?  @default("blue")
-  speedMbps       Int?     @default(1000)
-  status          String   @default("connected")
-  pic             String?
-  notes           String?
-  createdAt       String
-  updatedAt       String
+  id               String   @id @map("id")
+  locationId       String?  @map("id_lokasi")
+  zoneId           String?  @map("id_zona")
+  cableCode        String   @default("") @map("kode_kabel")
+  cableType        String   @default("cat6_utp") @map("tipe_kabel")
+  sourceDeviceId   String?  @map("id_perangkat_asal")
+  sourceDeviceName String?  @map("nama_perangkat_asal")
+  sourcePort       String?  @map("port_asal")
+  sourceLocation   String   @default("") @map("lokasi_asal")
+  targetDeviceId   String?  @map("id_perangkat_tujuan")
+  targetDeviceName String?  @map("nama_perangkat_tujuan")
+  targetPort       String?  @map("port_tujuan")
+  targetLocation   String   @default("") @map("lokasi_tujuan")
+  pathwayRoute     String?  @map("rute_jalur")
+  lengthMeter      Float?   @map("panjang_meter")
+  color            String?  @default("blue") @map("warna")
+  speedMbps        Int?     @default(1000) @map("kecepatan_mbps")
+  status           String   @default("connected") @map("status")
+  pic              String?  @map("penanggung_jawab")
+  notes            String?  @map("catatan")
+  createdAt        String   @map("dibuat_pada")
+  updatedAt        String   @map("diperbarui_pada")
+
+  @@map("jalur_kabel_lan")
 }
 
 model ElectricityCableRun {
-  id              String   @id
-  locationId      String?
-  zoneId          String?
-  cableCode       String   @default("")
-  cableType       String   @default("nya_nym")
-  sourceDeviceId  String?
-  sourceDeviceName String?
-  sourcePort      String?
-  sourceLocation  String   @default("")
-  targetDeviceId  String?
-  targetDeviceName String?
-  targetPort      String?
-  targetLocation  String   @default("")
-  pathwayRoute    String?
-  lengthMeter     Float?
-  color           String?  @default("black")
-  capacityAmpere  Float?
-  status          String   @default("connected")
-  pic             String?
-  notes           String?
-  createdAt       String
-  updatedAt       String
+  id               String   @id @map("id")
+  locationId       String?  @map("id_lokasi")
+  zoneId           String?  @map("id_zona")
+  cableCode        String   @default("") @map("kode_kabel")
+  cableType        String   @default("nya_nym") @map("tipe_kabel")
+  sourceDeviceId   String?  @map("id_perangkat_asal")
+  sourceDeviceName String?  @map("nama_perangkat_asal")
+  sourcePort       String?  @map("port_asal")
+  sourceLocation   String   @default("") @map("lokasi_asal")
+  targetDeviceId   String?  @map("id_perangkat_tujuan")
+  targetDeviceName String?  @map("nama_perangkat_tujuan")
+  targetPort       String?  @map("port_tujuan")
+  targetLocation   String   @default("") @map("lokasi_tujuan")
+  pathwayRoute     String?  @map("rute_jalur")
+  lengthMeter      Float?   @map("panjang_meter")
+  color            String?  @default("black") @map("warna")
+  capacityAmpere   Float?   @map("kapasitas_ampere")
+  status           String   @default("connected") @map("status")
+  pic              String?  @map("penanggung_jawab")
+  notes            String?  @map("catatan")
+  createdAt        String   @map("dibuat_pada")
+  updatedAt        String   @map("diperbarui_pada")
+
+  @@map("jalur_kabel_listrik")
 }
 
 model CctvCableRun {
-  id              String   @id
-  locationId      String?
-  zoneId          String?
-  cableCode       String   @default("")
-  cableType       String   @default("cat6_utp")
-  sourceDeviceId  String?
-  sourceDeviceName String?
-  sourcePort      String?
-  sourceLocation  String   @default("")
-  targetDeviceId  String?
-  targetDeviceName String?
-  targetPort      String?
-  targetLocation  String   @default("")
-  pathwayRoute    String?
-  lengthMeter     Float?
-  status          String   @default("connected")
-  pic             String?
-  notes           String?
-  createdAt       String
-  updatedAt       String
+  id               String   @id @map("id")
+  locationId       String?  @map("id_lokasi")
+  zoneId           String?  @map("id_zona")
+  cableCode        String   @default("") @map("kode_kabel")
+  cableType        String   @default("cat6_utp") @map("tipe_kabel")
+  sourceDeviceId   String?  @map("id_perangkat_asal")
+  sourceDeviceName String?  @map("nama_perangkat_asal")
+  sourcePort       String?  @map("port_asal")
+  sourceLocation   String   @default("") @map("lokasi_asal")
+  targetDeviceId   String?  @map("id_perangkat_tujuan")
+  targetDeviceName String?  @map("nama_perangkat_tujuan")
+  targetPort       String?  @map("port_tujuan")
+  targetLocation   String   @default("") @map("lokasi_tujuan")
+  pathwayRoute     String?  @map("rute_jalur")
+  lengthMeter      Float?   @map("panjang_meter")
+  status           String   @default("connected") @map("status")
+  pic              String?  @map("penanggung_jawab")
+  notes            String?  @map("catatan")
+  createdAt        String   @map("dibuat_pada")
+  updatedAt        String   @map("diperbarui_pada")
+
+  @@map("jalur_kabel_cctv")
 }
 
 model WaterPipeRun {
-  id              String   @id
-  locationId      String?
-  zoneId          String?
-  pipeCode        String   @default("")
-  pipeType        String   @default("pvc")
-  pipeDiameter    String?
-  sourceDeviceId  String?
-  sourceDeviceName String?
-  sourceLocation  String   @default("")
-  targetDeviceId  String?
-  targetDeviceName String?
-  targetLocation  String   @default("")
-  pathwayRoute    String?
-  lengthMeter     Float?
-  pressureBar     Float?
-  status          String   @default("active")
-  pic             String?
-  notes           String?
-  createdAt       String
-  updatedAt       String
+  id               String   @id @map("id")
+  locationId       String?  @map("id_lokasi")
+  zoneId           String?  @map("id_zona")
+  pipeCode         String   @default("") @map("kode_pipa")
+  pipeType         String   @default("pvc") @map("tipe_pipa")
+  pipeDiameter     String?  @map("diameter_pipa")
+  sourceDeviceId   String?  @map("id_perangkat_asal")
+  sourceDeviceName String?  @map("nama_perangkat_asal")
+  sourceLocation   String   @default("") @map("lokasi_asal")
+  targetDeviceId   String?  @map("id_perangkat_tujuan")
+  targetDeviceName String?  @map("nama_perangkat_tujuan")
+  targetLocation   String   @default("") @map("lokasi_tujuan")
+  pathwayRoute     String?  @map("rute_jalur")
+  lengthMeter      Float?   @map("panjang_meter")
+  pressureBar      Float?   @map("tekanan_bar")
+  status           String   @default("active") @map("status")
+  pic              String?  @map("penanggung_jawab")
+  notes            String?  @map("catatan")
+  createdAt        String   @map("dibuat_pada")
+  updatedAt        String   @map("diperbarui_pada")
+
+  @@map("jalur_pipa_air")
+}
+
+model LanDeviceType {
+  id          String   @id @map("id")
+  name        String   @map("nama_tipe")
+  code        String   @unique @map("kode")
+  category    String?  @default("network") @map("kategori")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("tipe_perangkat_lan")
+}
+
+model LanRoomType {
+  id          String   @id @map("id")
+  name        String   @map("nama_tipe")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("tipe_ruangan_lan")
 }

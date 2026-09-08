@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Network, Save, AlertCircle, Building2, Lock } from 'lucide-react';
-import { LanZone, LanLocation } from '../types/utilityNetworks';
+import { LanZone, LanLocation, LanRoomTypeItem } from '../types/utilityNetworks';
 
 interface LanZoneModalProps {
   isOpen: boolean;
@@ -8,6 +8,7 @@ interface LanZoneModalProps {
   onSave: (zone: Partial<LanZone>) => void;
   editZone?: LanZone | null;
   locations: LanLocation[];
+  roomTypes?: LanRoomTypeItem[];
   presetLocationId?: string;
   title?: string;
   nameLabel?: string;
@@ -20,6 +21,7 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
   onSave,
   editZone,
   locations,
+  roomTypes = [],
   presetLocationId,
   title = 'Jaringan / Sub-Sistem',
   nameLabel = 'Nama Jaringan / Sub-Sistem *',
@@ -185,12 +187,22 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
                 onChange={e => setRoomType(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                <option value="lab">Laboratorium Komputer / CBT</option>
-                <option value="server_room">Ruang Server / Data Center</option>
-                <option value="office">Ruang Guru / Kantor TU</option>
-                <option value="classroom">Ruang Kelas / Teori</option>
-                <option value="library">Perpustakaan Digital</option>
-                <option value="other">Area Lainnya</option>
+                {roomTypes.length > 0 ? (
+                  roomTypes.map(rt => (
+                    <option key={rt.id} value={rt.code}>
+                      {rt.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="lab">Laboratorium Komputer / CBT</option>
+                    <option value="server_room">Ruang Server / Data Center</option>
+                    <option value="office">Ruang Guru / Kantor TU</option>
+                    <option value="classroom">Ruang Kelas / Teori</option>
+                    <option value="library">Perpustakaan Digital</option>
+                    <option value="other">Area Lainnya</option>
+                  </>
+                )}
               </select>
             </div>
 
