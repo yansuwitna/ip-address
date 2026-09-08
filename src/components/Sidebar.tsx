@@ -15,7 +15,9 @@ import {
   Moon,
   Zap,
   Video,
-  Droplets
+  Droplets,
+  Server,
+  DoorOpen
 } from 'lucide-react';
 import { User } from '../types/auth';
 import { showConfirm } from '../utils/swal';
@@ -30,6 +32,8 @@ export type NavTab =
   | 'dns' 
   | 'services' 
   | 'categories' 
+  | 'lan_device_types'
+  | 'lan_room_types'
   | 'users' 
   | 'backup';
 
@@ -44,6 +48,8 @@ interface SidebarProps {
   totalUsedIps: number;
   totalLanCables?: number;
   totalLanDevices?: number;
+  totalLanDeviceTypes?: number;
+  totalLanRoomTypes?: number;
   totalElectricityDevices?: number;
   totalCctvDevices?: number;
   totalWaterDevices?: number;
@@ -66,6 +72,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   totalUsedIps,
   totalLanCables = 0,
   totalLanDevices = 0,
+  totalLanDeviceTypes = 0,
+  totalLanRoomTypes = 0,
   totalElectricityDevices = 0,
   totalCctvDevices = 0,
   totalWaterDevices = 0,
@@ -86,7 +94,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     activeColor?: string;
   }
 
-  // 4 Menu Utama Jaringan Infrastruktur Fisik & Distribusi
+  // 1. Sektor Jaringan (4 Infrastruktur Utama: LAN, Listrik, CCTV, AIR)
   const mainNetworkItems: NavItem[] = [
     {
       id: 'lan',
@@ -126,15 +134,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  // Menu Pendukung Sistem (Alamat IP / IPAM, DNS, Hardware & Users)
-  const systemItems: NavItem[] = [
+  // 2. Jenis Sektor Jaringan (Tipe Perangkat LAN & Tipe Ruangan)
+  const sectorTypeItems: NavItem[] = [
+    {
+      id: 'lan_device_types',
+      label: 'Tipe Perangkat LAN',
+      icon: Server,
+      description: 'Master Jenis Alat LAN',
+      badge: totalLanDeviceTypes > 0 ? `${totalLanDeviceTypes} Tipe` : undefined,
+      badgeColor: 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+      activeColor: 'bg-blue-600'
+    },
+    {
+      id: 'lan_room_types',
+      label: 'Tipe Ruangan',
+      icon: DoorOpen,
+      description: 'Master Lokasi & Ruangan',
+      badge: totalLanRoomTypes > 0 ? `${totalLanRoomTypes} Tipe` : undefined,
+      badgeColor: 'bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+      activeColor: 'bg-emerald-600'
+    }
+  ];
+
+  // 3. IP dan DNS (Alamat IP, Manajemen DNS, Kategori Hardware)
+  const ipDnsItems: NavItem[] = [
     {
       id: 'groups',
       label: 'Alamat IP',
       icon: Layers,
       description: 'Subnet CIDR & Alokasi Host IP',
       badge: totalGroups.toString(),
-      badgeColor: 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+      badgeColor: 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+      activeColor: 'bg-indigo-600'
     },
     {
       id: 'dns',
@@ -142,15 +173,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Globe,
       description: 'Domain & Record Server',
       badge: totalDnsRecords !== undefined ? totalDnsRecords.toString() : undefined,
-      badgeColor: 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+      badgeColor: 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+      activeColor: 'bg-indigo-600'
     },
     {
       id: 'categories',
       label: 'Kategori Hardware',
       icon: Cpu,
       description: 'Kelola Tipe Hardware',
-      badge: totalCategories !== undefined ? totalCategories.toString() : undefined
-    },
+      badge: totalCategories !== undefined ? totalCategories.toString() : undefined,
+      activeColor: 'bg-indigo-600'
+    }
+  ];
+
+  // 4. Sistem & Pengaturan (Akun Pengguna, Cadangan & Data)
+  const systemItems: NavItem[] = [
     {
       id: 'users',
       label: 'Akun Pengguna',
@@ -253,6 +290,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* SEKTOR JARINGAN UTAMA (LAN, LISTRIK, CCTV, AIR) */}
+          {/* 1. SEKTOR JARINGAN (LAN, LISTRIK, CCTV, AIR) */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
               <span>Sektor Jaringan</span>
@@ -285,15 +323,130 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   </div>
 
-                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
-                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
-                  }`} />
+                  <div className="flex items-center gap-1.5">
+                    {item.badge && (
+                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-lg border ${
+                        isActive 
+                          ? 'bg-white/20 text-white border-white/30' 
+                          : (item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700')
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                    <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                      isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                    }`} />
+                  </div>
                 </button>
               );
             })}
           </div>
 
-          {/* MENU SISTEM & PENDUKUNG */}
+          {/* 2. JENIS SEKTOR JARINGAN (TIPE PERANGKAT LAN, TIPE RUANGAN) */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>Jenis Sektor Jaringan</span>
+            </div>
+
+            {sectorTypeItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              const activeBg = item.activeColor || 'bg-blue-600';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? `${activeBg} text-white shadow-sm font-bold`
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {item.badge && (
+                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-lg border ${
+                        isActive 
+                          ? 'bg-white/20 text-white border-white/30' 
+                          : (item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700')
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                    <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                      isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                    }`} />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 3. IP DAN DNS (ALAMAT IP, MANAJEMEN DNS, KATEGORI HARDWARE) */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>IP dan DNS</span>
+            </div>
+
+            {ipDnsItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id || (item.id === 'groups' && currentTab === 'services');
+              const activeBg = item.activeColor || 'bg-indigo-600';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? `${activeBg} text-white shadow-sm font-bold`
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {item.badge && (
+                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-lg border ${
+                        isActive 
+                          ? 'bg-white/20 text-white border-white/30' 
+                          : (item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700')
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                    <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                      isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                    }`} />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 4. SISTEM & UTILITAS */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
               <span>Sistem & Utilitas</span>
@@ -301,7 +454,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {systemItems.map(item => {
               const Icon = item.icon;
-              const isActive = currentTab === item.id || (item.id === 'groups' && currentTab === 'services');
+              const isActive = currentTab === item.id;
 
               return (
                 <button
@@ -319,6 +472,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }`} />
                     <div className="text-left">
                       <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
                     </div>
                   </div>
 

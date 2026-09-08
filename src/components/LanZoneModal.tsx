@@ -31,7 +31,7 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [floor, setFloor] = useState('');
-  const [roomType, setRoomType] = useState('lab');
+  const [roomType, setRoomType] = useState(roomTypes[0]?.code || '');
   const [pic, setPic] = useState('');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
       setName(editZone.name);
       setCode(editZone.code || '');
       setFloor(editZone.floor || '');
-      setRoomType(editZone.roomType || 'lab');
+      setRoomType(editZone.roomType || (roomTypes[0]?.code || ''));
       setPic(editZone.pic || '');
       setNotes(editZone.notes || '');
     } else {
@@ -51,12 +51,12 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
       setName('');
       setCode(`NET-${String(Date.now()).slice(-4)}`);
       setFloor('Lantai 1');
-      setRoomType('lab');
+      setRoomType(roomTypes[0]?.code || '');
       setPic('');
       setNotes('');
     }
     setError(null);
-  }, [isOpen, editZone, locations, presetLocationId]);
+  }, [isOpen, editZone, locations, presetLocationId, roomTypes]);
 
   if (!isOpen) return null;
 
@@ -194,14 +194,7 @@ export const LanZoneModal: React.FC<LanZoneModalProps> = ({
                     </option>
                   ))
                 ) : (
-                  <>
-                    <option value="lab">Laboratorium Komputer / CBT</option>
-                    <option value="server_room">Ruang Server / Data Center</option>
-                    <option value="office">Ruang Guru / Kantor TU</option>
-                    <option value="classroom">Ruang Kelas / Teori</option>
-                    <option value="library">Perpustakaan Digital</option>
-                    <option value="other">Area Lainnya</option>
-                  </>
+                  <option value="">-- Belum ada Tipe Ruangan (Kelola di Menu Tipe Ruangan) --</option>
                 )}
               </select>
             </div>

@@ -29,7 +29,7 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
   const [zoneId, setZoneId] = useState('');
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
-  const [type, setType] = useState<LanDeviceType>('switch_distribution');
+  const [type, setType] = useState<string>(deviceTypes[0]?.code || '');
   const [brand, setBrand] = useState('Ruijie Reyee');
   const [model, setModel] = useState('');
   const [location, setLocation] = useState('');
@@ -67,7 +67,7 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
       setZoneId(presetZoneId || (availableZones[0]?.id || ''));
       setName('');
       setCode(`SW-LAB-${String(Date.now()).slice(-4)}`);
-      setType('switch_distribution');
+      setType(deviceTypes[0]?.code || '');
       setBrand('Ruijie Reyee');
       setModel('');
       setLocation('');
@@ -80,7 +80,7 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
       setNotes('');
     }
     setError(null);
-  }, [isOpen, editDevice, locations, zones, presetLocationId, presetZoneId]);
+  }, [isOpen, editDevice, locations, zones, presetLocationId, presetZoneId, deviceTypes]);
 
   if (!isOpen) return null;
 
@@ -246,7 +246,7 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
               </label>
               <select
                 value={type}
-                onChange={e => setType(e.target.value as LanDeviceType)}
+                onChange={e => setType(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
               >
                 {deviceTypes.length > 0 ? (
@@ -256,19 +256,7 @@ export const LanDeviceModal: React.FC<LanDeviceModalProps> = ({
                     </option>
                   ))
                 ) : (
-                  <>
-                    <option value="switch_distribution">Switch Distribusi Lab</option>
-                    <option value="switch_access">Switch Access (Meja Siswa)</option>
-                    <option value="switch_core">Switch Core Utama L3</option>
-                    <option value="patch_panel">Patch Panel RJ45</option>
-                    <option value="router_gateway">Router Gateway / Mikrotik</option>
-                    <option value="server_host">Server Komputer / CBT</option>
-                    <option value="access_point">Access Point Wi-Fi</option>
-                    <option value="otb_fiber">OTB / Roset Fiber Optic</option>
-                    <option value="wallplate_jack">Wallplate / Outlet Lantai</option>
-                    <option value="media_converter">Media Converter FO</option>
-                    <option value="other">Perangkat Lainnya</option>
-                  </>
+                  <option value="">-- Belum ada Jenis Perangkat (Kelola di Menu Tipe Perangkat LAN) --</option>
                 )}
               </select>
             </div>

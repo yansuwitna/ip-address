@@ -121,6 +121,8 @@ import { LanCableModal } from './components/LanCableModal';
 import { LanDeviceModal } from './components/LanDeviceModal';
 import { LanLocationModal } from './components/LanLocationModal';
 import { LanZoneModal } from './components/LanZoneModal';
+import { LanDeviceTypesView } from './components/LanDeviceTypesView';
+import { LanRoomTypesView } from './components/LanRoomTypesView';
 
 export const App: React.FC = () => {
   // Map pathname to internal tab (Bahasa Indonesia dengan dukungan URL sebelumnya)
@@ -134,6 +136,8 @@ export const App: React.FC = () => {
     if (clean === '/admin/rekaman-dns' || clean === '/admin/dns') return 'dns';
     if (clean === '/admin/layanan-ip' || clean === '/admin/services') return 'services';
     if (clean === '/admin/kategori-perangkat' || clean === '/admin/kategori' || clean === '/admin/categories') return 'categories';
+    if (clean === '/admin/tipe-perangkat-lan' || clean === '/admin/lan-device-types') return 'lan_device_types';
+    if (clean === '/admin/tipe-ruangan-lan' || clean === '/admin/tipe-ruangan' || clean === '/admin/lan-room-types') return 'lan_room_types';
     if (clean === '/admin/manajemen-pengguna' || clean === '/admin/pengguna' || clean === '/admin/users') return 'users';
     if (clean === '/admin/cadangan-pemulihan' || clean === '/admin/cadangan' || clean === '/admin/backup') return 'backup';
     return 'dashboard';
@@ -151,6 +155,8 @@ export const App: React.FC = () => {
       case 'dns': return '/admin/rekaman-dns';
       case 'services': return '/admin/layanan-ip';
       case 'categories': return '/admin/kategori-perangkat';
+      case 'lan_device_types': return '/admin/tipe-perangkat-lan';
+      case 'lan_room_types': return '/admin/tipe-ruangan-lan';
       case 'users': return '/admin/manajemen-pengguna';
       case 'backup': return '/admin/cadangan-pemulihan';
       default: return '/admin/dasbor';
@@ -289,19 +295,17 @@ export const App: React.FC = () => {
         setLanCables(data['netipam_lan_cables_v1'] || []);
         
         const serverDeviceTypes = data['netipam_lan_device_types_v1'];
-        if (serverDeviceTypes && serverDeviceTypes.length > 0) {
+        if (serverDeviceTypes) {
           setLanDeviceTypes(serverDeviceTypes);
         } else {
-          setLanDeviceTypes(INITIAL_LAN_DEVICE_TYPES);
-          saveLanDeviceTypes(INITIAL_LAN_DEVICE_TYPES);
+          setLanDeviceTypes(INITIAL_LAN_DEVICE_TYPES || []);
         }
 
         const serverRoomTypes = data['netipam_lan_room_types_v1'];
-        if (serverRoomTypes && serverRoomTypes.length > 0) {
+        if (serverRoomTypes) {
           setLanRoomTypes(serverRoomTypes);
         } else {
-          setLanRoomTypes(INITIAL_LAN_ROOM_TYPES);
-          saveLanRoomTypes(INITIAL_LAN_ROOM_TYPES);
+          setLanRoomTypes(INITIAL_LAN_ROOM_TYPES || []);
         }
         
         // Sektor Listrik, CCTV, AIR
@@ -599,13 +603,13 @@ export const App: React.FC = () => {
   }, [lanCables, isSyncing]);
 
   useEffect(() => {
-    if (!isSyncing && lanDeviceTypes.length > 0) {
+    if (!isSyncing) {
       saveLanDeviceTypes(lanDeviceTypes);
     }
   }, [lanDeviceTypes, isSyncing]);
 
   useEffect(() => {
-    if (!isSyncing && lanRoomTypes.length > 0) {
+    if (!isSyncing) {
       saveLanRoomTypes(lanRoomTypes);
     }
   }, [lanRoomTypes, isSyncing]);
@@ -1456,6 +1460,48 @@ export const App: React.FC = () => {
     setLanCables(prev => prev.filter(c => c.id !== id));
   };
 
+  const handleSaveLanDeviceType = (typeItem: LanDeviceTypeItem) => {
+    const isEdit = lanDeviceTypes.some(t => t.id === typeItem.id);
+    setLanDeviceTypes(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      if (exists) {
+        return prev.map(t => t.id === typeItem.id ? typeItem : t);
+      }
+      return [...prev, typeItem];
+    });
+    showSuccess(
+      isEdit ? 'Tipe Perangkat Diperbarui' : 'Tipe Perangkat Ditambahkan',
+      `Tipe "${typeItem.name}" (${typeItem.code}) berhasil disimpan.`
+    );
+  };
+
+  const handleDeleteLanDeviceType = (id: string) => {
+    const target = lanDeviceTypes.find(t => t.id === id);
+    setLanDeviceTypes(prev => prev.filter(t => t.id !== id));
+    showSuccess('Tipe Perangkat Dihapus', `Tipe "${target?.name || id}" berhasil dihapus.`);
+  };
+
+  const handleSaveLanRoomType = (typeItem: LanRoomTypeItem) => {
+    const isEdit = lanRoomTypes.some(t => t.id === typeItem.id);
+    setLanRoomTypes(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      if (exists) {
+        return prev.map(t => t.id === typeItem.id ? typeItem : t);
+      }
+      return [...prev, typeItem];
+    });
+    showSuccess(
+      isEdit ? 'Tipe Ruangan Diperbarui' : 'Tipe Ruangan Ditambahkan',
+      `Tipe Ruangan "${typeItem.name}" (${typeItem.code}) berhasil disimpan.`
+    );
+  };
+
+  const handleDeleteLanRoomType = (id: string) => {
+    const target = lanRoomTypes.find(t => t.id === id);
+    setLanRoomTypes(prev => prev.filter(t => t.id !== id));
+    showSuccess('Tipe Ruangan Dihapus', `Tipe Ruangan "${target?.name || id}" berhasil dihapus.`);
+  };
+
   const totalUsedIps = allocations.filter(a => a.status === 'used').length;
 
   const getTabTitle = (tab: NavTab) => {
@@ -1469,6 +1515,8 @@ export const App: React.FC = () => {
       case 'dns': return 'Manajemen DNS Server';
       case 'services': return 'Layanan & Port IP';
       case 'categories': return 'Kategori Perangkat';
+      case 'lan_device_types': return 'Tipe Perangkat LAN';
+      case 'lan_room_types': return 'Tipe Ruangan LAN';
       case 'users': return 'Akun Pengguna';
       case 'backup': return 'Cadangan & Data';
     }
@@ -1497,6 +1545,8 @@ export const App: React.FC = () => {
         totalUsedIps={totalUsedIps}
         totalLanCables={lanCables.length}
         totalLanDevices={lanDevices.length}
+        totalLanDeviceTypes={lanDeviceTypes.length}
+        totalLanRoomTypes={lanRoomTypes.length}
         totalElectricityDevices={electricityDevices.length}
         totalCctvDevices={cctvDevices.length}
         totalWaterDevices={waterDevices.length}
@@ -2494,6 +2544,24 @@ export const App: React.FC = () => {
               allocations={allocations}
               onSaveCategory={handleSaveCategory}
               onDeleteCategory={handleDeleteCategory}
+            />
+          )}
+
+          {/* TAB: TIPE PERANGKAT LAN */}
+          {currentTab === 'lan_device_types' && (
+            <LanDeviceTypesView
+              deviceTypes={lanDeviceTypes}
+              onSaveDeviceType={handleSaveLanDeviceType}
+              onDeleteDeviceType={handleDeleteLanDeviceType}
+            />
+          )}
+
+          {/* TAB: TIPE RUANGAN */}
+          {currentTab === 'lan_room_types' && (
+            <LanRoomTypesView
+              roomTypes={lanRoomTypes}
+              onSaveRoomType={handleSaveLanRoomType}
+              onDeleteRoomType={handleDeleteLanRoomType}
             />
           )}
 

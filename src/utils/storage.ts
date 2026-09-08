@@ -1249,28 +1249,9 @@ export function saveLanRoomTypes(roomTypes: LanRoomTypeItem[]): void {
   syncToServer(STORAGE_KEY_LAN_ROOM_TYPES, roomTypes);
 }
 
-export const INITIAL_LAN_DEVICE_TYPES: LanDeviceTypeItem[] = [
-  { id: 'type-sw-dist', name: 'Switch Distribusi Lab', code: 'switch_distribution', category: 'network', description: 'Switch distribusi/access untuk menghubungkan PC di lab', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'type-sw-acc', name: 'Switch Access (Meja Siswa)', code: 'switch_access', category: 'network', description: 'Switch meja/kelompok kerja siswa', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'type-sw-core', name: 'Switch Core Utama L3', code: 'switch_core', category: 'network', description: 'Switch backbone atau core layer 3', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'type-patch', name: 'Patch Panel RJ45', code: 'patch_panel', category: 'passive', description: 'Panel terminasi kabel UTP/STP', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'type-router', name: 'Router Gateway / Mikrotik', code: 'router_gateway', category: 'network', description: 'Router penghubung internet/gateway lab', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'type-server', name: 'Server Komputer / CBT', code: 'server_host', category: 'compute', description: 'Server lokal / ujian CBT', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'type-ap', name: 'Access Point Wi-Fi', code: 'access_point', category: 'wireless', description: 'Pemancar sinyal Wi-Fi di dalam lab/ruangan', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'type-otb', name: 'OTB / Roset Fiber Optic', code: 'otb_fiber', category: 'passive', description: 'Optical Termination Box kabel fiber optik', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'type-wallplate', name: 'Wallplate / Outlet Lantai', code: 'wallplate_jack', category: 'passive', description: 'Soket RJ45 di dinding atau lantai', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'type-media-conv', name: 'Media Converter FO', code: 'media_converter', category: 'network', description: 'Pengubah sinyal FO ke UTP / Ethernet', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'type-other', name: 'Perangkat Lainnya', code: 'other', category: 'other', description: 'Perangkat fisik LAN lainnya', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' }
-];
+export const INITIAL_LAN_DEVICE_TYPES: LanDeviceTypeItem[] = [];
 
-export const INITIAL_LAN_ROOM_TYPES: LanRoomTypeItem[] = [
-  { id: 'room-lab', name: 'Laboratorium Komputer / CBT', code: 'lab', description: 'Laboratorium komputer, multimedia, atau CBT', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'room-srv', name: 'Ruang Server / Data Center', code: 'server_room', description: 'Ruang rack server utama dan perangkat sentral', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'room-office', name: 'Ruang Guru / Kantor TU', code: 'office', description: 'Ruang administrasi, kantor staf atau guru', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'room-class', name: 'Ruang Kelas / Teori', code: 'classroom', description: 'Ruang belajar kelas teori', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'room-library', name: 'Perpustakaan Digital', code: 'library', description: 'Area perpustakaan atau e-library', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'room-other', name: 'Area Lainnya', code: 'other', description: 'Ruangan atau zona lainnya', isDefault: true, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' }
-];
+export const INITIAL_LAN_ROOM_TYPES: LanRoomTypeItem[] = [];
 
 // SAMPLE INITIAL DATA TINGKAT 1: LOKASI (Sekolah 1, Sekolah 2, dst)
 export const INITIAL_LAN_LOCATIONS: LanLocation[] = [
