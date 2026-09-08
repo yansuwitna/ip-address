@@ -8,7 +8,7 @@ import {
   Trash2, 
   X 
 } from 'lucide-react';
-import { LanDeviceTypeItem } from '../types/utilityNetworks';
+import { LanDeviceTypeItem } from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess } from '../utils/swal';
 
 interface LanDeviceTypesViewProps {

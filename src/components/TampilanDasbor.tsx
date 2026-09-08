@@ -14,9 +14,9 @@ import {
   Globe
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory, DnsRecord, SubDomainRecord } from '../types/ipam';
-import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/utilityNetworks';
-import { parseCidr } from '../utils/ipCalculator';
-import { getCategoryIconComponent } from './CategoriesView';
+import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/jaringanUtilitas';
+import { parseCidr } from '../utils/kalkulatorIp';
+import { getCategoryIconComponent } from './TampilanKategori';
 
 interface DashboardViewProps {
   groups: IPGroup[];

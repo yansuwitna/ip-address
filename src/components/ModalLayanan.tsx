@@ -14,7 +14,7 @@ import { IPService, IPAllocation, IPGroup, ServiceCategory, ServiceProtocol, Ser
 import { 
   SERVICE_CATEGORIES, 
   buildDefaultServiceUrl,
-} from '../utils/servicePresets';
+} from '../utils/presetLayanan';
 import { showWarning } from '../utils/swal';
 
 interface ServiceModalProps {

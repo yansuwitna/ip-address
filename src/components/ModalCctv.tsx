@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Video, Save, AlertCircle } from 'lucide-react';
-import { CctvDevice, CctvDeviceType, CctvStatus, LanLocation, LanZone } from '../types/utilityNetworks';
+import { CctvDevice, CctvDeviceType, CctvStatus, LanLocation, LanZone } from '../types/jaringanUtilitas';
 
 interface CctvModalProps {
   isOpen: boolean;

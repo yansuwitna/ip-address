@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Network, Save, AlertCircle, Building2, Lock } from 'lucide-react';
-import { LanZone, LanLocation, LanRoomTypeItem } from '../types/utilityNetworks';
+import { LanZone, LanLocation, LanRoomTypeItem } from '../types/jaringanUtilitas';
 
 interface LanZoneModalProps {
   isOpen: boolean;

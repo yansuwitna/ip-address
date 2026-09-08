@@ -1,4 +1,4 @@
-import { SubDomainView } from "./SubDomainView";
+import { SubDomainView } from "./TampilanSubDomain";
 import React, { useState, useMemo } from 'react';
 import { 
   Globe, 
@@ -158,7 +158,7 @@ export const DnsView: React.FC<DnsViewProps> = ({
       <SubDomainView 
         parentDomain={selectedDomainForSub} 
         subDomains={subDomains}
-        onSaveSubDomains={(records) => {
+        onSaveSubDomains={(records: SubDomainRecord[]) => {
           if (onSaveSubDomains) onSaveSubDomains(records);
         }}
         onBack={() => setSelectedDomainForSub(null)} 

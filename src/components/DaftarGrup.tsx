@@ -10,8 +10,8 @@ import {
   UserCheck
 } from 'lucide-react';
 import { IPGroup, IPAllocation } from '../types/ipam';
-import { parseCidr } from '../utils/ipCalculator';
-import { exportToCsv } from '../utils/exportImport';
+import { parseCidr } from '../utils/kalkulatorIp';
+import { exportToCsv } from '../utils/eksporImpor';
 import { showConfirm, showSuccess } from '../utils/swal';
 
 interface GroupListProps {

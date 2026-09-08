@@ -7,7 +7,7 @@ import {
   Trash2, 
   X 
 } from 'lucide-react';
-import { LanRoomTypeItem } from '../types/utilityNetworks';
+import { LanRoomTypeItem } from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess } from '../utils/swal';
 
 interface LanRoomTypesViewProps {

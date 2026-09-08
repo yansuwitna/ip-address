@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Cable, MapPin, Layers, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
-import { ElectricityCableRun, ElectricityDevice, LanLocation, LanZone } from '../types/utilityNetworks';
+import { ElectricityCableRun, ElectricityDevice, LanLocation, LanZone } from '../types/jaringanUtilitas';
 
 interface ElectricityCableModalProps {
   isOpen: boolean;

@@ -6,7 +6,7 @@ import {
   ElectricityDevice, ElectricityCableRun, 
   CctvDevice, CctvCableRun, 
   WaterDevice, WaterPipeRun 
-} from '../types/utilityNetworks';
+} from '../types/jaringanUtilitas';
 
 export const generateDemoData = () => {
   const now = new Date().toISOString();

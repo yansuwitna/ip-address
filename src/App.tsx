@@ -31,7 +31,7 @@ import {
   updateUser, 
   deleteUser, 
   wipeAllUsers 
-} from './utils/auth';
+} from './utils/autentikasi';
 import { wipeServer } from './utils/api';
 
 import { 
@@ -70,9 +70,9 @@ import {
   INITIAL_LAN_ZONES,
   INITIAL_LAN_DEVICE_TYPES,
   INITIAL_LAN_ROOM_TYPES
-} from './utils/storage';
-import { exportToXlsx } from './utils/exportImport';
-import { parseCidr } from './utils/ipCalculator';
+} from './utils/penyimpanan';
+import { exportToXlsx } from './utils/eksporImpor';
+import { parseCidr } from './utils/kalkulatorIp';
 import { showConfirm, showSuccess } from './utils/swal';
 import { 
   ElectricityDevice, 
@@ -87,42 +87,42 @@ import {
   LanZone,
   LanDeviceTypeItem,
   LanRoomTypeItem
-} from './types/utilityNetworks';
+} from './types/jaringanUtilitas';
 
-import { HomeView } from './components/HomeView';
-import { Login } from './components/Login';
-import { Sidebar, NavTab } from './components/Sidebar';
-import { Header } from './components/Header';
-import { DashboardView } from './components/DashboardView';
-import { CategoriesView } from './components/CategoriesView';
-import { UsersView } from './components/UsersView';
-import { IPMatrixGrid } from './components/IPMatrixGrid';
-import { IPTable } from './components/IPTable';
-import { ServicesView } from './components/ServicesView';
-import { BackupView } from './components/BackupView';
-import { DnsView } from './components/DnsView';
-import { DnsModal } from './components/DnsModal';
-import { PrintModal } from './components/PrintModal';
-import { GroupModal } from './components/GroupModal';
-import { IPAllocationModal } from './components/IPAllocationModal';
-import { BatchReserveModal } from './components/BatchReserveModal';
-import { PingSimulatorModal } from './components/PingSimulatorModal';
-import { ElectricityView } from './components/ElectricityView';
-import { ElectricityModal } from './components/ElectricityModal';
-import { ElectricityCableModal } from './components/ElectricityCableModal';
-import { CctvView } from './components/CctvView';
-import { CctvModal } from './components/CctvModal';
-import { CctvCableModal } from './components/CctvCableModal';
-import { WaterView } from './components/WaterView';
-import { WaterModal } from './components/WaterModal';
-import { WaterPipeModal } from './components/WaterPipeModal';
-import { LanView } from './components/LanView';
-import { LanCableModal } from './components/LanCableModal';
-import { LanDeviceModal } from './components/LanDeviceModal';
-import { LanLocationModal } from './components/LanLocationModal';
-import { LanZoneModal } from './components/LanZoneModal';
-import { LanDeviceTypesView } from './components/LanDeviceTypesView';
-import { LanRoomTypesView } from './components/LanRoomTypesView';
+import { HomeView } from './components/TampilanBeranda';
+import { Login } from './components/Masuk';
+import { Sidebar, NavTab } from './components/BilahSisi';
+import { Header } from './components/KepalaHalaman';
+import { DashboardView } from './components/TampilanDasbor';
+import { CategoriesView } from './components/TampilanKategori';
+import { UsersView } from './components/TampilanPengguna';
+import { IPMatrixGrid } from './components/MatriksGridIP';
+import { IPTable } from './components/TabelIP';
+import { ServicesView } from './components/TampilanLayanan';
+import { BackupView } from './components/TampilanCadangan';
+import { DnsView } from './components/TampilanDns';
+import { DnsModal } from './components/ModalDns';
+import { PrintModal } from './components/ModalCetak';
+import { GroupModal } from './components/ModalGrup';
+import { IPAllocationModal } from './components/ModalAlokasiIP';
+import { BatchReserveModal } from './components/ModalReservasiBatch';
+import { PingSimulatorModal } from './components/ModalSimulatorPing';
+import { ElectricityView } from './components/TampilanListrik';
+import { ElectricityModal } from './components/ModalListrik';
+import { ElectricityCableModal } from './components/ModalKabelListrik';
+import { CctvView } from './components/TampilanCctv';
+import { CctvModal } from './components/ModalCctv';
+import { CctvCableModal } from './components/ModalKabelCctv';
+import { WaterView } from './components/TampilanAir';
+import { WaterModal } from './components/ModalAir';
+import { WaterPipeModal } from './components/ModalPipaAir';
+import { LanView } from './components/TampilanLan';
+import { LanCableModal } from './components/ModalKabelLan';
+import { LanDeviceModal } from './components/ModalPerangkatLan';
+import { LanLocationModal } from './components/ModalLokasiLan';
+import { LanZoneModal } from './components/ModalRuanganLan';
+import { LanDeviceTypesView } from './components/TampilanTipePerangkatLan';
+import { LanRoomTypesView } from './components/TampilanTipeRuanganLan';
 
 export const App: React.FC = () => {
   // Map pathname to internal tab (Bahasa Indonesia dengan dukungan URL sebelumnya)

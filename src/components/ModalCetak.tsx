@@ -12,7 +12,7 @@ import {
   CctvCableRun, 
   WaterDevice, 
   WaterPipeRun 
-} from '../types/utilityNetworks';
+} from '../types/jaringanUtilitas';
 import { User } from '../types/auth';
 
 interface PrintModalProps {

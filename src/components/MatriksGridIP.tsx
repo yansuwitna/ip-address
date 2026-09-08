@@ -13,8 +13,8 @@ import {
   Cctv
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceType, IPService, DeviceCategory } from '../types/ipam';
-import { parseCidr, generateUsableIps } from '../utils/ipCalculator';
-import { getCategoryIconComponent } from './CategoriesView';
+import { parseCidr, generateUsableIps } from '../utils/kalkulatorIp';
+import { getCategoryIconComponent } from './TampilanKategori';
 
 interface IPMatrixGridProps {
   group: IPGroup;

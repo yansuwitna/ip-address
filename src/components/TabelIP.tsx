@@ -15,8 +15,8 @@ import {
   Printer
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceType, IPService, DeviceCategory } from '../types/ipam';
-import { ipToInt, findNextAvailableIp } from '../utils/ipCalculator';
-import { getCategoryIconComponent } from './CategoriesView';
+import { ipToInt, findNextAvailableIp } from '../utils/kalkulatorIp';
+import { getCategoryIconComponent } from './TampilanKategori';
 import { showConfirm, showWarning, showSuccess } from '../utils/swal';
 
 interface IPTableProps {

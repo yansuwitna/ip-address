@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { X, Network, Info, Check } from 'lucide-react';
 import { IPGroup } from '../types/ipam';
-import { isValidCidr, parseCidr, isValidIpv4 } from '../utils/ipCalculator';
+import { isValidCidr, parseCidr, isValidIpv4 } from '../utils/kalkulatorIp';
 
 interface GroupModalProps {
   isOpen: boolean;

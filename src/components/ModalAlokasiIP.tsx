@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { X, Server, Sparkles, AlertTriangle } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceType, IPStatus, DeviceCategory } from '../types/ipam';
-import { isValidIpv4, isIpInCidr, isValidMac, findNextAvailableIp } from '../utils/ipCalculator';
-import { DEFAULT_DEVICE_CATEGORIES } from '../utils/storage';
+import { isValidIpv4, isIpInCidr, isValidMac, findNextAvailableIp } from '../utils/kalkulatorIp';
+import { DEFAULT_DEVICE_CATEGORIES } from '../utils/penyimpanan';
 import { showWarning } from '../utils/swal';
 
 interface IPAllocationModalProps {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Cable, Save, AlertCircle, Lock } from 'lucide-react';
-import { LanCableRun, LanCableType, CableRunStatus, LanDevice, LanLocation, LanZone } from '../types/utilityNetworks';
+import { LanCableRun, LanCableType, CableRunStatus, LanDevice, LanLocation, LanZone } from '../types/jaringanUtilitas';
 
 interface LanCableModalProps {
   isOpen: boolean;

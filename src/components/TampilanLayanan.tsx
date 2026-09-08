@@ -43,8 +43,8 @@ import {
 import { 
   SERVICE_CATEGORIES, 
   getCategoryMeta, 
-} from '../utils/servicePresets';
-import { ServiceModal } from './ServiceModal';
+} from '../utils/presetLayanan';
+import { ServiceModal } from './ModalLayanan';
 import { showConfirm, showSuccess } from '../utils/swal';
 
 interface ServicesViewProps {

@@ -13,7 +13,7 @@ import {
   Layers
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceType } from '../types/ipam';
-import { parseCidr } from '../utils/ipCalculator';
+import { parseCidr } from '../utils/kalkulatorIp';
 
 interface DashboardStatsProps {
   groups: IPGroup[];

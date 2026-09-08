@@ -21,7 +21,7 @@ import {
   Tag,
   Printer
 } from 'lucide-react';
-import { CctvDevice, CctvCableRun, CctvStatus, CctvDeviceType, LanLocation, LanZone } from '../types/utilityNetworks';
+import { CctvDevice, CctvCableRun, CctvStatus, CctvDeviceType, LanLocation, LanZone } from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
 
 interface CctvViewProps {

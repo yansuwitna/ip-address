@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Zap, Save, AlertCircle } from 'lucide-react';
-import { ElectricityDevice, ElectricityDeviceType, ElectricalPhase, ElectricalStatus, LanLocation, LanZone } from '../types/utilityNetworks';
+import { ElectricityDevice, ElectricityDeviceType, ElectricalPhase, ElectricalStatus, LanLocation, LanZone } from '../types/jaringanUtilitas';
 
 interface ElectricityModalProps {
   isOpen: boolean;

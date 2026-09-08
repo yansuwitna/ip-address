@@ -36,7 +36,7 @@ import {
   LanDeviceType, 
   LanCableType, 
   CableRunStatus 
-} from '../types/utilityNetworks';
+} from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
 
 interface LanViewProps {

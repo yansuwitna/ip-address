@@ -19,7 +19,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { IPGroup, IPAllocation, DeviceCategory, DnsRecord, SubDomainRecord } from '../types/ipam';
-import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, LanDevice, LanCableRun } from '../types/jaringanUtilitas';
 import { User } from '../types/auth';
 
 interface HomeViewProps {

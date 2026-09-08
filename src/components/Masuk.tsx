@@ -16,9 +16,9 @@ import {
   Upload,
   FileJson
 } from 'lucide-react';
-import { loginUser } from '../utils/auth';
+import { loginUser } from '../utils/autentikasi';
 import { User, UserAccount } from '../types/auth';
-import { parseImportJson } from '../utils/exportImport';
+import { parseImportJson } from '../utils/eksporImpor';
 
 interface LoginProps {
   users?: UserAccount[];

@@ -19,7 +19,7 @@ import {
   Activity,
   Printer
 } from 'lucide-react';
-import { WaterDevice, WaterPipeRun, WaterStatus, WaterDeviceType, LanLocation, LanZone } from '../types/utilityNetworks';
+import { WaterDevice, WaterPipeRun, WaterStatus, WaterDeviceType, LanLocation, LanZone } from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
 
 interface WaterViewProps {

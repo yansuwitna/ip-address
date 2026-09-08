@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Route, MapPin, Layers, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
-import { CctvCableRun, CctvDevice, LanLocation, LanZone } from '../types/utilityNetworks';
+import { CctvCableRun, CctvDevice, LanLocation, LanZone } from '../types/jaringanUtilitas';
 
 interface CctvCableModalProps {
   isOpen: boolean;

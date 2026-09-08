@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { X, Layers, AlertCircle } from 'lucide-react';
 import { IPGroup, IPAllocation, IPStatus } from '../types/ipam';
-import { ipToInt, intToIp, isValidIpv4, isIpInCidr } from '../utils/ipCalculator';
+import { ipToInt, intToIp, isValidIpv4, isIpInCidr } from '../utils/kalkulatorIp';
 
 interface BatchReserveModalProps {
   isOpen: boolean;

@@ -23,7 +23,7 @@ import {
   Tag,
   Printer
 } from 'lucide-react';
-import { ElectricityDevice, ElectricityCableRun, ElectricalStatus, ElectricityDeviceType, LanLocation, LanZone } from '../types/utilityNetworks';
+import { ElectricityDevice, ElectricityCableRun, ElectricalStatus, ElectricityDeviceType, LanLocation, LanZone } from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
 
 interface ElectricityViewProps {

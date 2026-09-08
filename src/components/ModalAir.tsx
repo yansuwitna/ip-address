@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Droplets, Save, AlertCircle } from 'lucide-react';
-import { WaterDevice, WaterDeviceType, WaterStatus, LanLocation, LanZone } from '../types/utilityNetworks';
+import { WaterDevice, WaterDeviceType, WaterStatus, LanLocation, LanZone } from '../types/jaringanUtilitas';
 
 interface WaterModalProps {
   isOpen: boolean;

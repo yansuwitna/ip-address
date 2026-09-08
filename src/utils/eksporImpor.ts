@@ -11,7 +11,7 @@ import {
   LanCableRun, 
   LanLocation, 
   LanZone 
-} from '../types/utilityNetworks';
+} from '../types/jaringanUtilitas';
 import { UserAccount } from '../types/auth';
 
 export interface ComprehensiveExportOptions {
@@ -467,7 +467,7 @@ export function exportToXlsx(
   const safeSheetName = (group.name.replace(/[:\\/?*\[\]]/g, '').slice(0, 31)) || 'Alokasi IP';
   XLSX.utils.book_append_sheet(workbook, worksheet, safeSheetName);
 
-  const fileName = `LAN_IP_${group.name.replace(/[^a-zA-Z0-9_-]/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const fileName = `Alokasi_IP_${group.name.replace(/[^a-zA-Z0-9_-]/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(workbook, fileName);
 }
 
@@ -549,7 +549,7 @@ export function exportBackupJson(
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `Infrastruktur_Cadangan_Lengkap_${new Date().toISOString().slice(0, 10)}.json`);
+  link.setAttribute('download', `Cadangan_Infrastruktur_Jaringan_Lengkap_${new Date().toISOString().slice(0, 10)}.json`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

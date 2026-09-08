@@ -869,7 +869,7 @@ export function saveSubDomains(records: SubDomainRecord[]): void {
 }
 
 
-import { ElectricityDevice, CctvDevice, WaterDevice, ElectricityCableRun, CctvCableRun, WaterPipeRun } from '../types/utilityNetworks';
+import { ElectricityDevice, CctvDevice, WaterDevice, ElectricityCableRun, CctvCableRun, WaterPipeRun } from '../types/jaringanUtilitas';
 
 export const STORAGE_KEY_ELECTRICITY = 'netipam_electricity_devices_v1';
 export const STORAGE_KEY_ELECTRICITY_CABLES = 'netipam_electricity_cables_v1';
@@ -1216,7 +1216,7 @@ export const INITIAL_WATER_DEVICES: WaterDevice[] = [
   }
 ];
 
-import { LanDevice, LanCableRun, LanLocation, LanZone, LanDeviceTypeItem, LanRoomTypeItem } from '../types/utilityNetworks';
+import { LanDevice, LanCableRun, LanLocation, LanZone, LanDeviceTypeItem, LanRoomTypeItem } from '../types/jaringanUtilitas';
 
 export const STORAGE_KEY_LAN_LOCATIONS = 'netipam_lan_locations_v1';
 export const STORAGE_KEY_LAN_ZONES = 'netipam_lan_zones_v1';
