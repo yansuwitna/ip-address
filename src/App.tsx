@@ -58,6 +58,13 @@ import {
   saveLanZones,
   saveLanDeviceTypes,
   saveLanRoomTypes,
+  saveLanCableTypes,
+  saveElectricityDeviceTypes,
+  saveElectricityCableTypes,
+  saveCctvDeviceTypes,
+  saveCctvCableTypes,
+  saveWaterDeviceTypes,
+  saveWaterPipeTypes,
   INITIAL_ELECTRICITY_DEVICES,
   INITIAL_ELECTRICITY_CABLES,
   INITIAL_CCTV_DEVICES,
@@ -69,7 +76,14 @@ import {
   INITIAL_LAN_LOCATIONS,
   INITIAL_LAN_ZONES,
   INITIAL_LAN_DEVICE_TYPES,
-  INITIAL_LAN_ROOM_TYPES
+  INITIAL_LAN_ROOM_TYPES,
+  INITIAL_LAN_CABLE_TYPES,
+  INITIAL_ELECTRICITY_DEVICE_TYPES,
+  INITIAL_ELECTRICITY_CABLE_TYPES,
+  INITIAL_CCTV_DEVICE_TYPES,
+  INITIAL_CCTV_CABLE_TYPES,
+  INITIAL_WATER_DEVICE_TYPES,
+  INITIAL_WATER_PIPE_TYPES
 } from './utils/penyimpanan';
 import { exportToXlsx } from './utils/eksporImpor';
 import { parseCidr } from './utils/kalkulatorIp';
@@ -86,7 +100,14 @@ import {
   LanLocation, 
   LanZone,
   LanDeviceTypeItem,
-  LanRoomTypeItem
+  LanRoomTypeItem,
+  LanCableTypeItem,
+  ElectricityDeviceTypeItem,
+  ElectricityCableTypeItem,
+  CctvDeviceTypeItem,
+  CctvCableTypeItem,
+  WaterDeviceTypeItem,
+  WaterPipeTypeItem
 } from './types/jaringanUtilitas';
 
 import { HomeView } from './components/TampilanBeranda';
@@ -123,6 +144,8 @@ import { LanLocationModal } from './components/ModalLokasiLan';
 import { LanZoneModal } from './components/ModalRuanganLan';
 import { LanDeviceTypesView } from './components/TampilanTipePerangkatLan';
 import { LanRoomTypesView } from './components/TampilanTipeRuanganLan';
+import { MasterTypeView } from './components/TampilanMasterTipe';
+import { Zap, Video, Droplets } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Map pathname to internal tab (Bahasa Indonesia dengan dukungan URL sebelumnya)
@@ -137,7 +160,14 @@ export const App: React.FC = () => {
     if (clean === '/admin/layanan-ip' || clean === '/admin/services') return 'services';
     if (clean === '/admin/kategori-perangkat' || clean === '/admin/kategori' || clean === '/admin/categories') return 'categories';
     if (clean === '/admin/tipe-perangkat-lan' || clean === '/admin/lan-device-types') return 'lan_device_types';
+    if (clean === '/admin/jenis-kabel-lan' || clean === '/admin/lan-cable-types') return 'lan_cable_types';
     if (clean === '/admin/tipe-ruangan-lan' || clean === '/admin/tipe-ruangan' || clean === '/admin/lan-room-types') return 'lan_room_types';
+    if (clean === '/admin/tipe-perangkat-listrik' || clean === '/admin/electricity-device-types') return 'electricity_device_types';
+    if (clean === '/admin/jenis-kabel-listrik' || clean === '/admin/electricity-cable-types') return 'electricity_cable_types';
+    if (clean === '/admin/tipe-hardware-cctv' || clean === '/admin/cctv-device-types') return 'cctv_device_types';
+    if (clean === '/admin/jenis-kabel-cctv' || clean === '/admin/cctv-cable-types') return 'cctv_cable_types';
+    if (clean === '/admin/tipe-alat-air' || clean === '/admin/water-device-types') return 'water_device_types';
+    if (clean === '/admin/jenis-pipa-air' || clean === '/admin/water-pipe-types') return 'water_pipe_types';
     if (clean === '/admin/manajemen-pengguna' || clean === '/admin/pengguna' || clean === '/admin/users') return 'users';
     if (clean === '/admin/cadangan-pemulihan' || clean === '/admin/cadangan' || clean === '/admin/backup') return 'backup';
     return 'dashboard';
@@ -156,7 +186,14 @@ export const App: React.FC = () => {
       case 'services': return '/admin/layanan-ip';
       case 'categories': return '/admin/kategori-perangkat';
       case 'lan_device_types': return '/admin/tipe-perangkat-lan';
+      case 'lan_cable_types': return '/admin/jenis-kabel-lan';
       case 'lan_room_types': return '/admin/tipe-ruangan-lan';
+      case 'electricity_device_types': return '/admin/tipe-perangkat-listrik';
+      case 'electricity_cable_types': return '/admin/jenis-kabel-listrik';
+      case 'cctv_device_types': return '/admin/tipe-hardware-cctv';
+      case 'cctv_cable_types': return '/admin/jenis-kabel-cctv';
+      case 'water_device_types': return '/admin/tipe-alat-air';
+      case 'water_pipe_types': return '/admin/jenis-pipa-air';
       case 'users': return '/admin/manajemen-pengguna';
       case 'backup': return '/admin/cadangan-pemulihan';
       default: return '/admin/dasbor';
@@ -265,6 +302,13 @@ export const App: React.FC = () => {
   const [lanCables, setLanCables] = useState<LanCableRun[]>([]);
   const [lanDeviceTypes, setLanDeviceTypes] = useState<LanDeviceTypeItem[]>([]);
   const [lanRoomTypes, setLanRoomTypes] = useState<LanRoomTypeItem[]>([]);
+  const [lanCableTypes, setLanCableTypes] = useState<LanCableTypeItem[]>([]);
+  const [electricityDeviceTypes, setElectricityDeviceTypes] = useState<ElectricityDeviceTypeItem[]>([]);
+  const [electricityCableTypes, setElectricityCableTypes] = useState<ElectricityCableTypeItem[]>([]);
+  const [cctvDeviceTypes, setCctvDeviceTypes] = useState<CctvDeviceTypeItem[]>([]);
+  const [cctvCableTypes, setCctvCableTypes] = useState<CctvCableTypeItem[]>([]);
+  const [waterDeviceTypes, setWaterDeviceTypes] = useState<WaterDeviceTypeItem[]>([]);
+  const [waterPipeTypes, setWaterPipeTypes] = useState<WaterPipeTypeItem[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
   const [selectedServiceIp, setSelectedServiceIp] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'matrix' | 'table'>('matrix');
@@ -295,26 +339,29 @@ export const App: React.FC = () => {
         setLanCables(data['netipam_lan_cables_v1'] || []);
         
         const serverDeviceTypes = data['netipam_lan_device_types_v1'];
-        if (serverDeviceTypes) {
-          setLanDeviceTypes(serverDeviceTypes);
-        } else {
-          setLanDeviceTypes(INITIAL_LAN_DEVICE_TYPES || []);
-        }
+        setLanDeviceTypes(serverDeviceTypes && serverDeviceTypes.length > 0 ? serverDeviceTypes : (INITIAL_LAN_DEVICE_TYPES || []));
+
+        const serverCableTypes = data['netipam_lan_cable_types_v1'];
+        setLanCableTypes(serverCableTypes && serverCableTypes.length > 0 ? serverCableTypes : (INITIAL_LAN_CABLE_TYPES || []));
 
         const serverRoomTypes = data['netipam_lan_room_types_v1'];
-        if (serverRoomTypes) {
-          setLanRoomTypes(serverRoomTypes);
-        } else {
-          setLanRoomTypes(INITIAL_LAN_ROOM_TYPES || []);
-        }
+        setLanRoomTypes(serverRoomTypes && serverRoomTypes.length > 0 ? serverRoomTypes : (INITIAL_LAN_ROOM_TYPES || []));
         
         // Sektor Listrik, CCTV, AIR
         setElectricityDevices(data['netipam_electricity_devices_v1'] || []);
         setElectricityCables(data['netipam_electricity_cables_v1'] || []);
+        setElectricityDeviceTypes(data['netipam_electricity_device_types_v1'] || INITIAL_ELECTRICITY_DEVICE_TYPES || []);
+        setElectricityCableTypes(data['netipam_electricity_cable_types_v1'] || INITIAL_ELECTRICITY_CABLE_TYPES || []);
+
         setCctvDevices(data['netipam_cctv_devices_v1'] || []);
         setCctvCables(data['netipam_cctv_cables_v1'] || []);
+        setCctvDeviceTypes(data['netipam_cctv_device_types_v1'] || INITIAL_CCTV_DEVICE_TYPES || []);
+        setCctvCableTypes(data['netipam_cctv_cable_types_v1'] || INITIAL_CCTV_CABLE_TYPES || []);
+
         setWaterDevices(data['netipam_water_devices_v1'] || []);
         setWaterPipes(data['netipam_water_pipes_v1'] || []);
+        setWaterDeviceTypes(data['netipam_water_device_types_v1'] || INITIAL_WATER_DEVICE_TYPES || []);
+        setWaterPipeTypes(data['netipam_water_pipe_types_v1'] || INITIAL_WATER_PIPE_TYPES || []);
         
         const serverUsers: UserAccount[] = data['netipam_users_list_v1'] || [];
         setUsers(serverUsers);
@@ -614,6 +661,48 @@ export const App: React.FC = () => {
     }
   }, [lanRoomTypes, isSyncing]);
 
+  useEffect(() => {
+    if (!isSyncing) {
+      saveLanCableTypes(lanCableTypes);
+    }
+  }, [lanCableTypes, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveElectricityDeviceTypes(electricityDeviceTypes);
+    }
+  }, [electricityDeviceTypes, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveElectricityCableTypes(electricityCableTypes);
+    }
+  }, [electricityCableTypes, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveCctvDeviceTypes(cctvDeviceTypes);
+    }
+  }, [cctvDeviceTypes, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveCctvCableTypes(cctvCableTypes);
+    }
+  }, [cctvCableTypes, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveWaterDeviceTypes(waterDeviceTypes);
+    }
+  }, [waterDeviceTypes, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveWaterPipeTypes(waterPipeTypes);
+    }
+  }, [waterPipeTypes, isSyncing]);
+
 
 
 
@@ -728,7 +817,14 @@ export const App: React.FC = () => {
     setLanDevices([]);
     setLanCables([]);
     setLanDeviceTypes([]);
+    setLanCableTypes([]);
     setLanRoomTypes([]);
+    setElectricityDeviceTypes([]);
+    setElectricityCableTypes([]);
+    setCctvDeviceTypes([]);
+    setCctvCableTypes([]);
+    setWaterDeviceTypes([]);
+    setWaterPipeTypes([]);
     setUsers([]);
     setCurrentUser(null);
     
@@ -766,7 +862,14 @@ export const App: React.FC = () => {
     lanDevices?: LanDevice[];
     lanCables?: LanCableRun[];
     lanDeviceTypes?: any[];
+    lanCableTypes?: any[];
     lanRoomTypes?: any[];
+    electricityDeviceTypes?: any[];
+    electricityCableTypes?: any[];
+    cctvDeviceTypes?: any[];
+    cctvCableTypes?: any[];
+    waterDeviceTypes?: any[];
+    waterPipeTypes?: any[];
   }, isDemo: boolean = false) => {
     if (data.lanLocations) {
       setLanLocations(data.lanLocations);
@@ -779,6 +882,10 @@ export const App: React.FC = () => {
     if (data.lanDeviceTypes) {
       setLanDeviceTypes(data.lanDeviceTypes);
       saveLanDeviceTypes(data.lanDeviceTypes);
+    }
+    if (data.lanCableTypes) {
+      setLanCableTypes(data.lanCableTypes);
+      saveLanCableTypes(data.lanCableTypes);
     }
     if (data.lanRoomTypes) {
       setLanRoomTypes(data.lanRoomTypes);
@@ -804,25 +911,49 @@ export const App: React.FC = () => {
       setElectricityDevices(data.electricityDevices);
       saveElectricityDevices(data.electricityDevices);
     }
+    if (data.electricityDeviceTypes) {
+      setElectricityDeviceTypes(data.electricityDeviceTypes);
+      saveElectricityDeviceTypes(data.electricityDeviceTypes);
+    }
     if (data.electricityCables) {
       setElectricityCables(data.electricityCables);
       saveElectricityCables(data.electricityCables);
+    }
+    if (data.electricityCableTypes) {
+      setElectricityCableTypes(data.electricityCableTypes);
+      saveElectricityCableTypes(data.electricityCableTypes);
     }
     if (data.cctvDevices) {
       setCctvDevices(data.cctvDevices);
       saveCctvDevices(data.cctvDevices);
     }
+    if (data.cctvDeviceTypes) {
+      setCctvDeviceTypes(data.cctvDeviceTypes);
+      saveCctvDeviceTypes(data.cctvDeviceTypes);
+    }
     if (data.cctvCables) {
       setCctvCables(data.cctvCables);
       saveCctvCables(data.cctvCables);
+    }
+    if (data.cctvCableTypes) {
+      setCctvCableTypes(data.cctvCableTypes);
+      saveCctvCableTypes(data.cctvCableTypes);
     }
     if (data.waterDevices) {
       setWaterDevices(data.waterDevices);
       saveWaterDevices(data.waterDevices);
     }
+    if (data.waterDeviceTypes) {
+      setWaterDeviceTypes(data.waterDeviceTypes);
+      saveWaterDeviceTypes(data.waterDeviceTypes);
+    }
     if (data.waterPipes) {
       setWaterPipes(data.waterPipes);
       saveWaterPipes(data.waterPipes);
+    }
+    if (data.waterPipeTypes) {
+      setWaterPipeTypes(data.waterPipeTypes);
+      saveWaterPipeTypes(data.waterPipeTypes);
     }
     if (data.categories) {
       setCategories(data.categories);
@@ -1515,6 +1646,111 @@ export const App: React.FC = () => {
     showSuccess('Tipe Ruangan Dihapus', `Tipe Ruangan "${target?.name || id}" berhasil dihapus.`);
   };
 
+  // 1. Master Jenis Kabel LAN
+  const handleSaveLanCableType = (typeItem: any) => {
+    const isEdit = lanCableTypes.some(t => t.id === typeItem.id);
+    setLanCableTypes(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      return exists ? prev.map(t => t.id === typeItem.id ? typeItem : t) : [...prev, typeItem];
+    });
+    showSuccess(isEdit ? 'Jenis Kabel LAN Diperbarui' : 'Jenis Kabel LAN Ditambahkan', `Jenis Kabel "${typeItem.name}" berhasil disimpan.`);
+  };
+  const handleDeleteLanCableType = (id: string) => {
+    const target = lanCableTypes.find(t => t.id === id);
+    setLanCableTypes(prev => prev.filter(t => t.id !== id));
+    showSuccess('Jenis Kabel LAN Dihapus', `Jenis Kabel "${target?.name || id}" berhasil dihapus.`);
+  };
+
+  // 2. Master Tipe Perangkat Listrik
+  const handleSaveElectricityDeviceType = (typeItem: any) => {
+    const isEdit = electricityDeviceTypes.some(t => t.id === typeItem.id);
+    setElectricityDeviceTypes(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      return exists ? prev.map(t => t.id === typeItem.id ? typeItem : t) : [...prev, typeItem];
+    });
+    showSuccess(isEdit ? 'Tipe Komponen Listrik Diperbarui' : 'Tipe Komponen Listrik Ditambahkan', `Tipe "${typeItem.name}" berhasil disimpan.`);
+  };
+  const handleDeleteElectricityDeviceType = (id: string) => {
+    const target = electricityDeviceTypes.find(t => t.id === id);
+    setElectricityDeviceTypes(prev => prev.filter(t => t.id !== id));
+    showSuccess('Tipe Komponen Listrik Dihapus', `Tipe "${target?.name || id}" berhasil dihapus.`);
+  };
+
+  // 3. Master Jenis Kabel Listrik
+  const handleSaveElectricityCableType = (typeItem: any) => {
+    const isEdit = electricityCableTypes.some(t => t.id === typeItem.id);
+    setElectricityCableTypes(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      return exists ? prev.map(t => t.id === typeItem.id ? typeItem : t) : [...prev, typeItem];
+    });
+    showSuccess(isEdit ? 'Jenis Kabel Listrik Diperbarui' : 'Jenis Kabel Listrik Ditambahkan', `Jenis Kabel "${typeItem.name}" berhasil disimpan.`);
+  };
+  const handleDeleteElectricityCableType = (id: string) => {
+    const target = electricityCableTypes.find(t => t.id === id);
+    setElectricityCableTypes(prev => prev.filter(t => t.id !== id));
+    showSuccess('Jenis Kabel Listrik Dihapus', `Jenis Kabel "${target?.name || id}" berhasil dihapus.`);
+  };
+
+  // 4. Master Tipe Hardware CCTV
+  const handleSaveCctvDeviceType = (typeItem: any) => {
+    const isEdit = cctvDeviceTypes.some(t => t.id === typeItem.id);
+    setCctvDeviceTypes(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      return exists ? prev.map(t => t.id === typeItem.id ? typeItem : t) : [...prev, typeItem];
+    });
+    showSuccess(isEdit ? 'Tipe Hardware CCTV Diperbarui' : 'Tipe Hardware CCTV Ditambahkan', `Tipe "${typeItem.name}" berhasil disimpan.`);
+  };
+  const handleDeleteCctvDeviceType = (id: string) => {
+    const target = cctvDeviceTypes.find(t => t.id === id);
+    setCctvDeviceTypes(prev => prev.filter(t => t.id !== id));
+    showSuccess('Tipe Hardware CCTV Dihapus', `Tipe "${target?.name || id}" berhasil dihapus.`);
+  };
+
+  // 5. Master Jenis Kabel CCTV
+  const handleSaveCctvCableType = (typeItem: any) => {
+    const isEdit = cctvCableTypes.some(t => t.id === typeItem.id);
+    setCctvCableTypes(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      return exists ? prev.map(t => t.id === typeItem.id ? typeItem : t) : [...prev, typeItem];
+    });
+    showSuccess(isEdit ? 'Jenis Kabel CCTV Diperbarui' : 'Jenis Kabel CCTV Ditambahkan', `Jenis Kabel "${typeItem.name}" berhasil disimpan.`);
+  };
+  const handleDeleteCctvCableType = (id: string) => {
+    const target = cctvCableTypes.find(t => t.id === id);
+    setCctvCableTypes(prev => prev.filter(t => t.id !== id));
+    showSuccess('Jenis Kabel CCTV Dihapus', `Jenis Kabel "${target?.name || id}" berhasil dihapus.`);
+  };
+
+  // 6. Master Tipe Alat & Sistem Air
+  const handleSaveWaterDeviceType = (typeItem: any) => {
+    const isEdit = waterDeviceTypes.some(t => t.id === typeItem.id);
+    setWaterDeviceTypes(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      return exists ? prev.map(t => t.id === typeItem.id ? typeItem : t) : [...prev, typeItem];
+    });
+    showSuccess(isEdit ? 'Tipe Alat Air Diperbarui' : 'Tipe Alat Air Ditambahkan', `Tipe "${typeItem.name}" berhasil disimpan.`);
+  };
+  const handleDeleteWaterDeviceType = (id: string) => {
+    const target = waterDeviceTypes.find(t => t.id === id);
+    setWaterDeviceTypes(prev => prev.filter(t => t.id !== id));
+    showSuccess('Tipe Alat Air Dihapus', `Tipe "${target?.name || id}" berhasil dihapus.`);
+  };
+
+  // 7. Master Jenis Pipa Air
+  const handleSaveWaterPipeType = (typeItem: any) => {
+    const isEdit = waterPipeTypes.some(t => t.id === typeItem.id);
+    setWaterPipeTypes(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      return exists ? prev.map(t => t.id === typeItem.id ? typeItem : t) : [...prev, typeItem];
+    });
+    showSuccess(isEdit ? 'Jenis Pipa Air Diperbarui' : 'Jenis Pipa Air Ditambahkan', `Jenis Pipa "${typeItem.name}" berhasil disimpan.`);
+  };
+  const handleDeleteWaterPipeType = (id: string) => {
+    const target = waterPipeTypes.find(t => t.id === id);
+    setWaterPipeTypes(prev => prev.filter(t => t.id !== id));
+    showSuccess('Jenis Pipa Air Dihapus', `Jenis Pipa "${target?.name || id}" berhasil dihapus.`);
+  };
+
   const totalUsedIps = allocations.filter(a => a.status === 'used').length;
 
   const getTabTitle = (tab: NavTab) => {
@@ -1528,8 +1764,15 @@ export const App: React.FC = () => {
       case 'dns': return 'Manajemen DNS Server';
       case 'services': return 'Layanan & Port IP';
       case 'categories': return 'Kategori Perangkat';
-      case 'lan_device_types': return 'Tipe Perangkat LAN';
-      case 'lan_room_types': return 'Tipe Ruangan LAN';
+      case 'lan_device_types': return 'Master Tipe Perangkat LAN';
+      case 'lan_cable_types': return 'Master Jenis Kabel LAN';
+      case 'lan_room_types': return 'Master Tipe Ruangan LAN';
+      case 'electricity_device_types': return 'Master Tipe Komponen Listrik';
+      case 'electricity_cable_types': return 'Master Jenis Kabel Listrik';
+      case 'cctv_device_types': return 'Master Tipe Hardware CCTV';
+      case 'cctv_cable_types': return 'Master Jenis Kabel CCTV';
+      case 'water_device_types': return 'Master Tipe Alat & Sistem Air';
+      case 'water_pipe_types': return 'Master Jenis Pipa Air';
       case 'users': return 'Akun Pengguna';
       case 'backup': return 'Cadangan & Data';
     }
@@ -1559,10 +1802,17 @@ export const App: React.FC = () => {
         totalLanCables={lanCables.length}
         totalLanDevices={lanDevices.length}
         totalLanDeviceTypes={lanDeviceTypes.length}
+        totalLanCableTypes={lanCableTypes.length}
         totalLanRoomTypes={lanRoomTypes.length}
         totalElectricityDevices={electricityDevices.length}
+        totalElectricityDeviceTypes={electricityDeviceTypes.length}
+        totalElectricityCableTypes={electricityCableTypes.length}
         totalCctvDevices={cctvDevices.length}
+        totalCctvDeviceTypes={cctvDeviceTypes.length}
+        totalCctvCableTypes={cctvCableTypes.length}
         totalWaterDevices={waterDevices.length}
+        totalWaterDeviceTypes={waterDeviceTypes.length}
+        totalWaterPipeTypes={waterPipeTypes.length}
         totalDnsRecords={dnsRecords.length}
         totalCategories={categories.length}
         totalUsers={users.length}
@@ -2569,12 +2819,117 @@ export const App: React.FC = () => {
             />
           )}
 
+          {/* TAB: JENIS KABEL LAN */}
+          {currentTab === 'lan_cable_types' && (
+            <MasterTypeView
+              title="Jenis Kabel LAN"
+              subtitle="Kelola master jenis kabel jaringan lokal (UTP Cat5e, Cat6, Fiber Optic, dll)"
+              badgeLabel="Kabel Jaringan"
+              addLabel="Tambah Jenis Kabel LAN"
+              icon={Network}
+              themeColor="blue"
+              items={lanCableTypes}
+              onSaveItem={handleSaveLanCableType}
+              onDeleteItem={handleDeleteLanCableType}
+            />
+          )}
+
           {/* TAB: TIPE RUANGAN */}
           {currentTab === 'lan_room_types' && (
             <LanRoomTypesView
               roomTypes={lanRoomTypes}
               onSaveRoomType={handleSaveLanRoomType}
               onDeleteRoomType={handleDeleteLanRoomType}
+            />
+          )}
+
+          {/* TAB: TIPE PERANGKAT LISTRIK */}
+          {currentTab === 'electricity_device_types' && (
+            <MasterTypeView
+              title="Tipe Komponen / Perangkat Listrik"
+              subtitle="Kelola master jenis perangkat kelistrikan (MDP, SDP, Trafo, Genset, UPS, MCB, dll)"
+              badgeLabel="Komponen Listrik"
+              addLabel="Tambah Tipe Komponen"
+              icon={Zap}
+              themeColor="amber"
+              items={electricityDeviceTypes}
+              onSaveItem={handleSaveElectricityDeviceType}
+              onDeleteItem={handleDeleteElectricityDeviceType}
+            />
+          )}
+
+          {/* TAB: JENIS KABEL LISTRIK */}
+          {currentTab === 'electricity_cable_types' && (
+            <MasterTypeView
+              title="Jenis Kabel Listrik"
+              subtitle="Kelola master tipe kabel kelistrikan & transmisi daya (NYY, NYM, NYAF, Power Cord, dll)"
+              badgeLabel="Kabel Kelistrikan"
+              addLabel="Tambah Jenis Kabel Listrik"
+              icon={Zap}
+              themeColor="amber"
+              items={electricityCableTypes}
+              onSaveItem={handleSaveElectricityCableType}
+              onDeleteItem={handleDeleteElectricityCableType}
+            />
+          )}
+
+          {/* TAB: TIPE HARDWARE CCTV */}
+          {currentTab === 'cctv_device_types' && (
+            <MasterTypeView
+              title="Tipe Hardware CCTV"
+              subtitle="Kelola master tipe perangkat kamera & perekam (IP Camera Dome, Bullet, PTZ, NVR, PoE Switch, dll)"
+              badgeLabel="Hardware CCTV"
+              addLabel="Tambah Tipe Hardware"
+              icon={Video}
+              themeColor="rose"
+              items={cctvDeviceTypes}
+              onSaveItem={handleSaveCctvDeviceType}
+              onDeleteItem={handleDeleteCctvDeviceType}
+            />
+          )}
+
+          {/* TAB: JENIS KABEL CCTV */}
+          {currentTab === 'cctv_cable_types' && (
+            <MasterTypeView
+              title="Jenis Kabel CCTV"
+              subtitle="Kelola master jenis kabel transmisi video kamera (Cat6 UTP, RG59 Coaxial, Fiber Optic, dll)"
+              badgeLabel="Kabel Kamera"
+              addLabel="Tambah Jenis Kabel CCTV"
+              icon={Video}
+              themeColor="rose"
+              items={cctvCableTypes}
+              onSaveItem={handleSaveCctvCableType}
+              onDeleteItem={handleDeleteCctvCableType}
+            />
+          )}
+
+          {/* TAB: TIPE ALAT & SISTEM AIR */}
+          {currentTab === 'water_device_types' && (
+            <MasterTypeView
+              title="Tipe Alat & Sistem Air"
+              subtitle="Kelola master perangkat sistem distribusi air (Pompa Submersible, Booster, Toren, Flow Meter, dll)"
+              badgeLabel="Alat Distribusi Air"
+              addLabel="Tambah Tipe Alat Air"
+              icon={Droplets}
+              themeColor="cyan"
+              items={waterDeviceTypes}
+              onSaveItem={handleSaveWaterDeviceType}
+              onDeleteItem={handleDeleteWaterDeviceType}
+            />
+          )}
+
+          {/* TAB: JENIS PIPA AIR */}
+          {currentTab === 'water_pipe_types' && (
+            <MasterTypeView
+              title="Jenis Pipa Air & Irigasi"
+              subtitle="Kelola master spesifikasi pipa distribusi air (PVC AW, HDPE, Galvanis, Selang Drip, dll)"
+              badgeLabel="Pipa Distribusi"
+              addLabel="Tambah Jenis Pipa Air"
+              icon={Droplets}
+              themeColor="cyan"
+              items={waterPipeTypes}
+              onSaveItem={handleSaveWaterPipeType}
+              onDeleteItem={handleDeleteWaterPipeType}
             />
           )}
 
@@ -2609,7 +2964,14 @@ export const App: React.FC = () => {
               waterDevices={waterDevices}
               waterPipes={waterPipes}
               lanDeviceTypes={lanDeviceTypes}
+              lanCableTypes={lanCableTypes}
               lanRoomTypes={lanRoomTypes}
+              electricityDeviceTypes={electricityDeviceTypes}
+              electricityCableTypes={electricityCableTypes}
+              cctvDeviceTypes={cctvDeviceTypes}
+              cctvCableTypes={cctvCableTypes}
+              waterDeviceTypes={waterDeviceTypes}
+              waterPipeTypes={waterPipeTypes}
               onImportData={handleImportData}
               onWipeAllData={handleWipeAllData}
             />
@@ -2726,6 +3088,7 @@ export const App: React.FC = () => {
           existingDevices={electricityDevices}
           locations={lanLocations.filter(loc => loc.systemType === 'electricity')}
           zones={lanZones}
+          deviceTypes={electricityDeviceTypes}
           presetLocationId={electricityDeviceDefaultLocationId}
           presetZoneId={electricityDeviceDefaultZoneId}
         />
@@ -2745,6 +3108,7 @@ export const App: React.FC = () => {
           locations={lanLocations.filter(loc => loc.systemType === 'electricity')}
           zones={lanZones}
           electricityDevices={electricityDevices}
+          cableTypes={electricityCableTypes}
           presetLocationId={electricityCableDefaultLocationId}
           presetZoneId={electricityCableDefaultZoneId}
         />
@@ -2764,6 +3128,7 @@ export const App: React.FC = () => {
           existingNvrList={cctvDevices.filter(d => d.type === 'nvr' || d.type === 'dvr')}
           locations={lanLocations.filter(loc => loc.systemType === 'cctv')}
           zones={lanZones}
+          deviceTypes={cctvDeviceTypes}
           presetLocationId={cctvDeviceDefaultLocationId}
           presetZoneId={cctvDeviceDefaultZoneId}
         />
@@ -2783,6 +3148,7 @@ export const App: React.FC = () => {
           locations={lanLocations.filter(loc => loc.systemType === 'cctv')}
           zones={lanZones}
           cctvDevices={cctvDevices}
+          cableTypes={cctvCableTypes}
           presetLocationId={cctvCableDefaultLocationId}
           presetZoneId={cctvCableDefaultZoneId}
         />
@@ -2801,6 +3167,7 @@ export const App: React.FC = () => {
           editDevice={editingWaterDevice}
           locations={lanLocations.filter(loc => loc.systemType === 'water')}
           zones={lanZones}
+          deviceTypes={waterDeviceTypes}
           presetLocationId={waterDeviceDefaultLocationId}
           presetZoneId={waterDeviceDefaultZoneId}
         />
@@ -2820,6 +3187,7 @@ export const App: React.FC = () => {
           locations={lanLocations.filter(loc => loc.systemType === 'water')}
           zones={lanZones}
           waterDevices={waterDevices}
+          pipeTypes={waterPipeTypes}
           presetLocationId={waterPipeDefaultLocationId}
           presetZoneId={waterPipeDefaultZoneId}
         />
@@ -2887,6 +3255,7 @@ export const App: React.FC = () => {
           devices={lanDevices}
           locations={lanLocations.filter(loc => loc.systemType === 'lan' || !loc.systemType)}
           zones={lanZones}
+          cableTypes={lanCableTypes}
           presetLocationId={lanCableDefaultLocationId}
           presetZoneId={lanCableDefaultZoneId}
         />

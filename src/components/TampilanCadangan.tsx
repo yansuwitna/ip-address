@@ -59,7 +59,14 @@ interface BackupViewProps {
   lanDevices?: LanDevice[];
   lanCables?: LanCableRun[];
   lanDeviceTypes?: any[];
+  lanCableTypes?: any[];
   lanRoomTypes?: any[];
+  electricityDeviceTypes?: any[];
+  electricityCableTypes?: any[];
+  cctvDeviceTypes?: any[];
+  cctvCableTypes?: any[];
+  waterDeviceTypes?: any[];
+  waterPipeTypes?: any[];
   onImportData: (data: {
     groups?: IPGroup[];
     allocations?: IPAllocation[];
@@ -79,7 +86,14 @@ interface BackupViewProps {
     lanDevices?: LanDevice[];
     lanCables?: LanCableRun[];
     lanDeviceTypes?: any[];
+    lanCableTypes?: any[];
     lanRoomTypes?: any[];
+    electricityDeviceTypes?: any[];
+    electricityCableTypes?: any[];
+    cctvDeviceTypes?: any[];
+    cctvCableTypes?: any[];
+    waterDeviceTypes?: any[];
+    waterPipeTypes?: any[];
   }, isDemo?: boolean) => void;
   onWipeAllData: () => Promise<void> | void;
 }
@@ -103,7 +117,14 @@ export const BackupView: React.FC<BackupViewProps> = ({
   lanDevices = [],
   lanCables = [],
   lanDeviceTypes = [],
+  lanCableTypes = [],
   lanRoomTypes = [],
+  electricityDeviceTypes = [],
+  electricityCableTypes = [],
+  cctvDeviceTypes = [],
+  cctvCableTypes = [],
+  waterDeviceTypes = [],
+  waterPipeTypes = [],
   onImportData,
   onWipeAllData
 }) => {
@@ -159,7 +180,14 @@ export const BackupView: React.FC<BackupViewProps> = ({
       cctvCables,
       waterPipes,
       lanDeviceTypes,
-      lanRoomTypes
+      lanRoomTypes,
+      lanCableTypes,
+      electricityDeviceTypes,
+      electricityCableTypes,
+      cctvDeviceTypes,
+      cctvCableTypes,
+      waterDeviceTypes,
+      waterPipeTypes
     );
     setHasBackedUp(true);
     showSuccess('Cadangan Berhasil Diunduh', 'Berkas cadangan format JSON berhasil disimpan.');
@@ -249,6 +277,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
       dataToRestore.lanDevices = pendingRestoreData.lanDevices;
       dataToRestore.lanCables = pendingRestoreData.lanCables;
       dataToRestore.lanDeviceTypes = pendingRestoreData.lanDeviceTypes;
+      dataToRestore.lanCableTypes = pendingRestoreData.lanCableTypes;
       dataToRestore.lanRoomTypes = pendingRestoreData.lanRoomTypes;
     }
     if (restoreIpam) {
@@ -257,15 +286,21 @@ export const BackupView: React.FC<BackupViewProps> = ({
     }
     if (restoreElectricity) {
       dataToRestore.electricityDevices = pendingRestoreData.electricityDevices;
+      dataToRestore.electricityDeviceTypes = pendingRestoreData.electricityDeviceTypes;
       dataToRestore.electricityCables = pendingRestoreData.electricityCables;
+      dataToRestore.electricityCableTypes = pendingRestoreData.electricityCableTypes;
     }
     if (restoreCctv) {
       dataToRestore.cctvDevices = pendingRestoreData.cctvDevices;
+      dataToRestore.cctvDeviceTypes = pendingRestoreData.cctvDeviceTypes;
       dataToRestore.cctvCables = pendingRestoreData.cctvCables;
+      dataToRestore.cctvCableTypes = pendingRestoreData.cctvCableTypes;
     }
     if (restoreWater) {
       dataToRestore.waterDevices = pendingRestoreData.waterDevices;
+      dataToRestore.waterDeviceTypes = pendingRestoreData.waterDeviceTypes;
       dataToRestore.waterPipes = pendingRestoreData.waterPipes;
+      dataToRestore.waterPipeTypes = pendingRestoreData.waterPipeTypes;
     }
     if (restoreDns) dataToRestore.dnsRecords = pendingRestoreData.dnsRecords;
     if (restoreSub) dataToRestore.subDomains = pendingRestoreData.subDomains;

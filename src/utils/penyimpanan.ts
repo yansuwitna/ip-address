@@ -1216,7 +1216,21 @@ export const INITIAL_WATER_DEVICES: WaterDevice[] = [
   }
 ];
 
-import { LanDevice, LanCableRun, LanLocation, LanZone, LanDeviceTypeItem, LanRoomTypeItem } from '../types/jaringanUtilitas';
+import { 
+  LanDevice, 
+  LanCableRun, 
+  LanLocation, 
+  LanZone, 
+  LanDeviceTypeItem, 
+  LanRoomTypeItem,
+  LanCableTypeItem,
+  ElectricityDeviceTypeItem,
+  ElectricityCableTypeItem,
+  CctvDeviceTypeItem,
+  CctvCableTypeItem,
+  WaterDeviceTypeItem,
+  WaterPipeTypeItem
+} from '../types/jaringanUtilitas';
 
 export const STORAGE_KEY_LAN_LOCATIONS = 'netipam_lan_locations_v1';
 export const STORAGE_KEY_LAN_ZONES = 'netipam_lan_zones_v1';
@@ -1224,6 +1238,13 @@ export const STORAGE_KEY_LAN_DEVICES = 'netipam_lan_devices_v1';
 export const STORAGE_KEY_LAN_CABLES = 'netipam_lan_cables_v1';
 export const STORAGE_KEY_LAN_DEVICE_TYPES = 'netipam_lan_device_types_v1';
 export const STORAGE_KEY_LAN_ROOM_TYPES = 'netipam_lan_room_types_v1';
+export const STORAGE_KEY_LAN_CABLE_TYPES = 'netipam_lan_cable_types_v1';
+export const STORAGE_KEY_ELECTRICITY_DEVICE_TYPES = 'netipam_electricity_device_types_v1';
+export const STORAGE_KEY_ELECTRICITY_CABLE_TYPES = 'netipam_electricity_cable_types_v1';
+export const STORAGE_KEY_CCTV_DEVICE_TYPES = 'netipam_cctv_device_types_v1';
+export const STORAGE_KEY_CCTV_CABLE_TYPES = 'netipam_cctv_cable_types_v1';
+export const STORAGE_KEY_WATER_DEVICE_TYPES = 'netipam_water_device_types_v1';
+export const STORAGE_KEY_WATER_PIPE_TYPES = 'netipam_water_pipe_types_v1';
 
 export function saveLanLocations(locations: LanLocation[]): void {
   syncToServer(STORAGE_KEY_LAN_LOCATIONS, locations);
@@ -1249,9 +1270,44 @@ export function saveLanRoomTypes(roomTypes: LanRoomTypeItem[]): void {
   syncToServer(STORAGE_KEY_LAN_ROOM_TYPES, roomTypes);
 }
 
-export const INITIAL_LAN_DEVICE_TYPES: LanDeviceTypeItem[] = [];
+export function saveLanCableTypes(items: LanCableTypeItem[]): void {
+  syncToServer(STORAGE_KEY_LAN_CABLE_TYPES, items);
+}
 
+export function saveElectricityDeviceTypes(items: ElectricityDeviceTypeItem[]): void {
+  syncToServer(STORAGE_KEY_ELECTRICITY_DEVICE_TYPES, items);
+}
+
+export function saveElectricityCableTypes(items: ElectricityCableTypeItem[]): void {
+  syncToServer(STORAGE_KEY_ELECTRICITY_CABLE_TYPES, items);
+}
+
+export function saveCctvDeviceTypes(items: CctvDeviceTypeItem[]): void {
+  syncToServer(STORAGE_KEY_CCTV_DEVICE_TYPES, items);
+}
+
+export function saveCctvCableTypes(items: CctvCableTypeItem[]): void {
+  syncToServer(STORAGE_KEY_CCTV_CABLE_TYPES, items);
+}
+
+export function saveWaterDeviceTypes(items: WaterDeviceTypeItem[]): void {
+  syncToServer(STORAGE_KEY_WATER_DEVICE_TYPES, items);
+}
+
+export function saveWaterPipeTypes(items: WaterPipeTypeItem[]): void {
+  syncToServer(STORAGE_KEY_WATER_PIPE_TYPES, items);
+}
+
+export const INITIAL_LAN_DEVICE_TYPES: LanDeviceTypeItem[] = [];
 export const INITIAL_LAN_ROOM_TYPES: LanRoomTypeItem[] = [];
+export const INITIAL_LAN_CABLE_TYPES: LanCableTypeItem[] = [];
+export const INITIAL_ELECTRICITY_DEVICE_TYPES: ElectricityDeviceTypeItem[] = [];
+export const INITIAL_ELECTRICITY_CABLE_TYPES: ElectricityCableTypeItem[] = [];
+export const INITIAL_CCTV_DEVICE_TYPES: CctvDeviceTypeItem[] = [];
+export const INITIAL_CCTV_CABLE_TYPES: CctvCableTypeItem[] = [];
+export const INITIAL_WATER_DEVICE_TYPES: WaterDeviceTypeItem[] = [];
+export const INITIAL_WATER_PIPE_TYPES: WaterPipeTypeItem[] = [];
+
 
 // SAMPLE INITIAL DATA TINGKAT 1: LOKASI (Sekolah 1, Sekolah 2, dst)
 export const INITIAL_LAN_LOCATIONS: LanLocation[] = [

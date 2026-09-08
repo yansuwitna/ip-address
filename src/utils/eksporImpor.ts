@@ -496,7 +496,14 @@ export function exportBackupJson(
   cctvCables?: CctvCableRun[],
   waterPipes?: WaterPipeRun[],
   lanDeviceTypes?: any[],
-  lanRoomTypes?: any[]
+  lanRoomTypes?: any[],
+  lanCableTypes?: any[],
+  electricityDeviceTypes?: any[],
+  electricityCableTypes?: any[],
+  cctvDeviceTypes?: any[],
+  cctvCableTypes?: any[],
+  waterDeviceTypes?: any[],
+  waterPipeTypes?: any[]
 ): void {
   const backupData = {
     appName: 'Infrastruktur Jaringan Terpadu (LAN, Listrik, CCTV, AIR)',
@@ -515,13 +522,20 @@ export function exportBackupJson(
       lanDevices: lanDevices?.length || 0,
       lanCables: lanCables?.length || 0,
       lanDeviceTypes: lanDeviceTypes?.length || 0,
+      lanCableTypes: lanCableTypes?.length || 0,
       lanRoomTypes: lanRoomTypes?.length || 0,
       electricityDevices: electricityDevices?.length || 0,
+      electricityDeviceTypes: electricityDeviceTypes?.length || 0,
       electricityCables: electricityCables?.length || 0,
+      electricityCableTypes: electricityCableTypes?.length || 0,
       cctvDevices: cctvDevices?.length || 0,
+      cctvDeviceTypes: cctvDeviceTypes?.length || 0,
       cctvCables: cctvCables?.length || 0,
+      cctvCableTypes: cctvCableTypes?.length || 0,
       waterDevices: waterDevices?.length || 0,
-      waterPipes: waterPipes?.length || 0
+      waterDeviceTypes: waterDeviceTypes?.length || 0,
+      waterPipes: waterPipes?.length || 0,
+      waterPipeTypes: waterPipeTypes?.length || 0
     },
     groups,
     allocations,
@@ -535,13 +549,20 @@ export function exportBackupJson(
     lanDevices: lanDevices || [],
     lanCables: lanCables || [],
     lanDeviceTypes: lanDeviceTypes || [],
+    lanCableTypes: lanCableTypes || [],
     lanRoomTypes: lanRoomTypes || [],
     electricityDevices: electricityDevices || [],
+    electricityDeviceTypes: electricityDeviceTypes || [],
     electricityCables: electricityCables || [],
+    electricityCableTypes: electricityCableTypes || [],
     cctvDevices: cctvDevices || [],
+    cctvDeviceTypes: cctvDeviceTypes || [],
     cctvCables: cctvCables || [],
+    cctvCableTypes: cctvCableTypes || [],
     waterDevices: waterDevices || [],
-    waterPipes: waterPipes || []
+    waterDeviceTypes: waterDeviceTypes || [],
+    waterPipes: waterPipes || [],
+    waterPipeTypes: waterPipeTypes || []
   };
 
   const jsonStr = JSON.stringify(backupData, null, 2);
@@ -576,6 +597,13 @@ export function parseImportJson(fileContent: string): {
   lanCables?: LanCableRun[];
   lanDeviceTypes?: any[];
   lanRoomTypes?: any[];
+  lanCableTypes?: any[];
+  electricityDeviceTypes?: any[];
+  electricityCableTypes?: any[];
+  cctvDeviceTypes?: any[];
+  cctvCableTypes?: any[];
+  waterDeviceTypes?: any[];
+  waterPipeTypes?: any[];
 } {
   const parsed = JSON.parse(fileContent);
   if (!parsed || typeof parsed !== 'object') {
@@ -600,6 +628,13 @@ export function parseImportJson(fileContent: string): {
     lanDevices: Array.isArray(parsed.lanDevices) ? parsed.lanDevices : undefined,
     lanCables: Array.isArray(parsed.lanCables) ? parsed.lanCables : undefined,
     lanDeviceTypes: Array.isArray(parsed.lanDeviceTypes) ? parsed.lanDeviceTypes : undefined,
-    lanRoomTypes: Array.isArray(parsed.lanRoomTypes) ? parsed.lanRoomTypes : undefined
+    lanRoomTypes: Array.isArray(parsed.lanRoomTypes) ? parsed.lanRoomTypes : undefined,
+    lanCableTypes: Array.isArray(parsed.lanCableTypes) ? parsed.lanCableTypes : undefined,
+    electricityDeviceTypes: Array.isArray(parsed.electricityDeviceTypes) ? parsed.electricityDeviceTypes : undefined,
+    electricityCableTypes: Array.isArray(parsed.electricityCableTypes) ? parsed.electricityCableTypes : undefined,
+    cctvDeviceTypes: Array.isArray(parsed.cctvDeviceTypes) ? parsed.cctvDeviceTypes : undefined,
+    cctvCableTypes: Array.isArray(parsed.cctvCableTypes) ? parsed.cctvCableTypes : undefined,
+    waterDeviceTypes: Array.isArray(parsed.waterDeviceTypes) ? parsed.waterDeviceTypes : undefined,
+    waterPipeTypes: Array.isArray(parsed.waterPipeTypes) ? parsed.waterPipeTypes : undefined
   };
 }

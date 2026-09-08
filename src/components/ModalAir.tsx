@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Droplets, Save, AlertCircle } from 'lucide-react';
-import { WaterDevice, WaterDeviceType, WaterStatus, LanLocation, LanZone } from '../types/jaringanUtilitas';
+import { X, Droplets, Save, AlertCircle, Lock } from 'lucide-react';
+import { WaterDevice, WaterDeviceType, WaterStatus, LanLocation, LanZone, WaterDeviceTypeItem } from '../types/jaringanUtilitas';
 
 interface WaterModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface WaterModalProps {
   editDevice?: WaterDevice | null;
   locations?: LanLocation[];
   zones?: LanZone[];
+  deviceTypes?: WaterDeviceTypeItem[];
   presetLocationId?: string;
   presetZoneId?: string;
 }
@@ -20,6 +21,7 @@ export const WaterModal: React.FC<WaterModalProps> = ({
   editDevice,
   locations = [],
   zones = [],
+  deviceTypes = [],
   presetLocationId,
   presetZoneId
 }) => {
@@ -168,9 +170,15 @@ export const WaterModal: React.FC<WaterModalProps> = ({
               <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Lokasi Tempat *
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                        Lokasi Tempat *
+                      </label>
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        <span>Terkunci</span>
+                      </span>
+                    </div>
                     <select
                       value={locationId}
                       onChange={e => {
@@ -179,7 +187,8 @@ export const WaterModal: React.FC<WaterModalProps> = ({
                         const matchingZones = zones.filter(z => z.systemType === 'water' && z.locationId === newLocId);
                         setZoneId(matchingZones[0]?.id || '');
                       }}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-800 dark:text-slate-100"
+                      disabled={true}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 cursor-not-allowed select-none opacity-80"
                     >
                       {locations.map(loc => (
                         <option key={loc.id} value={loc.id}>
@@ -190,13 +199,20 @@ export const WaterModal: React.FC<WaterModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Jaringan / Area Distribusi Air *
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                        Jaringan / Area Distribusi Air *
+                      </label>
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        <span>Terkunci</span>
+                      </span>
+                    </div>
                     <select
                       value={zoneId}
                       onChange={e => setZoneId(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-800 dark:text-slate-100"
+                      disabled={true}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 cursor-not-allowed select-none opacity-80"
                     >
                       {zones.filter(z => z.systemType === 'water' && z.locationId === locationId).map(zone => (
                         <option key={zone.id} value={zone.id}>
@@ -251,17 +267,27 @@ export const WaterModal: React.FC<WaterModalProps> = ({
                 onChange={e => setType(e.target.value as WaterDeviceType)}
                 className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-800 dark:text-slate-100"
               >
-                <option value="pump_submersible">Pompa Celup / Submersible (Sumur)</option>
-                <option value="pump_booster">Pompa Pendorong (Booster Pump)</option>
-                <option value="water_tank">Tandon / Toren Penampungan Air</option>
-                <option value="valve_solenoid">Katup Solenoid Otomatis (Electric Valve)</option>
-                <option value="valve_manual">Katup / Stop Kran Manual (Ball Valve)</option>
-                <option value="flow_meter">Flow Meter / Pengukur Debit Aliran</option>
-                <option value="water_level_sensor">Sensor Ketinggian Air (Radar / Ultrasonic)</option>
-                <option value="pressure_sensor">Sensor / Manometer Tekanan Pipa</option>
-                <option value="sprinkler_zone">Sistem Sprinkler / Nozzle Irigasi</option>
-                <option value="filter_water">Tabung Filter / Penyaring Air</option>
-                <option value="other">Lainnya</option>
+                {deviceTypes && deviceTypes.length > 0 ? (
+                  deviceTypes.map(dt => (
+                    <option key={dt.id} value={dt.code || dt.name}>
+                      {dt.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="pump_submersible">Pompa Celup / Submersible (Sumur)</option>
+                    <option value="pump_booster">Pompa Pendorong (Booster Pump)</option>
+                    <option value="water_tank">Tandon / Toren Penampungan Air</option>
+                    <option value="valve_solenoid">Katup Solenoid Otomatis (Electric Valve)</option>
+                    <option value="valve_manual">Katup / Stop Kran Manual (Ball Valve)</option>
+                    <option value="flow_meter">Flow Meter / Pengukur Debit Aliran</option>
+                    <option value="water_level_sensor">Sensor Ketinggian Air (Radar / Ultrasonic)</option>
+                    <option value="pressure_sensor">Sensor / Manometer Tekanan Pipa</option>
+                    <option value="sprinkler_zone">Sistem Sprinkler / Nozzle Irigasi</option>
+                    <option value="filter_water">Tabung Filter / Penyaring Air</option>
+                    <option value="other">Lainnya</option>
+                  </>
+                )}
               </select>
             </div>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Droplets, MapPin, Layers, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
-import { WaterPipeRun, WaterDevice, LanLocation, LanZone } from '../types/jaringanUtilitas';
+import { X, Droplets, MapPin, Layers, ArrowRight, ShieldCheck, Tag, Lock } from 'lucide-react';
+import { WaterPipeRun, WaterDevice, LanLocation, LanZone, WaterPipeTypeItem } from '../types/jaringanUtilitas';
 
 interface WaterPipeModalProps {
   isOpen: boolean;
@@ -10,6 +10,7 @@ interface WaterPipeModalProps {
   locations: LanLocation[];
   zones: LanZone[];
   waterDevices: WaterDevice[];
+  pipeTypes?: WaterPipeTypeItem[];
   presetLocationId?: string;
   presetZoneId?: string;
 }
@@ -22,6 +23,7 @@ export const WaterPipeModal: React.FC<WaterPipeModalProps> = ({
   locations,
   zones,
   waterDevices,
+  pipeTypes = [],
   presetLocationId,
   presetZoneId,
 }) => {
@@ -140,10 +142,16 @@ export const WaterPipeModal: React.FC<WaterPipeModalProps> = ({
             {/* Lokasi & Jaringan */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-cyan-500" />
-                  Lokasi
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-cyan-500" />
+                    Lokasi
+                  </label>
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                    <Lock className="w-3 h-3" />
+                    <span>Terkunci</span>
+                  </span>
+                </div>
                 <select
                   value={selectedLocationId}
                   onChange={(e) => {
@@ -151,7 +159,8 @@ export const WaterPipeModal: React.FC<WaterPipeModalProps> = ({
                     const matching = zones.filter(z => z.systemType === 'water' && z.locationId === e.target.value);
                     setSelectedZoneId(matching[0]?.id || '');
                   }}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-cyan-500 outline-hidden"
+                  disabled={true}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 text-sm cursor-not-allowed select-none opacity-80"
                 >
                   <option value="">Pilih Lokasi</option>
                   {locations.map(loc => (
@@ -161,14 +170,21 @@ export const WaterPipeModal: React.FC<WaterPipeModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-cyan-500" />
-                  Nama Jaringan
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-cyan-500" />
+                    Nama Jaringan
+                  </label>
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                    <Lock className="w-3 h-3" />
+                    <span>Terkunci</span>
+                  </span>
+                </div>
                 <select
                   value={selectedZoneId}
                   onChange={(e) => setSelectedZoneId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-cyan-500 outline-hidden"
+                  disabled={true}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 text-sm cursor-not-allowed select-none opacity-80"
                 >
                   <option value="">Pilih Jaringan</option>
                   {availableZones.map(zone => (
@@ -205,12 +221,22 @@ export const WaterPipeModal: React.FC<WaterPipeModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, pipeType: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-cyan-500 outline-hidden"
                 >
-                  <option value="PVC AW (Air Bersih)">PVC AW (Air Bersih)</option>
-                  <option value="PVC D (Pembuangan)">PVC D (Pembuangan)</option>
-                  <option value="PPR (Air Panas / Dingin Tekanan)">PPR (Air Panas / Dingin Tekanan)</option>
-                  <option value="HDPE (Outdoor / Underground)">HDPE (Outdoor / Underground)</option>
-                  <option value="Pipa Besi Galvanis (GIP)">Pipa Besi Galvanis (GIP)</option>
-                  <option value="Selang Fleksibel / PE Drip">Selang Fleksibel / PE Drip</option>
+                  {pipeTypes && pipeTypes.length > 0 ? (
+                    pipeTypes.map(pt => (
+                      <option key={pt.id} value={pt.name || pt.code}>
+                        {pt.name}
+                      </option>
+                    ))
+                  ) : (
+                    <>
+                      <option value="PVC AW (Air Bersih)">PVC AW (Air Bersih)</option>
+                      <option value="PVC D (Pembuangan)">PVC D (Pembuangan)</option>
+                      <option value="PPR (Air Panas / Dingin Tekanan)">PPR (Air Panas / Dingin Tekanan)</option>
+                      <option value="HDPE (Outdoor / Underground)">HDPE (Outdoor / Underground)</option>
+                      <option value="Pipa Besi Galvanis (GIP)">Pipa Besi Galvanis (GIP)</option>
+                      <option value="Selang Fleksibel / PE Drip">Selang Fleksibel / PE Drip</option>
+                    </>
+                  )}
                 </select>
               </div>
             </div>

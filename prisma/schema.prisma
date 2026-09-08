@@ -381,3 +381,95 @@ model LanRoomType {
 
   @@map("tipe_ruangan_lan")
 }
+
+model LanCableType {
+  id          String   @id @map("id")
+  name        String   @map("nama_tipe")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("tipe_kabel_lan")
+}
+
+model ElectricityDeviceTypeModel {
+  id          String   @id @map("id")
+  name        String   @map("nama_tipe")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("tipe_perangkat_listrik")
+}
+
+model ElectricityCableType {
+  id          String   @id @map("id")
+  name        String   @map("nama_tipe")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("tipe_kabel_listrik")
+}
+
+model CctvDeviceTypeModel {
+  id          String   @id @map("id")
+  name        String   @map("nama_tipe")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("tipe_perangkat_cctv")
+}
+
+model CctvCableType {
+  id          String   @id @map("id")
+  name        String   @map("nama_tipe")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("tipe_kabel_cctv")
+}
+
+model WaterDeviceTypeModel {
+  id          String   @id @map("id")
+  name        String   @map("nama_tipe")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("tipe_perangkat_air")
+}
+
+model WaterPipeType {
+  id          String   @id @map("id")
+  name        String   @map("nama_tipe")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("tipe_pipa_air")
+}
+

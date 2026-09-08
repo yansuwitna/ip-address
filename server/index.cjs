@@ -179,7 +179,14 @@ async function startServer() {
         lanDevices,
         lanCableRuns,
         lanDeviceTypes,
-        lanRoomTypes
+        lanRoomTypes,
+        lanCableTypes,
+        electricityDeviceTypes,
+        electricityCableTypes,
+        cctvDeviceTypes,
+        cctvCableTypes,
+        waterDeviceTypes,
+        waterPipeTypes
       ] = await Promise.all([
         prisma.user.findMany(),
         prisma.iPGroup.findMany(),
@@ -199,7 +206,14 @@ async function startServer() {
         prisma.lanDevice.findMany(),
         prisma.lanCableRun.findMany(),
         prisma.lanDeviceType.findMany(),
-        prisma.lanRoomType.findMany()
+        prisma.lanRoomType.findMany(),
+        prisma.lanCableType.findMany(),
+        prisma.electricityDeviceTypeModel.findMany(),
+        prisma.electricityCableType.findMany(),
+        prisma.cctvDeviceTypeModel.findMany(),
+        prisma.cctvCableType.findMany(),
+        prisma.waterDeviceTypeModel.findMany(),
+        prisma.waterPipeType.findMany()
       ]);
       
       res.json({
@@ -221,7 +235,14 @@ async function startServer() {
         'netipam_lan_devices_v1': lanDevices,
         'netipam_lan_cables_v1': lanCableRuns,
         'netipam_lan_device_types_v1': lanDeviceTypes,
-        'netipam_lan_room_types_v1': lanRoomTypes
+        'netipam_lan_room_types_v1': lanRoomTypes,
+        'netipam_lan_cable_types_v1': lanCableTypes,
+        'netipam_electricity_device_types_v1': electricityDeviceTypes,
+        'netipam_electricity_cable_types_v1': electricityCableTypes,
+        'netipam_cctv_device_types_v1': cctvDeviceTypes,
+        'netipam_cctv_cable_types_v1': cctvCableTypes,
+        'netipam_water_device_types_v1': waterDeviceTypes,
+        'netipam_water_pipe_types_v1': waterPipeTypes
       });
     } catch (error) {
       console.error(error);
@@ -306,6 +327,27 @@ async function startServer() {
         case 'netipam_lan_room_types_v1':
           await replaceTable(prisma.lanRoomType, data);
           break;
+        case 'netipam_lan_cable_types_v1':
+          await replaceTable(prisma.lanCableType, data);
+          break;
+        case 'netipam_electricity_device_types_v1':
+          await replaceTable(prisma.electricityDeviceTypeModel, data);
+          break;
+        case 'netipam_electricity_cable_types_v1':
+          await replaceTable(prisma.electricityCableType, data);
+          break;
+        case 'netipam_cctv_device_types_v1':
+          await replaceTable(prisma.cctvDeviceTypeModel, data);
+          break;
+        case 'netipam_cctv_cable_types_v1':
+          await replaceTable(prisma.cctvCableType, data);
+          break;
+        case 'netipam_water_device_types_v1':
+          await replaceTable(prisma.waterDeviceTypeModel, data);
+          break;
+        case 'netipam_water_pipe_types_v1':
+          await replaceTable(prisma.waterPipeType, data);
+          break;
         default:
           return res.status(400).json({ error: 'Unknown key' });
       }
@@ -338,7 +380,14 @@ async function startServer() {
         prisma.lanZone.deleteMany({}),
         prisma.lanLocation.deleteMany({}),
         prisma.lanDeviceType.deleteMany({}),
-        prisma.lanRoomType.deleteMany({})
+        prisma.lanRoomType.deleteMany({}),
+        prisma.lanCableType.deleteMany({}),
+        prisma.electricityDeviceTypeModel.deleteMany({}),
+        prisma.electricityCableType.deleteMany({}),
+        prisma.cctvDeviceTypeModel.deleteMany({}),
+        prisma.cctvCableType.deleteMany({}),
+        prisma.waterDeviceTypeModel.deleteMany({}),
+        prisma.waterPipeType.deleteMany({})
       ]);
       res.json({ success: true });
     } catch (error) {

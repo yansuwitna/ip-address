@@ -250,6 +250,84 @@ export interface LanRoomTypeItem {
   updatedAt?: string;
 }
 
+export interface LanCableTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ElectricityDeviceTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ElectricityCableTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CctvDeviceTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CctvCableTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface WaterDeviceTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface WaterPipeTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+
 export type LanCableType = 
   | 'cat5e_utp' 
   | 'cat6_utp' 

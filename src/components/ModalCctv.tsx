@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Video, Save, AlertCircle } from 'lucide-react';
-import { CctvDevice, CctvDeviceType, CctvStatus, LanLocation, LanZone } from '../types/jaringanUtilitas';
+import { X, Video, Save, AlertCircle, Lock } from 'lucide-react';
+import { CctvDevice, CctvDeviceType, CctvStatus, LanLocation, LanZone, CctvDeviceTypeItem } from '../types/jaringanUtilitas';
 
 interface CctvModalProps {
   isOpen: boolean;
@@ -10,6 +10,7 @@ interface CctvModalProps {
   existingNvrList: CctvDevice[];
   locations?: LanLocation[];
   zones?: LanZone[];
+  deviceTypes?: CctvDeviceTypeItem[];
   presetLocationId?: string;
   presetZoneId?: string;
 }
@@ -22,6 +23,7 @@ export const CctvModal: React.FC<CctvModalProps> = ({
   existingNvrList,
   locations = [],
   zones = [],
+  deviceTypes = [],
   presetLocationId,
   presetZoneId
 }) => {
@@ -178,9 +180,15 @@ export const CctvModal: React.FC<CctvModalProps> = ({
               <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Lokasi Tempat *
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                        Lokasi Tempat *
+                      </label>
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        <span>Terkunci</span>
+                      </span>
+                    </div>
                     <select
                       value={locationId}
                       onChange={e => {
@@ -189,7 +197,8 @@ export const CctvModal: React.FC<CctvModalProps> = ({
                         const matchingZones = zones.filter(z => z.systemType === 'cctv' && z.locationId === newLocId);
                         setZoneId(matchingZones[0]?.id || '');
                       }}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500 text-slate-800 dark:text-slate-100"
+                      disabled={true}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 cursor-not-allowed select-none opacity-80"
                     >
                       {locations.map(loc => (
                         <option key={loc.id} value={loc.id}>
@@ -200,13 +209,20 @@ export const CctvModal: React.FC<CctvModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Jaringan / Area CCTV *
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                        Jaringan / Area CCTV *
+                      </label>
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        <span>Terkunci</span>
+                      </span>
+                    </div>
                     <select
                       value={zoneId}
                       onChange={e => setZoneId(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500 text-slate-800 dark:text-slate-100"
+                      disabled={true}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 cursor-not-allowed select-none opacity-80"
                     >
                       {zones.filter(z => z.systemType === 'cctv' && z.locationId === locationId).map(zone => (
                         <option key={zone.id} value={zone.id}>
@@ -259,15 +275,25 @@ export const CctvModal: React.FC<CctvModalProps> = ({
                 onChange={e => setType(e.target.value as CctvDeviceType)}
                 className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500 text-slate-800 dark:text-slate-100"
               >
-                <option value="camera_ip_dome">IP Camera - Dome (Indoor / Langit-langit)</option>
-                <option value="camera_ip_bullet">IP Camera - Bullet (Outdoor / Tahan Cuaca)</option>
-                <option value="camera_ip_ptz">IP Camera - PTZ (Pan-Tilt-Zoom Speed Dome)</option>
-                <option value="nvr">NVR (Network Video Recorder)</option>
-                <option value="dvr">DVR (Digital Video Recorder)</option>
-                <option value="switch_poe">Switch PoE Kamera</option>
-                <option value="storage_nas">NAS / Video Storage Server</option>
-                <option value="monitor_matrix">Monitor Display / Video Wall</option>
-                <option value="other">Lainnya</option>
+                {deviceTypes && deviceTypes.length > 0 ? (
+                  deviceTypes.map(dt => (
+                    <option key={dt.id} value={dt.code || dt.name}>
+                      {dt.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="camera_ip_dome">IP Camera - Dome (Indoor / Langit-langit)</option>
+                    <option value="camera_ip_bullet">IP Camera - Bullet (Outdoor / Tahan Cuaca)</option>
+                    <option value="camera_ip_ptz">IP Camera - PTZ (Pan-Tilt-Zoom Speed Dome)</option>
+                    <option value="nvr">NVR (Network Video Recorder)</option>
+                    <option value="dvr">DVR (Digital Video Recorder)</option>
+                    <option value="switch_poe">Switch PoE Kamera</option>
+                    <option value="storage_nas">NAS / Video Storage Server</option>
+                    <option value="monitor_matrix">Monitor Display / Video Wall</option>
+                    <option value="other">Lainnya</option>
+                  </>
+                )}
               </select>
             </div>
           </div>

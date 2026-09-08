@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Cable, Save, AlertCircle, Lock } from 'lucide-react';
-import { LanCableRun, LanCableType, CableRunStatus, LanDevice, LanLocation, LanZone } from '../types/jaringanUtilitas';
+import { LanCableRun, LanCableType, CableRunStatus, LanDevice, LanLocation, LanZone, LanCableTypeItem } from '../types/jaringanUtilitas';
 
 interface LanCableModalProps {
   isOpen: boolean;
@@ -10,6 +10,7 @@ interface LanCableModalProps {
   devices: LanDevice[];
   locations?: LanLocation[];
   zones?: LanZone[];
+  cableTypes?: LanCableTypeItem[];
   presetLocationId?: string;
   presetZoneId?: string;
 }
@@ -22,6 +23,7 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
   devices,
   locations = [],
   zones = [],
+  cableTypes = [],
   presetLocationId,
   presetZoneId
 }) => {
@@ -283,14 +285,24 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
                 onChange={e => setCableType(e.target.value as LanCableType)}
                 className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
               >
-                <option value="cat6_utp">UTP Cat6 (Standar Lab)</option>
-                <option value="cat6a_stp">STP Cat6A (Shielded Riser)</option>
-                <option value="cat5e_utp">UTP Cat5e</option>
-                <option value="cat7_stp">STP Cat7</option>
-                <option value="fiber_sm">Fiber Optic Single Mode</option>
-                <option value="fiber_mm">Fiber Optic Multi Mode</option>
-                <option value="dac_sfp">Direct Attach Copper SFP+</option>
-                <option value="other">Kabel Lainnya</option>
+                {cableTypes && cableTypes.length > 0 ? (
+                  cableTypes.map(ct => (
+                    <option key={ct.id} value={ct.code || ct.name}>
+                      {ct.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="cat6_utp">UTP Cat6 (Standar Lab)</option>
+                    <option value="cat6a_stp">STP Cat6A (Shielded Riser)</option>
+                    <option value="cat5e_utp">UTP Cat5e</option>
+                    <option value="cat7_stp">STP Cat7</option>
+                    <option value="fiber_sm">Fiber Optic Single Mode</option>
+                    <option value="fiber_mm">Fiber Optic Multi Mode</option>
+                    <option value="dac_sfp">Direct Attach Copper SFP+</option>
+                    <option value="other">Kabel Lainnya</option>
+                  </>
+                )}
               </select>
             </div>
           </div>

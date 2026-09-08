@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Zap, Save, AlertCircle } from 'lucide-react';
-import { ElectricityDevice, ElectricityDeviceType, ElectricalPhase, ElectricalStatus, LanLocation, LanZone } from '../types/jaringanUtilitas';
+import { X, Zap, Save, AlertCircle, Lock } from 'lucide-react';
+import { ElectricityDevice, ElectricityDeviceType, ElectricalPhase, ElectricalStatus, LanLocation, LanZone, ElectricityDeviceTypeItem } from '../types/jaringanUtilitas';
 
 interface ElectricityModalProps {
   isOpen: boolean;
@@ -10,6 +10,7 @@ interface ElectricityModalProps {
   existingDevices: ElectricityDevice[];
   locations?: LanLocation[];
   zones?: LanZone[];
+  deviceTypes?: ElectricityDeviceTypeItem[];
   presetLocationId?: string;
   presetZoneId?: string;
 }
@@ -22,6 +23,7 @@ export const ElectricityModal: React.FC<ElectricityModalProps> = ({
   existingDevices,
   locations = [],
   zones = [],
+  deviceTypes = [],
   presetLocationId,
   presetZoneId
 }) => {
@@ -165,14 +167,20 @@ export const ElectricityModal: React.FC<ElectricityModalProps> = ({
               </div>
             )}
 
-          {/* Konteks Lokasi & Jaringan Tempat Perangkat */}
+          {/* Pilihan Lokasi & Jaringan Listrik */}
           {locations.length > 0 && (
             <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Lokasi Gedung / Tempat *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                      Lokasi Gedung / Tempat *
+                    </label>
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                      <Lock className="w-3 h-3" />
+                      <span>Terkunci</span>
+                    </span>
+                  </div>
                   <select
                     value={locationId}
                     onChange={e => {
@@ -181,7 +189,8 @@ export const ElectricityModal: React.FC<ElectricityModalProps> = ({
                       const matchingZones = zones.filter(z => (z.systemType === 'electricity' || !z.systemType) && z.locationId === newLocId);
                       setZoneId(matchingZones[0]?.id || '');
                     }}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800 dark:text-slate-100"
+                    disabled={true}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 cursor-not-allowed select-none opacity-80"
                   >
                     {locations.map(loc => (
                       <option key={loc.id} value={loc.id}>
@@ -192,13 +201,20 @@ export const ElectricityModal: React.FC<ElectricityModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Jaringan / Zona Area *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                      Jaringan / Zona Area *
+                    </label>
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                      <Lock className="w-3 h-3" />
+                      <span>Terkunci</span>
+                    </span>
+                  </div>
                   <select
                     value={zoneId}
                     onChange={e => setZoneId(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800 dark:text-slate-100"
+                    disabled={true}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 cursor-not-allowed select-none opacity-80"
                   >
                     {zones.filter(z => (z.systemType === 'electricity' || !z.systemType) && z.locationId === locationId).map(zone => (
                       <option key={zone.id} value={zone.id}>
@@ -253,17 +269,27 @@ export const ElectricityModal: React.FC<ElectricityModalProps> = ({
                 onChange={e => setType(e.target.value as ElectricityDeviceType)}
                 className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800 dark:text-slate-100"
               >
-                <option value="panel_mdp">Panel MDP (Main Distribution Panel)</option>
-                <option value="panel_sdp">Panel SDP (Sub Distribution Panel)</option>
-                <option value="trafo">Trafo / Transformator PLN</option>
-                <option value="genset">Genset Generator Cadangan</option>
-                <option value="ups">UPS (Uninterruptible Power Supply)</option>
-                <option value="mcb">MCB / MCCB / Breaker Box</option>
-                <option value="kwh_meter">KWH Meter Listrik</option>
-                <option value="pdu_stopkontak">PDU Rack / Stop Kontak</option>
-                <option value="stabilizer">Automatic Voltage Regulator (AVR)</option>
-                <option value="inverter">Solar Inverter / Power Inverter</option>
-                <option value="other">Lainnya</option>
+                {deviceTypes && deviceTypes.length > 0 ? (
+                  deviceTypes.map(dt => (
+                    <option key={dt.id} value={dt.code || dt.name}>
+                      {dt.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="panel_mdp">Panel MDP (Main Distribution Panel)</option>
+                    <option value="panel_sdp">Panel SDP (Sub Distribution Panel)</option>
+                    <option value="trafo">Trafo / Transformator PLN</option>
+                    <option value="genset">Genset Generator Cadangan</option>
+                    <option value="ups">UPS (Uninterruptible Power Supply)</option>
+                    <option value="mcb">MCB / MCCB / Breaker Box</option>
+                    <option value="kwh_meter">KWH Meter Listrik</option>
+                    <option value="pdu_stopkontak">PDU Rack / Stop Kontak</option>
+                    <option value="stabilizer">Automatic Voltage Regulator (AVR)</option>
+                    <option value="inverter">Solar Inverter / Power Inverter</option>
+                    <option value="other">Lainnya</option>
+                  </>
+                )}
               </select>
             </div>
 

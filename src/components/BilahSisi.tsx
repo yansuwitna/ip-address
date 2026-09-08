@@ -33,7 +33,14 @@ export type NavTab =
   | 'services' 
   | 'categories' 
   | 'lan_device_types'
+  | 'lan_cable_types'
   | 'lan_room_types'
+  | 'electricity_device_types'
+  | 'electricity_cable_types'
+  | 'cctv_device_types'
+  | 'cctv_cable_types'
+  | 'water_device_types'
+  | 'water_pipe_types'
   | 'users' 
   | 'backup';
 
@@ -49,10 +56,17 @@ interface SidebarProps {
   totalLanCables?: number;
   totalLanDevices?: number;
   totalLanDeviceTypes?: number;
+  totalLanCableTypes?: number;
   totalLanRoomTypes?: number;
   totalElectricityDevices?: number;
+  totalElectricityDeviceTypes?: number;
+  totalElectricityCableTypes?: number;
   totalCctvDevices?: number;
+  totalCctvDeviceTypes?: number;
+  totalCctvCableTypes?: number;
   totalWaterDevices?: number;
+  totalWaterDeviceTypes?: number;
+  totalWaterPipeTypes?: number;
   totalDnsRecords?: number;
   totalCategories?: number;
   totalUsers?: number;
@@ -73,10 +87,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   totalLanCables = 0,
   totalLanDevices = 0,
   totalLanDeviceTypes = 0,
+  totalLanCableTypes = 0,
   totalLanRoomTypes = 0,
   totalElectricityDevices = 0,
+  totalElectricityDeviceTypes = 0,
+  totalElectricityCableTypes = 0,
   totalCctvDevices = 0,
+  totalCctvDeviceTypes = 0,
+  totalCctvCableTypes = 0,
   totalWaterDevices = 0,
+  totalWaterDeviceTypes = 0,
+  totalWaterPipeTypes = 0,
   totalDnsRecords,
   totalCategories,
   totalUsers,
@@ -126,13 +147,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  // 2. Jenis Sektor Jaringan (Tipe Perangkat LAN & Tipe Ruangan)
-  const sectorTypeItems: NavItem[] = [
+  // 2. Master Sektor LAN
+  const lanMasterItems: NavItem[] = [
     {
       id: 'lan_device_types',
       label: 'Tipe Perangkat LAN',
       icon: Server,
       description: 'Master Jenis Alat LAN',
+      activeColor: 'bg-blue-600'
+    },
+    {
+      id: 'lan_cable_types',
+      label: 'Jenis Kabel LAN',
+      icon: Network,
+      description: 'Master Tipe Kabel Jaringan',
       activeColor: 'bg-blue-600'
     },
     {
@@ -144,7 +172,61 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  // 3. IP dan DNS (Alamat IP, Manajemen DNS, Kategori Hardware)
+  // 3. Master Sektor Listrik
+  const electricityMasterItems: NavItem[] = [
+    {
+      id: 'electricity_device_types',
+      label: 'Tipe Perangkat Listrik',
+      icon: Zap,
+      description: 'Master Jenis Komponen Listrik',
+      activeColor: 'bg-amber-500'
+    },
+    {
+      id: 'electricity_cable_types',
+      label: 'Jenis Kabel Listrik',
+      icon: Zap,
+      description: 'Master Jenis Kabel Kelistrikan',
+      activeColor: 'bg-amber-500'
+    }
+  ];
+
+  // 4. Master Sektor CCTV
+  const cctvMasterItems: NavItem[] = [
+    {
+      id: 'cctv_device_types',
+      label: 'Tipe Hardware CCTV',
+      icon: Video,
+      description: 'Master Jenis Kamera & Recorder',
+      activeColor: 'bg-rose-600'
+    },
+    {
+      id: 'cctv_cable_types',
+      label: 'Jenis Kabel CCTV',
+      icon: Video,
+      description: 'Master Tipe Kabel Kamera',
+      activeColor: 'bg-rose-600'
+    }
+  ];
+
+  // 5. Master Sektor AIR
+  const waterMasterItems: NavItem[] = [
+    {
+      id: 'water_device_types',
+      label: 'Tipe Alat & Sistem Air',
+      icon: Droplets,
+      description: 'Master Jenis Pompa & Sensor Air',
+      activeColor: 'bg-cyan-600'
+    },
+    {
+      id: 'water_pipe_types',
+      label: 'Jenis Pipa Air',
+      icon: Droplets,
+      description: 'Master Jenis Pipa Distribusi',
+      activeColor: 'bg-cyan-600'
+    }
+  ];
+
+  // 6. IP dan DNS (Alamat IP, Manajemen DNS, Kategori Hardware)
   const ipDnsItems: NavItem[] = [
     {
       id: 'groups',
@@ -169,7 +251,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  // 4. Sistem & Pengaturan (Akun Pengguna, Cadangan & Data)
+  // 7. Sistem & Pengaturan (Akun Pengguna, Cadangan & Data)
   const systemItems: NavItem[] = [
     {
       id: 'users',
@@ -314,13 +396,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
 
-          {/* 2. JENIS SEKTOR JARINGAN (TIPE PERANGKAT LAN, TIPE RUANGAN) */}
+          {/* 2. MASTER SEKTOR LAN */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-              <span>Jenis Sektor Jaringan</span>
+              <span>Master LAN</span>
             </div>
 
-            {sectorTypeItems.map(item => {
+            {lanMasterItems.map(item => {
               const Icon = item.icon;
               const isActive = currentTab === item.id;
               const activeBg = item.activeColor || 'bg-blue-600';
@@ -338,6 +420,129 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <div className="flex items-center gap-3">
                     <Icon className={`w-4 h-4 transition-colors ${
                       isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 3. MASTER SEKTOR LISTRIK */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>Master Listrik</span>
+            </div>
+
+            {electricityMasterItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              const activeBg = item.activeColor || 'bg-amber-500';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? `${activeBg} text-white shadow-sm font-bold`
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-amber-500 dark:group-hover:text-amber-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 4. MASTER SEKTOR CCTV */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>Master CCTV</span>
+            </div>
+
+            {cctvMasterItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              const activeBg = item.activeColor || 'bg-rose-600';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? `${activeBg} text-white shadow-sm font-bold`
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-rose-600 dark:group-hover:text-rose-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 5. MASTER SEKTOR AIR */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>Master Air & Irigasi</span>
+            </div>
+
+            {waterMasterItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              const activeBg = item.activeColor || 'bg-cyan-600';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? `${activeBg} text-white shadow-sm font-bold`
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-cyan-600 dark:group-hover:text-cyan-400'
                     }`} />
                     <div className="text-left">
                       <div>{item.label}</div>
