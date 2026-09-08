@@ -134,6 +134,42 @@ Pilihan populer yang banyak digunakan di berbagai server Linux.
 
 ---
 
+## 🛡️ Panduan Pembaruan Database: Menjaga Data Lama Tetap Aman
+
+Jika di database Anda **sudah ada data yang tersimpan** dan Anda baru saja memperbarui kode aplikasi (misalnya terdapat penambahan fitur tabel `tipe_perangkat_lan`, `tipe_ruangan_lan`, dsb.), ikuti langkah berikut agar **data lama sama sekali tidak terhapus**:
+
+### 1. Unduh Cadangan Data (Sangat Disarankan)
+Sebagai proteksi 100%, simpan cadangan sebelum sinkronisasi:
+- Buka aplikasi di browser, buka menu **Pengaturan & Bantuan > Cadangan & Data**.
+- Klik tombol **Unduh Cadangan Lengkap (.json)**. Simpan file cadangan tersebut.
+
+### 2. Terapkan Perubahan Menggunakan `prisma db push`
+Buka terminal/PowerShell di direktori proyek dan jalankan:
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+> **Mengapa perintah ini aman?**
+> - `npx prisma db push` secara cerdas hanya akan **membuat tabel baru** yang belum ada di database MySQL/PostgreSQL/SQLite Anda.
+> - Perintah ini **TIDAK AKAN** menghapus tabel lama ataupun data yang sudah ada di dalamnya.
+> - Backend akan langsung mengenali skema baru setelah `npx prisma generate` dijalankan.
+
+### 3. Jalankan / Restart Aplikasi
+- Di komputer lokal:
+  ```bash
+  npm run dev
+  ```
+- Di server VPS (PM2):
+  ```bash
+  npm run build
+  pm2 restart ip-address
+  ```
+
+### ⚠️ PERINGATAN (HAL YANG HARUS DIHINDARI):
+- ❌ **JANGAN PERNAH** menjalankan perintah `npx prisma migrate reset` karena perintah tersebut akan menghapus bersih (*drop database*) seluruh data yang ada.
+- ❌ **JANGAN** menekan tombol *Hapus Bersih Database* di menu Cadangan & Data kecuali jika Anda benar-benar sengaja ingin mengosongkan seluruh isi data.
+
 ## 🚀 Panduan Instalasi & Deployment dengan PM2 di Server VPS Debian
 
 Panduan lengkap ini ditujukan untuk deployment di server **Debian Linux (Debian 11 Bullseye / Debian 12 Bookworm)** menggunakan **PM2 Process Manager** dan arsitektur Fullstack (Frontend React + Backend Express + SQLite & Prisma).
