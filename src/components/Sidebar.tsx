@@ -306,20 +306,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
-                    {item.badge && (
-                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-lg border ${
-                        isActive 
-                          ? 'bg-white/20 text-white border-white/30' 
-                          : (item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700')
-                      }`}>
-                        {item.badge}
-                      </span>
-                    )}
-                    <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
-                      isActive ? 'opacity-100 text-white' : 'text-slate-400'
-                    }`} />
-                  </div>
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
                 </button>
               );
             })}
@@ -358,20 +347,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
-                    {item.badge && (
-                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-lg border ${
-                        isActive 
-                          ? 'bg-white/20 text-white border-white/30' 
-                          : (item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700')
-                      }`}>
-                        {item.badge}
-                      </span>
-                    )}
-                    <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
-                      isActive ? 'opacity-100 text-white' : 'text-slate-400'
-                    }`} />
-                  </div>
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
                 </button>
               );
             })}
@@ -410,20 +388,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
-                    {item.badge && (
-                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-lg border ${
-                        isActive 
-                          ? 'bg-white/20 text-white border-white/30' 
-                          : (item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700')
-                      }`}>
-                        {item.badge}
-                      </span>
-                    )}
-                    <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
-                      isActive ? 'opacity-100 text-white' : 'text-slate-400'
-                    }`} />
-                  </div>
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
                 </button>
               );
             })}
