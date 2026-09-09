@@ -138,7 +138,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-slate-100 dark:bg-slate-950 flex flex-col overflow-hidden animate-in fade-in duration-200 print:static print:z-auto print:bg-white print:overflow-visible print:h-auto">
+    <div className="fixed inset-0 z-[9999] bg-slate-100 dark:bg-slate-950 flex flex-col overflow-hidden animate-in fade-in duration-200 print-modal-root print:static print:z-auto print:bg-white print:overflow-visible print:h-auto">
       
       {/* Container Full Page */}
       <div className="w-full h-full flex flex-col print:h-auto print:overflow-visible">
@@ -154,7 +154,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                 Pratinjau Cetak Halaman (Print Preview)
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Format standar dokumen resmi cetak ukuran A4
+                Format standar dokumen resmi cetak ukuran A4 (Multi-halaman)
               </p>
             </div>
           </div>
@@ -178,11 +178,11 @@ export const PrintModal: React.FC<PrintModalProps> = ({
         </div>
 
         {/* Printable Paper Canvas */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8 print:p-0 print:bg-white print:overflow-visible flex flex-col items-center">
-          <div className="bg-white text-black p-8 sm:p-12 shadow-xl border border-slate-200 print:border-none print:shadow-none print:p-0 w-full max-w-[21cm] min-h-[29.7cm] font-sans leading-normal">
+        <div className="flex-1 overflow-auto p-2 sm:p-6 print:p-0 print:bg-white print:overflow-visible flex flex-col items-center">
+          <div className="print-canvas bg-white text-black p-6 sm:p-8 print:p-0 shadow-xl border border-slate-200 print:border-none print:shadow-none w-full max-w-[21cm] min-h-[29.7cm] font-sans leading-normal">
             
             {/* Kop / Header Dokumen Resmi */}
-            <div className="border-b-2 border-slate-800 pb-4 mb-6 flex items-start justify-between gap-4">
+            <div className="border-b-2 border-slate-800 pb-4 mb-6 flex items-start justify-between gap-4 break-inside-avoid">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   {currentUser?.appLogo ? (
@@ -209,7 +209,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
             </div>
 
             {/* Judul Laporan */}
-            <div className="mb-6 text-center">
+            <div className="mb-6 text-center break-inside-avoid">
               <h2 className="text-base font-extrabold uppercase tracking-wide text-slate-900 dark:text-slate-100">
                 {displayTitle}
               </h2>
@@ -227,7 +227,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
             {/* Metadata Ringkasan Subnet jika ada */}
             {group && type === 'allocations' && (
-              <div className="grid grid-cols-4 gap-2 text-xs mb-6 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl">
+              <div className="grid grid-cols-4 gap-2 text-xs mb-6 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl break-inside-avoid">
                 <div>
                   <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Lokasi Subnet</span>
                   <strong className="text-slate-800 dark:text-slate-200">{group.location || '-'}</strong>
@@ -262,7 +262,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                       </span>
                     )}
                   </h4>
-                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                  <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none">
                     <table className="w-full text-left border-collapse text-[11px]">
                       <thead>
                         <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
@@ -338,7 +338,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
             {/* Metadata Ringkasan Detail Jaringan (Lokasi & Lab/Ruang) */}
             {location && zone && (
-              <div className="grid grid-cols-4 gap-2 text-xs mb-6 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl">
+              <div className="grid grid-cols-4 gap-2 text-xs mb-6 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl break-inside-avoid">
                 <div>
                   <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Lokasi Utama</span>
                   <strong className="text-slate-800 dark:text-slate-200">{location.name}</strong>
@@ -366,7 +366,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                     <Network className="w-3.5 h-3.5 text-blue-600" />
                     <span>Daftar Perangkat Fisik LAN ({filteredLanDevices.length})</span>
                   </h4>
-                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                  <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none">
                     <table className="w-full text-left border-collapse text-[11px]">
                       <thead>
                         <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
@@ -405,7 +405,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                     <Cable className="w-3.5 h-3.5 text-blue-600" />
                     <span>Daftar Pencatatan Jalur Kabel LAN ({filteredLanCables.length})</span>
                   </h4>
-                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                  <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none">
                     <table className="w-full text-left border-collapse text-[11px]">
                       <thead>
                         <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
@@ -449,7 +449,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                     <Zap className="w-3.5 h-3.5 text-amber-600" />
                     <span>Daftar Perangkat Listrik ({filteredElectricityDevices.length})</span>
                   </h4>
-                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                  <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none">
                     <table className="w-full text-left border-collapse text-[11px]">
                       <thead>
                         <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
@@ -488,7 +488,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                     <Cable className="w-3.5 h-3.5 text-amber-600" />
                     <span>Daftar Distribusi Kabel Listrik ({filteredElectricityCables.length})</span>
                   </h4>
-                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                  <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none">
                     <table className="w-full text-left border-collapse text-[11px]">
                       <thead>
                         <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
@@ -532,7 +532,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                     <Video className="w-3.5 h-3.5 text-indigo-600" />
                     <span>Daftar Kamera & NVR CCTV ({filteredCctvDevices.length})</span>
                   </h4>
-                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                  <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none">
                     <table className="w-full text-left border-collapse text-[11px]">
                       <thead>
                         <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
@@ -571,7 +571,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                     <Cable className="w-3.5 h-3.5 text-indigo-600" />
                     <span>Daftar Jalur Kabel CCTV ({filteredCctvCables.length})</span>
                   </h4>
-                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                  <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none">
                     <table className="w-full text-left border-collapse text-[11px]">
                       <thead>
                         <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
@@ -615,7 +615,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                     <Droplets className="w-3.5 h-3.5 text-teal-600" />
                     <span>Daftar Perangkat Air & Irigasi ({filteredWaterDevices.length})</span>
                   </h4>
-                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                  <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none">
                     <table className="w-full text-left border-collapse text-[11px]">
                       <thead>
                         <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
@@ -654,7 +654,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                     <Network className="w-3.5 h-3.5 text-teal-600" />
                     <span>Daftar Distribusi Pipa Air ({filteredWaterPipes.length})</span>
                   </h4>
-                  <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg">
+                  <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none">
                     <table className="w-full text-left border-collapse text-[11px]">
                       <thead>
                         <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
@@ -692,7 +692,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
             {/* TABEL: DNS Records */}
             {type === 'dns' && (
-              <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg mb-8">
+              <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none mb-8">
                 <table className="w-full text-left border-collapse text-[11px]">
                   <thead>
                     <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
@@ -746,7 +746,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
             {/* TABEL: Sub Domain Records */}
             {type === 'sub_domains' && (
-              <div className="overflow-hidden border border-slate-300 dark:border-slate-600 rounded-lg mb-8">
+              <div className="print-table-wrapper overflow-x-auto print:overflow-visible border border-slate-300 dark:border-slate-600 rounded-lg print:rounded-none mb-8">
                 <table className="w-full text-left border-collapse text-[11px]">
                   <thead>
                     <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 font-bold">
