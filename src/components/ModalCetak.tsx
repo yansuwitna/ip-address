@@ -177,9 +177,9 @@ export const PrintModal: React.FC<PrintModalProps> = ({
           </div>
         </div>
 
-        {/* Printable Paper Canvas */}
-        <div className="flex-1 overflow-auto p-2 sm:p-6 print:p-0 print:bg-white print:overflow-visible flex flex-col items-center">
-          <div className="print-canvas bg-white text-black p-6 sm:p-8 print:p-0 shadow-xl border border-slate-200 print:border-none print:shadow-none w-full max-w-[21cm] min-h-[29.7cm] font-sans leading-normal">
+        {/* Printable Paper Canvas Container */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-6 lg:p-8 print:p-0 print:bg-white print:overflow-visible flex justify-center items-start">
+          <div className="print-canvas bg-white text-black p-4 sm:p-6 md:p-8 print:p-0 shadow-xl border border-slate-200 print:border-none print:shadow-none w-full max-w-4xl min-h-[29.7cm] font-sans leading-normal mx-auto box-border">
             
             {/* Kop / Header Dokumen Resmi */}
             <div className="border-b-2 border-slate-800 pb-4 mb-6 flex items-start justify-between gap-4 break-inside-avoid">
