@@ -26,7 +26,8 @@ import {
   Maximize2,
   Phone,
   Info,
-  Printer
+  Printer,
+  Sparkles
 } from 'lucide-react';
 import { 
   LanDevice, 
@@ -38,6 +39,7 @@ import {
   CableRunStatus 
 } from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
+import { ModalDiagramSimulasi } from './ModalDiagramSimulasi';
 
 interface LanViewProps {
   locations: LanLocation[];
@@ -94,6 +96,7 @@ export const LanView: React.FC<LanViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [isSimulationModalOpen, setIsSimulationModalOpen] = useState(false);
 
   // Objek aktif saat ini
   const activeLocation = useMemo(() => {
@@ -664,6 +667,19 @@ export const LanView: React.FC<LanViewProps> = ({
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>
               </button>
+              
+              {/* Tombol Simulasi Diagram Topologi & Jalur Kabel */}
+              {activeLocation && activeZone && (
+                <button
+                  onClick={() => setIsSimulationModalOpen(true)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/25 hover:shadow-indigo-600/40 active:scale-[0.99]"
+                  title="Buka Simulasi Diagram Topologi & Jalur Kabel"
+                >
+                  <Sparkles className="w-4 h-4 text-cyan-200 animate-pulse" />
+                  <span>Simulasi Topologi</span>
+                </button>
+              )}
+
               {onOpenPrintDetail && activeLocation && activeZone && (
                 <button
                   onClick={() => onOpenPrintDetail(activeLocation, activeZone)}
@@ -1137,6 +1153,18 @@ export const LanView: React.FC<LanViewProps> = ({
           )}
 
         </div>
+      )}
+
+      {/* Modal Diagram Simulasi Topologi */}
+      {isSimulationModalOpen && activeLocation && activeZone && (
+        <ModalDiagramSimulasi
+          isOpen={isSimulationModalOpen}
+          onClose={() => setIsSimulationModalOpen(false)}
+          location={activeLocation}
+          zone={activeZone}
+          devices={devices}
+          cables={cables}
+        />
       )}
 
     </div>
