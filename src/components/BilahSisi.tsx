@@ -115,8 +115,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     activeColor?: string;
   }
 
-  // 1. Sektor Jaringan (4 Infrastruktur Utama: LAN, Listrik, CCTV, AIR)
-  const mainNetworkItems: NavItem[] = [
+  // 1. Sektor LAN (Jaringan LAN, Tipe Perangkat LAN, Jenis Kabel LAN)
+  const lanGroupItems: NavItem[] = [
     {
       id: 'lan',
       label: 'Jaringan LAN',
@@ -124,31 +124,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       description: 'Jalur Kabel, Switch & Arah',
       activeColor: 'bg-blue-600'
     },
-    {
-      id: 'electricity',
-      label: 'Jaringan Listrik',
-      icon: Zap,
-      description: 'Panel, Genset, Trafo & UPS',
-      activeColor: 'bg-amber-500'
-    },
-    {
-      id: 'cctv',
-      label: 'Jaringan CCTV',
-      icon: Video,
-      description: 'Kamera IP, NVR & PoE',
-      activeColor: 'bg-rose-600'
-    },
-    {
-      id: 'water',
-      label: 'Jaringan AIR',
-      icon: Droplets,
-      description: 'Irigasi, Pompa & Toren',
-      activeColor: 'bg-cyan-600'
-    }
-  ];
-
-  // 2. Master Sektor LAN
-  const lanMasterItems: NavItem[] = [
     {
       id: 'lan_device_types',
       label: 'Tipe Perangkat LAN',
@@ -162,18 +137,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Network,
       description: 'Master Tipe Kabel Jaringan',
       activeColor: 'bg-blue-600'
-    },
-    {
-      id: 'lan_room_types',
-      label: 'Tipe Ruangan',
-      icon: DoorOpen,
-      description: 'Master Lokasi & Ruangan',
-      activeColor: 'bg-emerald-600'
     }
   ];
 
-  // 3. Master Sektor Listrik
-  const electricityMasterItems: NavItem[] = [
+  // 2. Sektor Listrik (Jaringan Listrik, Tipe Perangkat Listrik, Jenis Kabel Listrik)
+  const electricityGroupItems: NavItem[] = [
+    {
+      id: 'electricity',
+      label: 'Jaringan Listrik',
+      icon: Zap,
+      description: 'Panel, Genset, Trafo & UPS',
+      activeColor: 'bg-amber-500'
+    },
     {
       id: 'electricity_device_types',
       label: 'Tipe Perangkat Listrik',
@@ -190,8 +165,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  // 4. Master Sektor CCTV
-  const cctvMasterItems: NavItem[] = [
+  // 3. Sektor CCTV (Jaringan CCTV, Tipe Hardware CCTV, Jenis Kabel CCTV)
+  const cctvGroupItems: NavItem[] = [
+    {
+      id: 'cctv',
+      label: 'Jaringan CCTV',
+      icon: Video,
+      description: 'Kamera IP, NVR & PoE',
+      activeColor: 'bg-rose-600'
+    },
     {
       id: 'cctv_device_types',
       label: 'Tipe Hardware CCTV',
@@ -208,8 +190,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  // 5. Master Sektor AIR
-  const waterMasterItems: NavItem[] = [
+  // 4. Sektor AIR (Jaringan AIR, Tipe Alat & Sistem Air, Jenis Pipa Air)
+  const waterGroupItems: NavItem[] = [
+    {
+      id: 'water',
+      label: 'Jaringan AIR',
+      icon: Droplets,
+      description: 'Irigasi, Pompa & Toren',
+      activeColor: 'bg-cyan-600'
+    },
     {
       id: 'water_device_types',
       label: 'Tipe Alat & Sistem Air',
@@ -223,6 +212,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Droplets,
       description: 'Master Jenis Pipa Distribusi',
       activeColor: 'bg-cyan-600'
+    }
+  ];
+
+  // 5. Ruangan & Lokasi (Kelompok Terpisah)
+  const roomItems: NavItem[] = [
+    {
+      id: 'lan_room_types',
+      label: 'Tipe Ruang',
+      icon: DoorOpen,
+      description: 'Master Tipe Ruangan / Lab',
+      activeColor: 'bg-emerald-600'
     }
   ];
 
@@ -354,14 +354,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
-          {/* SEKTOR JARINGAN UTAMA (LAN, LISTRIK, CCTV, AIR) */}
-          {/* 1. SEKTOR JARINGAN (LAN, LISTRIK, CCTV, AIR) */}
+          {/* 1. SEKTOR LAN (Jaringan LAN, Tipe Perangkat LAN, Jenis Kabel LAN) */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-              <span>Sektor Jaringan</span>
+              <span>Jaringan LAN</span>
             </div>
 
-            {mainNetworkItems.map(item => {
+            {lanGroupItems.map(item => {
               const Icon = item.icon;
               const isActive = currentTab === item.id;
               const activeBg = item.activeColor || 'bg-blue-600';
@@ -396,54 +395,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
 
-          {/* 2. MASTER SEKTOR LAN */}
+          {/* 2. SEKTOR LISTRIK (Jaringan Listrik, Tipe Perangkat Listrik, Jenis Kabel Listrik) */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-              <span>Master LAN</span>
+              <span>Jaringan Listrik</span>
             </div>
 
-            {lanMasterItems.map(item => {
-              const Icon = item.icon;
-              const isActive = currentTab === item.id;
-              const activeBg = item.activeColor || 'bg-blue-600';
-
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
-                    isActive
-                      ? `${activeBg} text-white shadow-sm font-bold`
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 transition-colors ${
-                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400'
-                    }`} />
-                    <div className="text-left">
-                      <div>{item.label}</div>
-                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
-                        {item.description}
-                      </div>
-                    </div>
-                  </div>
-
-                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
-                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
-                  }`} />
-                </button>
-              );
-            })}
-          </div>
-
-          {/* 3. MASTER SEKTOR LISTRIK */}
-          <div className="space-y-1">
-            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-              <span>Master Listrik</span>
-            </div>
-
-            {electricityMasterItems.map(item => {
+            {electricityGroupItems.map(item => {
               const Icon = item.icon;
               const isActive = currentTab === item.id;
               const activeBg = item.activeColor || 'bg-amber-500';
@@ -478,13 +436,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
 
-          {/* 4. MASTER SEKTOR CCTV */}
+          {/* 3. SEKTOR CCTV (Jaringan CCTV, Tipe Hardware CCTV, Jenis Kabel CCTV) */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-              <span>Master CCTV</span>
+              <span>Jaringan CCTV</span>
             </div>
 
-            {cctvMasterItems.map(item => {
+            {cctvGroupItems.map(item => {
               const Icon = item.icon;
               const isActive = currentTab === item.id;
               const activeBg = item.activeColor || 'bg-rose-600';
@@ -519,13 +477,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
 
-          {/* 5. MASTER SEKTOR AIR */}
+          {/* 4. SEKTOR AIR (Jaringan AIR, Tipe Alat & Sistem Air, Jenis Pipa Air) */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-              <span>Master Air & Irigasi</span>
+              <span>Jaringan AIR</span>
             </div>
 
-            {waterMasterItems.map(item => {
+            {waterGroupItems.map(item => {
               const Icon = item.icon;
               const isActive = currentTab === item.id;
               const activeBg = item.activeColor || 'bg-cyan-600';
@@ -543,6 +501,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <div className="flex items-center gap-3">
                     <Icon className={`w-4 h-4 transition-colors ${
                       isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-cyan-600 dark:group-hover:text-cyan-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 5. RUANGAN & LOKASI (Kelompok Berbeda untuk Tipe Ruang) */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>Ruangan & Lokasi</span>
+            </div>
+
+            {roomItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              const activeBg = item.activeColor || 'bg-emerald-600';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? `${activeBg} text-white shadow-sm font-bold`
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
                     }`} />
                     <div className="text-left">
                       <div>{item.label}</div>
