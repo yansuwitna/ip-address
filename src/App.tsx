@@ -1862,7 +1862,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className={`h-screen w-screen overflow-hidden flex bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-poppins antialiased selection:bg-blue-600 selection:text-white ${theme === 'dark' ? 'dark' : 'light'}`}>
+    <div className={`h-dvh w-screen overflow-hidden flex bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-poppins antialiased selection:bg-blue-600 selection:text-white ${theme === 'dark' ? 'dark' : 'light'}`}>
       
       {/* 1. Left STATIC Dedicated Sidebar (Permanently anchored & pinned) */}
       <Sidebar
@@ -1899,7 +1899,7 @@ export const App: React.FC = () => {
       />
 
       {/* 2. Main Work Area with Independent Smooth Scroll */}
-      <div className={`flex-1 flex flex-col h-screen overflow-y-auto min-w-0 bg-slate-50 dark:bg-slate-950 print:hidden`}>
+      <div className={`flex-1 flex flex-col h-dvh overflow-y-auto min-w-0 bg-slate-50 dark:bg-slate-950 print:hidden`}>
         
         {/* Top Header (Sticky) */}
         <Header 
