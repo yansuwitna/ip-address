@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ModalPortal } from './ModalPortal';
 import { 
   Network, 
@@ -21,7 +21,9 @@ import {
   Video,
   Droplets,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Move,
+  RefreshCw
 } from 'lucide-react';
 import { LanLocation, LanZone } from '../types/jaringanUtilitas';
 
@@ -246,6 +248,54 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
     return { tier1, tier2, tier3, tier4 };
   }, [zoneDevices, utilityType]);
 
+  // State posisi kustom yang bisa digeser (drag & drop)
+  const [customPositions, setCustomPositions] = useState<Record<string, { x: number; y: number }>>({});
+  const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+  const dragStartRef = useRef<{ mouseX: number; mouseY: number; nodeX: number; nodeY: number } | null>(null);
+  const hasDraggedRef = useRef<boolean>(false);
+  const svgContainerRef = useRef<SVGSVGElement | null>(null);
+
+  // Storage key per zona dan utilitas
+  const storageKey = useMemo(() => {
+    return `simulasi_pos_${utilityType}_${location.id}_${zone.id}`;
+  }, [utilityType, location.id, zone.id]);
+
+  // Muat posisi tersimpan dari localStorage saat komponen / zona dibuka
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          setCustomPositions(parsed);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Gagal memuat posisi simulasi:', e);
+    }
+    setCustomPositions({});
+  }, [storageKey]);
+
+  // Simpan posisi kustom ke localStorage saat posisi berubah
+  const saveCustomPositions = useCallback((newPositions: Record<string, { x: number; y: number }>) => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(newPositions));
+    } catch (e) {
+      console.warn('Gagal menyimpan posisi simulasi:', e);
+    }
+  }, [storageKey]);
+
+  // Reset tata letak kembali ke posisi otomatis default
+  const handleResetPositions = useCallback(() => {
+    setCustomPositions({});
+    try {
+      localStorage.removeItem(storageKey);
+    } catch (e) {
+      console.warn('Gagal mereset posisi simulasi:', e);
+    }
+  }, [storageKey]);
+
   // Hitung posisi koordinat graf (X, Y) untuk setiap node perangkat terdaftar
   const nodePositions = useMemo(() => {
     const positions: Record<string, NodePosition> = {};
@@ -256,8 +306,9 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
       categorizedNodes.tier4
     ];
 
-    const canvasWidth = 1050;
-    const tierY = [120, 280, 440, 600];
+    const canvasWidth = 1100;
+    // Jarak Y yang lebih leluasa dan proporsional untuk mencegah tumpang tindih
+    const tierY = [110, 290, 480, 670];
 
     tiers.forEach((tierDevices, tierIdx) => {
       const count = tierDevices.length;
@@ -265,9 +316,17 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
 
       const spacing = canvasWidth / (count + 1);
       tierDevices.forEach((dev, idx) => {
+        // Jika dalam 1 baris ada lebih dari 4 perangkat, beri variasi Y selang-seling agar tidak bertabrakan
+        const staggerY = count > 4 ? (idx % 2 === 1 ? 32 : -32) : 0;
+        const defaultX = Math.round(spacing * (idx + 1));
+        const defaultY = tierY[tierIdx] + staggerY;
+
+        // Gunakan posisi kustom yang digeser user jika ada
+        const custom = customPositions[dev.id];
+
         positions[dev.id] = {
-          x: Math.round(spacing * (idx + 1)),
-          y: tierY[tierIdx],
+          x: custom ? custom.x : defaultX,
+          y: custom ? custom.y : defaultY,
           tier: tierIdx + 1
         };
       });
@@ -276,16 +335,52 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
     // Cek perangkat berdasarkan kecocokan nama jika id kosong
     zoneDevices.forEach(dev => {
       if (!positions[dev.id] && dev.name) {
+        const custom = customPositions[dev.id] || customPositions[dev.name.toLowerCase()];
         positions[dev.name.toLowerCase()] = {
-          x: 200,
-          y: 200,
+          x: custom ? custom.x : 200,
+          y: custom ? custom.y : 200,
           tier: 2
         };
       }
     });
 
     return positions;
-  }, [categorizedNodes, zoneDevices]);
+  }, [categorizedNodes, zoneDevices, customPositions]);
+
+  // Helper untuk menghitung titik jangkar (docking point) kabel pada tepi batas node perangkat (140x52px, center at 0,0)
+  // Ini memastikan kabel TIDAK ditutup atau menembus badan perangkat
+  const getNodeBorderPort = (
+    center: { x: number; y: number },
+    target: { x: number; y: number },
+    isVirtual: boolean
+  ) => {
+    if (isVirtual) return { x: center.x, y: center.y };
+
+    const dx = target.x - center.x;
+    const dy = target.y - center.y;
+    const halfW = 70; // Setengah lebar kartu perangkat (140px / 2)
+    const halfH = 26; // Setengah tinggi kartu perangkat (52px / 2)
+
+    // Jika target dominan di atas atau bawah (vertical flow)
+    if (Math.abs(dy) * halfW >= Math.abs(dx) * halfH) {
+      if (dy >= 0) {
+        // Target di bawah -> port keluar dari sisi BAWAH
+        return { x: center.x + Math.max(-45, Math.min(45, dx * 0.2)), y: center.y + halfH };
+      } else {
+        // Target di atas -> port keluar dari sisi ATAS
+        return { x: center.x + Math.max(-45, Math.min(45, dx * 0.2)), y: center.y - halfH };
+      }
+    } else {
+      // Jika target dominan di kiri atau kanan (horizontal flow)
+      if (dx >= 0) {
+        // Target di kanan -> port keluar dari sisi KANAN
+        return { x: center.x + halfW, y: center.y + Math.max(-14, Math.min(14, dy * 0.2)) };
+      } else {
+        // Target di kiri -> port keluar dari sisi KIRI
+        return { x: center.x - halfW, y: center.y + Math.max(-14, Math.min(14, dy * 0.2)) };
+      }
+    }
+  };
 
   // Kalkulasi kabel/pipa yang tidak memiliki salah satu atau kedua ujung perangkat fisik
   const processedCables = useMemo(() => {
@@ -325,7 +420,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
         unattachedIndex++;
 
         const startX = 140 + col * 240;
-        const startY = 660 + row * 80;
+        const startY = 720 + row * 80;
         sPos = { x: startX, y: startY };
         tPos = { x: startX + 160, y: startY + 40 };
         isSourceVirtual = true;
@@ -338,16 +433,22 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
         isSourceVirtual = true;
       } else if (sPos && !tPos) {
         tPos = { 
-          x: Math.min(990, sPos.x + 130), 
-          y: Math.min(710, sPos.y + 110) 
+          x: Math.min(1040, sPos.x + 130), 
+          y: Math.min(780, sPos.y + 110) 
         };
         isTargetVirtual = true;
       }
+
+      // 4. Hitung port docking di tepi batas perangkat agar kabel tidak tertutup kartu perangkat
+      const dockSource = getNodeBorderPort(sPos!, tPos!, isSourceVirtual);
+      const dockTarget = getNodeBorderPort(tPos!, sPos!, isTargetVirtual);
 
       return {
         cable,
         sourcePos: sPos!,
         targetPos: tPos!,
+        dockSource,
+        dockTarget,
         isSourceVirtual,
         isTargetVirtual
       };
@@ -448,6 +549,64 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
     return <Tv className="w-5 h-5 text-slate-300" />;
   };
 
+  // Event handler untuk geser-geser perangkat (Drag and Drop)
+  const handleNodePointerDown = (e: React.PointerEvent, devId: string) => {
+    // Hanya tangani klik kiri / primary touch
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    
+    // Tangkap pointer pada target agar drag lancar meskipun cursor keluar dari node
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+
+    const pos = nodePositions[devId];
+    if (!pos) return;
+
+    setDraggingNodeId(devId);
+    hasDraggedRef.current = false;
+    dragStartRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      nodeX: pos.x,
+      nodeY: pos.y
+    };
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!draggingNodeId || !dragStartRef.current) return;
+
+    const dx = (e.clientX - dragStartRef.current.mouseX) / zoom;
+    const dy = (e.clientY - dragStartRef.current.mouseY) / zoom;
+
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+      hasDraggedRef.current = true;
+    }
+
+    const newX = Math.round(Math.max(80, Math.min(1020, dragStartRef.current.nodeX + dx)));
+    const newY = Math.round(Math.max(40, Math.min(800, dragStartRef.current.nodeY + dy)));
+
+    setCustomPositions(prev => ({
+      ...prev,
+      [draggingNodeId]: { x: newX, y: newY }
+    }));
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (draggingNodeId) {
+      try {
+        (e.currentTarget as Element).releasePointerCapture(e.pointerId);
+      } catch {
+        // Abaikan jika pointer capture telah terlepas
+      }
+      setDraggingNodeId(null);
+      dragStartRef.current = null;
+      // Persist posisi ke localStorage saat selesai digeser
+      setCustomPositions(current => {
+        saveCustomPositions(current);
+        return current;
+      });
+    }
+  };
+
   if (!isOpen) return null;
 
   const HeaderIcon = utilityConfig.icon;
@@ -533,6 +692,17 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
             </button>
           </div>
 
+          {/* Tombol Reset Posisi Tata Letak */}
+          <button
+            onClick={handleResetPositions}
+            className="px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 bg-slate-800 text-slate-300 border border-slate-700 hover:text-white hover:bg-slate-700/70 transition-all cursor-pointer shadow-xs"
+            title="Kembalikan posisi semua perangkat ke tata letak default"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
+            <span className="hidden sm:inline">Reset Posisi</span>
+            <span className="sm:hidden">Reset</span>
+          </button>
+
           {/* Mobile Inspector Toggle */}
           <button
             onClick={() => setIsMobilePanelOpen(!isMobilePanelOpen)}
@@ -587,9 +757,13 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
               style={{ transform: `scale(${zoom})` }}
             >
               <svg 
-                width="1050" 
-                height="780" 
-                className="overflow-visible"
+                ref={svgContainerRef}
+                width="1100" 
+                height="840" 
+                className="overflow-visible select-none"
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerLeave={handlePointerUp}
               >
                 <defs>
                   <filter id="glow-dynamic" x="-20%" y="-20%" width="140%" height="140%">
@@ -601,8 +775,8 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                   </filter>
                 </defs>
 
-                {/* Layer 1: Garis Jalur Kabel/Pipa - SEMUA JALUR DITAMPILKAN */}
-                {processedCables.map(({ cable, sourcePos, targetPos, isSourceVirtual, isTargetVirtual }) => {
+                {/* Layer 1: Garis Jalur Kabel/Pipa - Terhubung ke Tepi Perangkat (TIDAK TERTUTUP) */}
+                {processedCables.map(({ cable, sourcePos, targetPos, dockSource, dockTarget, isSourceVirtual, isTargetVirtual }) => {
                   const isSelected = selectedCableId === cable.id;
                   const isRelatedToDevice = selectedDeviceId && relatedCableIds.has(cable.id);
                   const isHighlighted = isSelected || isRelatedToDevice;
@@ -611,12 +785,40 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                   const strokeColor = isHighlighted ? utilityConfig.accentColor : statusStyle.stroke;
                   const strokeWidth = isHighlighted ? 3.5 : 2;
 
-                  const deltaY = targetPos.y - sourcePos.y;
-                  const curveOffset = Math.min(80, Math.abs(deltaY) * 0.4);
-                  const pathD = `M ${sourcePos.x} ${sourcePos.y + (isSourceVirtual ? 0 : 20)} C ${sourcePos.x} ${sourcePos.y + (isSourceVirtual ? 0 : 20) + curveOffset}, ${targetPos.x} ${targetPos.y - (isTargetVirtual ? 0 : 20) - curveOffset}, ${targetPos.x} ${targetPos.y - (isTargetVirtual ? 0 : 20)}`;
+                  // Gunakan dockSource dan dockTarget pada batas tepi node perangkat
+                  const sx = dockSource.x;
+                  const sy = dockSource.y;
+                  const tx = dockTarget.x;
+                  const ty = dockTarget.y;
 
-                  const midX = (sourcePos.x + targetPos.x) / 2;
-                  const midY = (sourcePos.y + targetPos.y) / 2;
+                  const deltaX = tx - sx;
+                  const deltaY = ty - sy;
+                  const dist = Math.hypot(deltaX, deltaY);
+
+                  // Hitung kontrol kurva Bezier yang luwes dan menjauh dari node
+                  let cp1x = sx;
+                  let cp1y = sy;
+                  let cp2x = tx;
+                  let cp2y = ty;
+
+                  if (Math.abs(deltaY) >= Math.abs(deltaX) * 0.5) {
+                    // Vertical curve
+                    const bend = Math.min(100, Math.max(30, Math.abs(deltaY) * 0.45));
+                    const dirY = deltaY >= 0 ? 1 : -1;
+                    cp1y = sy + dirY * bend;
+                    cp2y = ty - dirY * bend;
+                  } else {
+                    // Horizontal curve
+                    const bend = Math.min(100, Math.max(30, Math.abs(deltaX) * 0.45));
+                    const dirX = deltaX >= 0 ? 1 : -1;
+                    cp1x = sx + dirX * bend;
+                    cp2x = tx - dirX * bend;
+                  }
+
+                  const pathD = `M ${sx} ${sy} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${tx} ${ty}`;
+
+                  const midX = (sx + tx) / 2;
+                  const midY = (sy + ty) / 2;
                   const cableCodeDisplay = cable.cableCode || cable.pipeCode || cable.labelCode || 'JALUR';
 
                   return (
@@ -629,6 +831,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                       }}
                       className="cursor-pointer group"
                     >
+                      {/* Interactive broad hit area */}
                       <path
                         d={pathD}
                         fill="none"
@@ -636,16 +839,39 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                         strokeWidth="18"
                       />
 
+                      {/* Main cable line */}
                       <path
                         d={pathD}
                         fill="none"
                         stroke={strokeColor}
                         strokeWidth={strokeWidth}
-                        strokeOpacity={isHighlighted ? 1 : (isSourceVirtual || isTargetVirtual ? 0.75 : 0.65)}
+                        strokeOpacity={isHighlighted ? 1 : (isSourceVirtual || isTargetVirtual ? 0.8 : 0.7)}
                         strokeDasharray={cable.status === 'fault' || cable.status === 'leaking' ? '6 4' : (isSourceVirtual || isTargetVirtual ? '5 3' : undefined)}
                         className="transition-all group-hover:stroke-opacity-100"
                         style={{ filter: isHighlighted ? 'url(#glow-dynamic)' : undefined }}
                       />
+
+                      {/* Dot konektor kecil di ujung kabel batas perangkat */}
+                      {!isSourceVirtual && (
+                        <circle
+                          cx={sx}
+                          cy={sy}
+                          r={isHighlighted ? 3.5 : 2.5}
+                          fill={strokeColor}
+                          stroke="#0f172a"
+                          strokeWidth="1"
+                        />
+                      )}
+                      {!isTargetVirtual && (
+                        <circle
+                          cx={tx}
+                          cy={ty}
+                          r={isHighlighted ? 3.5 : 2.5}
+                          fill={strokeColor}
+                          stroke="#0f172a"
+                          strokeWidth="1"
+                        />
+                      )}
 
                       {showAnimatedFlow && (cable.status === 'connected' || cable.status === 'normal' || cable.status === 'online' || cable.status === 'active') && (
                         <path
@@ -725,95 +951,115 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                   const isHighlighted = isSelected || isConnectedToSelectedCable;
                   const statusStyle = getStatusColor(dev.status);
 
-                  return (
-                    <g
-                      key={dev.id}
-                      transform={`translate(${pos.x}, ${pos.y})`}
-                      onClick={() => {
-                        setSelectedDeviceId(dev.id);
-                        setSelectedCableId(null);
-                        setIsMobilePanelOpen(true);
-                      }}
-                      className="cursor-pointer group"
-                    >
-                      {isHighlighted && (
-                        <circle
-                          r="42"
-                          fill="none"
-                          stroke={utilityConfig.accentColor}
-                          strokeWidth="2"
-                          strokeOpacity="0.8"
-                          className="animate-ping"
-                        />
-                      )}
+                    const isDraggingThis = draggingNodeId === dev.id;
 
-                      <rect
-                        x="-70"
-                        y="-26"
-                        width="140"
-                        height="52"
-                        rx="14"
-                        fill={isHighlighted ? '#1e293b' : '#0f172a'}
-                        stroke={isHighlighted ? utilityConfig.accentColor : '#334155'}
-                        strokeWidth={isHighlighted ? 2.5 : 1.5}
-                        className="transition-all group-hover:fill-slate-800 shadow-xl"
-                      />
+                    return (
+                      <g
+                        key={dev.id}
+                        transform={`translate(${pos.x}, ${pos.y})`}
+                        onPointerDown={(e) => handleNodePointerDown(e, dev.id)}
+                        onClick={() => {
+                          // Jika baru saja digeser (drag), jangan picu pemilihan klik
+                          if (hasDraggedRef.current) return;
+                          setSelectedDeviceId(dev.id);
+                          setSelectedCableId(null);
+                          setIsMobilePanelOpen(true);
+                        }}
+                        className={`group ${isDraggingThis ? 'cursor-grabbing' : 'cursor-grab'} select-none`}
+                        style={{ touchAction: 'none' }}
+                      >
+                        {isHighlighted && (
+                          <circle
+                            r="42"
+                            fill="none"
+                            stroke={utilityConfig.accentColor}
+                            strokeWidth="2"
+                            strokeOpacity="0.8"
+                            className="animate-ping pointer-events-none"
+                          />
+                        )}
 
-                      <g transform="translate(-48, 0)">
-                        <circle
-                          r="16"
-                          fill="#1e293b"
-                          stroke="#334155"
-                          strokeWidth="1"
+                        {/* Background kartu node perangkat */}
+                        <rect
+                          x="-70"
+                          y="-26"
+                          width="140"
+                          height="52"
+                          rx="14"
+                          fill={isDraggingThis ? '#334155' : isHighlighted ? '#1e293b' : '#0f172a'}
+                          stroke={isDraggingThis ? '#60a5fa' : isHighlighted ? utilityConfig.accentColor : '#334155'}
+                          strokeWidth={isDraggingThis || isHighlighted ? 2.5 : 1.5}
+                          className="transition-colors group-hover:stroke-slate-500 shadow-xl"
                         />
-                        <g transform="translate(-10, -10)">
-                          {renderDeviceIcon(dev.type)}
+
+                        {/* Drag Handle Grip Icon (indikator visual perangkat bisa digeser) */}
+                        <g 
+                          transform="translate(-62, -18)" 
+                          className="opacity-40 group-hover:opacity-100 transition-opacity pointer-events-none"
+                        >
+                          <circle cx="0" cy="0" r="1.2" fill="#94a3b8" />
+                          <circle cx="3" cy="0" r="1.2" fill="#94a3b8" />
+                          <circle cx="0" cy="4" r="1.2" fill="#94a3b8" />
+                          <circle cx="3" cy="4" r="1.2" fill="#94a3b8" />
                         </g>
+
+                        <g transform="translate(-48, 0)" className="pointer-events-none">
+                          <circle
+                            r="16"
+                            fill="#1e293b"
+                            stroke="#334155"
+                            strokeWidth="1"
+                          />
+                          <g transform="translate(-10, -10)">
+                            {renderDeviceIcon(dev.type)}
+                          </g>
+                        </g>
+
+                        <text
+                          x="-24"
+                          y="-6"
+                          fill="#f8fafc"
+                          fontSize="11"
+                          fontWeight="800"
+                          className="truncate pointer-events-none"
+                        >
+                          {dev.name && dev.name.length > 13 ? `${dev.name.substring(0, 12)}…` : (dev.name || 'Perangkat')}
+                        </text>
+
+                        <text
+                          x="-24"
+                          y="8"
+                          fill="#94a3b8"
+                          fontSize="9"
+                          fontWeight="500"
+                          fontFamily="monospace"
+                          className="pointer-events-none"
+                        >
+                          {dev.ipAddress || dev.code || dev.voltage ? `${dev.voltage}V` : dev.pipeDiameter || '-'}
+                        </text>
+
+                        <text
+                          x="-24"
+                          y="18"
+                          fill="#64748b"
+                          fontSize="8"
+                          className="capitalize pointer-events-none"
+                        >
+                          {(dev.type || '').replace(/_/g, ' ')}
+                        </text>
+
+                        <circle
+                          cx="58"
+                          cy="-16"
+                          r="4.5"
+                          fill={statusStyle.stroke}
+                          stroke="#0f172a"
+                          strokeWidth="1.5"
+                          className="pointer-events-none"
+                        />
                       </g>
-
-                      <text
-                        x="-24"
-                        y="-6"
-                        fill="#f8fafc"
-                        fontSize="11"
-                        fontWeight="800"
-                        className="truncate"
-                      >
-                        {dev.name && dev.name.length > 13 ? `${dev.name.substring(0, 12)}…` : (dev.name || 'Perangkat')}
-                      </text>
-
-                      <text
-                        x="-24"
-                        y="8"
-                        fill="#94a3b8"
-                        fontSize="9"
-                        fontWeight="500"
-                        fontFamily="monospace"
-                      >
-                        {dev.ipAddress || dev.code || dev.voltage ? `${dev.voltage}V` : dev.pipeDiameter || '-'}
-                      </text>
-
-                      <text
-                        x="-24"
-                        y="18"
-                        fill="#64748b"
-                        fontSize="8"
-                        className="capitalize"
-                      >
-                        {(dev.type || '').replace(/_/g, ' ')}
-                      </text>
-
-                      <circle
-                        cx="58"
-                        cy="-16"
-                        r="4.5"
-                        fill={statusStyle.stroke}
-                        stroke="#0f172a"
-                        strokeWidth="1.5"
-                      />
-                    </g>
-                  );
-                })}
+                    );
+                  })}
               </svg>
             </div>
           )}
