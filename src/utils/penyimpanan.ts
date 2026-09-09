@@ -1,5 +1,14 @@
 import { syncToServer } from './api';
-import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from '../types/ipam';
+import { 
+  IPGroup, 
+  IPAllocation, 
+  DeviceCategory, 
+  IPService, 
+  DnsRecord, 
+  SubDomainRecord,
+  UrlProtocolItem,
+  DnsRecordTypeItem
+} from '../types/ipam';
 
 const STORAGE_KEYS = {
   GROUPS: 'netipam_groups_v1',
@@ -1245,6 +1254,8 @@ export const STORAGE_KEY_CCTV_DEVICE_TYPES = 'netipam_cctv_device_types_v1';
 export const STORAGE_KEY_CCTV_CABLE_TYPES = 'netipam_cctv_cable_types_v1';
 export const STORAGE_KEY_WATER_DEVICE_TYPES = 'netipam_water_device_types_v1';
 export const STORAGE_KEY_WATER_PIPE_TYPES = 'netipam_water_pipe_types_v1';
+export const STORAGE_KEY_URL_PROTOCOLS = 'netipam_url_protocols_v1';
+export const STORAGE_KEY_DNS_RECORD_TYPES = 'netipam_dns_record_types_v1';
 
 export function saveLanLocations(locations: LanLocation[]): void {
   syncToServer(STORAGE_KEY_LAN_LOCATIONS, locations);
@@ -1297,6 +1308,47 @@ export function saveWaterDeviceTypes(items: WaterDeviceTypeItem[]): void {
 export function saveWaterPipeTypes(items: WaterPipeTypeItem[]): void {
   syncToServer(STORAGE_KEY_WATER_PIPE_TYPES, items);
 }
+
+export function saveUrlProtocols(items: UrlProtocolItem[]): void {
+  syncToServer(STORAGE_KEY_URL_PROTOCOLS, items);
+}
+
+export function saveDnsRecordTypes(items: DnsRecordTypeItem[]): void {
+  syncToServer(STORAGE_KEY_DNS_RECORD_TYPES, items);
+}
+
+export const INITIAL_URL_PROTOCOLS: UrlProtocolItem[] = [
+  { id: 'proto-http', name: 'HTTP (Hypertext Transfer Protocol)', code: 'http', description: 'Protokol web standar tanpa enkripsi (port 80)', isDefault: true },
+  { id: 'proto-https', name: 'HTTPS (HTTP Secure / SSL)', code: 'https', description: 'Protokol web terenkripsi SSL/TLS (port 443)', isDefault: true },
+  { id: 'proto-postgresql', name: 'PostgreSQL Database', code: 'postgresql', description: 'Protokol koneksi database PostgreSQL (port 5432)', isDefault: true },
+  { id: 'proto-mysql', name: 'MySQL / MariaDB', code: 'mysql', description: 'Protokol koneksi database MySQL/MariaDB (port 3306)', isDefault: true },
+  { id: 'proto-mongodb', name: 'MongoDB NoSQL', code: 'mongodb', description: 'Protokol database dokumen MongoDB (port 27017)', isDefault: true },
+  { id: 'proto-redis', name: 'Redis Cache & In-Memory', code: 'redis', description: 'Protokol in-memory data store Redis (port 6379)', isDefault: true },
+  { id: 'proto-ssh', name: 'SSH (Secure Shell)', code: 'ssh', description: 'Akses remote terminal terenkripsi (port 22)', isDefault: true },
+  { id: 'proto-sftp', name: 'SFTP (SSH File Transfer)', code: 'sftp', description: 'Transfer berkas aman melalui SSH (port 22)', isDefault: true },
+  { id: 'proto-ftp', name: 'FTP (File Transfer Protocol)', code: 'ftp', description: 'Transfer berkas standar jaringan (port 21)', isDefault: true },
+  { id: 'proto-telnet', name: 'Telnet Remote Terminal', code: 'telnet', description: 'Protokol remote terminal CLI lama (port 23)', isDefault: true },
+  { id: 'proto-rdp', name: 'RDP (Remote Desktop Protocol)', code: 'rdp', description: 'Akses GUI desktop Windows jarak jauh (port 3389)', isDefault: true },
+  { id: 'proto-vnc', name: 'VNC (Virtual Network Computing)', code: 'vnc', description: 'Remote display grafis desktop (port 5900)', isDefault: true },
+  { id: 'proto-ws', name: 'WebSocket (WS)', code: 'ws', description: 'Komunikasi dua arah real-time via HTTP (port 80/8080)', isDefault: true },
+  { id: 'proto-wss', name: 'WebSocket Secure (WSS)', code: 'wss', description: 'Komunikasi dua arah real-time terenkripsi SSL (port 443)', isDefault: true },
+  { id: 'proto-grpc', name: 'gRPC Remote Procedure Call', code: 'grpc', description: 'Protokol RPC berkinerja tinggi berbasis HTTP/2 & Protobuf', isDefault: true },
+  { id: 'proto-tcp', name: 'TCP Generic Raw Stream', code: 'tcp', description: 'Soket koneksi protokol transport TCP langsung', isDefault: true },
+  { id: 'proto-udp', name: 'UDP Datagram Packet', code: 'udp', description: 'Protokol komunikasi paket cepat tanpa koneksi UDP', isDefault: true }
+];
+
+export const INITIAL_DNS_RECORD_TYPES: DnsRecordTypeItem[] = [
+  { id: 'rec-a', name: 'A (IPv4 Address)', code: 'A', description: 'Memetakan hostname ke alamat IPv4 32-bit (contoh: 192.168.1.10)', isDefault: true },
+  { id: 'rec-aaaa', name: 'AAAA (IPv6 Address)', code: 'AAAA', description: 'Memetakan hostname ke alamat IPv6 128-bit', isDefault: true },
+  { id: 'rec-cname', name: 'CNAME (Canonical Name / Alias)', code: 'CNAME', description: 'Alias dari satu nama domain ke nama domain kanonikal lain', isDefault: true },
+  { id: 'rec-forward', name: 'FORWARD (DNS Forwarder)', code: 'FORWARD', description: 'Meneruskan query resolusi domain ke resolver DNS atau upstream server lain', isDefault: true },
+  { id: 'rec-ptr', name: 'PTR (Pointer / Reverse DNS)', code: 'PTR', description: 'Resolusi alamat IP kembali ke nama hostname domain (rDNS)', isDefault: true },
+  { id: 'rec-mx', name: 'MX (Mail Exchanger)', code: 'MX', description: 'Menentukan server email pengirim/penerima surat elektronik domain', isDefault: true },
+  { id: 'rec-txt', name: 'TXT (Text Record / SPF / DKIM)', code: 'TXT', description: 'Menyimpan teks deskriptif, verifikasi domain, SPF, dan DKIM key', isDefault: true },
+  { id: 'rec-ns', name: 'NS (Name Server)', code: 'NS', description: 'Menyatakan server DNS otoritatif yang melayani zona domain', isDefault: true },
+  { id: 'rec-srv', name: 'SRV (Service Locator)', code: 'SRV', description: 'Menentukan port dan host untuk protokol layanan jaringan tertentu', isDefault: true },
+  { id: 'rec-soa', name: 'SOA (Start of Authority)', code: 'SOA', description: 'Informasi otoritas zona DNS, serial number, refresh, dan interval retry', isDefault: true }
+];
 
 export const INITIAL_LAN_DEVICE_TYPES: LanDeviceTypeItem[] = [];
 export const INITIAL_LAN_ROOM_TYPES: LanRoomTypeItem[] = [];

@@ -10,7 +10,7 @@ import {
   ArrowRight,
   Shield
 } from 'lucide-react';
-import { DnsRecord, DnsRecordType, DnsRecordStatus, IPGroup, IPAllocation } from '../types/ipam';
+import { DnsRecord, DnsRecordType, DnsRecordStatus, IPGroup, IPAllocation, UrlProtocolItem, DnsRecordTypeItem } from '../types/ipam';
 
 interface DnsModalProps {
   isOpen: boolean;
@@ -19,6 +19,8 @@ interface DnsModalProps {
   editRecord?: DnsRecord | null;
   groups: IPGroup[];
   allocations: IPAllocation[];
+  urlProtocols?: UrlProtocolItem[];
+  dnsRecordTypes?: DnsRecordTypeItem[];
 }
 
 export const DnsModal: React.FC<DnsModalProps> = ({
@@ -27,7 +29,9 @@ export const DnsModal: React.FC<DnsModalProps> = ({
   onSave,
   editRecord,
   groups,
-  allocations
+  allocations,
+  urlProtocols = [],
+  dnsRecordTypes = []
 }) => {
   const [domain, setDomain] = useState('');
   const [type, setType] = useState<DnsRecordType>('A');
@@ -125,7 +129,7 @@ export const DnsModal: React.FC<DnsModalProps> = ({
     onClose();
   };
 
-  const recordTypes: { type: DnsRecordType; label: string; desc: string }[] = [
+  const defaultRecordTypes: { type: DnsRecordType; label: string; desc: string }[] = [
     { type: 'A', label: 'A (IPv4)', desc: 'Memetakan hostname ke alamat IPv4' },
     { type: 'AAAA', label: 'AAAA (IPv6)', desc: 'Memetakan hostname ke alamat IPv6' },
     { type: 'CNAME', label: 'CNAME (Alias)', desc: 'Alias nama domain ke domain lain' },
@@ -137,6 +141,19 @@ export const DnsModal: React.FC<DnsModalProps> = ({
     { type: 'SRV', label: 'SRV (Service)', desc: 'Lokasi layanan protokol spesifik' },
     { type: 'SOA', label: 'SOA (Authority)', desc: 'Start of Authority zona domain' }
   ];
+
+  const effectiveRecordTypes = dnsRecordTypes.length > 0 
+    ? dnsRecordTypes.map(rt => ({ type: rt.code as DnsRecordType, label: `${rt.name} (${rt.code})`, desc: rt.description || '' }))
+    : defaultRecordTypes;
+
+  const defaultProtocols = [
+    'http', 'https', 'postgresql', 'mysql', 'mongodb', 'redis', 
+    'ssh', 'sftp', 'ftp', 'telnet', 'rdp', 'vnc', 'ws', 'wss', 'grpc', 'tcp', 'udp'
+  ];
+
+  const effectiveProtocols = urlProtocols.length > 0
+    ? urlProtocols.map(p => ({ code: p.code, label: `${p.code}:// (${p.name})` }))
+    : defaultProtocols.map(p => ({ code: p, label: `${p}://` }));
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:items-center sm:pt-4 overflow-y-auto p-4 bg-slate-900/50 backdrop-blur-xs">
@@ -188,23 +205,11 @@ export const DnsModal: React.FC<DnsModalProps> = ({
                 onChange={(e) => setProtocol(e.target.value)}
                 className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="http">http://</option>
-                <option value="https">https://</option>
-                <option value="postgresql">postgresql://</option>
-                <option value="mysql">mysql://</option>
-                <option value="mongodb">mongodb://</option>
-                <option value="redis">redis://</option>
-                <option value="ssh">ssh://</option>
-                <option value="sftp">sftp://</option>
-                <option value="ftp">ftp://</option>
-                <option value="telnet">telnet://</option>
-                <option value="rdp">rdp://</option>
-                <option value="vnc">vnc://</option>
-                <option value="ws">ws://</option>
-                <option value="wss">wss://</option>
-                <option value="grpc">grpc://</option>
-                <option value="tcp">tcp://</option>
-                <option value="udp">udp://</option>
+                {effectiveProtocols.map(p => (
+                  <option key={p.code} value={p.code}>
+                    {p.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -234,7 +239,7 @@ export const DnsModal: React.FC<DnsModalProps> = ({
                 onChange={(e) => setType(e.target.value as DnsRecordType)}
                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {recordTypes.map(rt => (
+                {effectiveRecordTypes.map(rt => (
                   <option key={rt.type} value={rt.type}>
                     {rt.label}
                   </option>

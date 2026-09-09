@@ -503,11 +503,13 @@ export function exportBackupJson(
   cctvDeviceTypes?: any[],
   cctvCableTypes?: any[],
   waterDeviceTypes?: any[],
-  waterPipeTypes?: any[]
+  waterPipeTypes?: any[],
+  urlProtocols?: any[],
+  dnsRecordTypes?: any[]
 ): void {
   const backupData = {
     appName: 'Infrastruktur Jaringan Terpadu (LAN, Listrik, CCTV, AIR)',
-    version: '3.1.0',
+    version: '3.2.0',
     exportDate: new Date().toISOString(),
     totalData: {
       groups: groups.length,
@@ -517,6 +519,8 @@ export function exportBackupJson(
       services: services?.length || 0,
       dnsRecords: dnsRecords?.length || 0,
       subDomains: subDomains?.length || 0,
+      urlProtocols: urlProtocols?.length || 0,
+      dnsRecordTypes: dnsRecordTypes?.length || 0,
       lanLocations: lanLocations?.length || 0,
       lanZones: lanZones?.length || 0,
       lanDevices: lanDevices?.length || 0,
@@ -544,6 +548,8 @@ export function exportBackupJson(
     services: services || [],
     dnsRecords: dnsRecords || [],
     subDomains: subDomains || [],
+    urlProtocols: urlProtocols || [],
+    dnsRecordTypes: dnsRecordTypes || [],
     lanLocations: lanLocations || [],
     lanZones: lanZones || [],
     lanDevices: lanDevices || [],
@@ -585,6 +591,8 @@ export function parseImportJson(fileContent: string): {
   services?: IPService[];
   dnsRecords?: DnsRecord[];
   subDomains?: SubDomainRecord[];
+  urlProtocols?: any[];
+  dnsRecordTypes?: any[];
   electricityDevices?: ElectricityDevice[];
   electricityCables?: ElectricityCableRun[];
   cctvDevices?: CctvDevice[];
@@ -617,6 +625,8 @@ export function parseImportJson(fileContent: string): {
     services: Array.isArray(parsed.services) ? parsed.services : undefined,
     dnsRecords: Array.isArray(parsed.dnsRecords) ? parsed.dnsRecords : undefined,
     subDomains: Array.isArray(parsed.subDomains) ? parsed.subDomains : undefined,
+    urlProtocols: Array.isArray(parsed.urlProtocols) ? parsed.urlProtocols : undefined,
+    dnsRecordTypes: Array.isArray(parsed.dnsRecordTypes) ? parsed.dnsRecordTypes : undefined,
     electricityDevices: Array.isArray(parsed.electricityDevices) ? parsed.electricityDevices : undefined,
     electricityCables: Array.isArray(parsed.electricityCables) ? parsed.electricityCables : undefined,
     cctvDevices: Array.isArray(parsed.cctvDevices) ? parsed.cctvDevices : undefined,

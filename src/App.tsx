@@ -17,9 +17,11 @@ import {
   ServerCog,
   LayoutGrid,
   Table as TableIcon,
-  Printer
+  Printer,
+  Link2,
+  BookmarkCheck
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord } from './types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord, UrlProtocolItem, DnsRecordTypeItem } from './types/ipam';
 import { User, UserAccount } from './types/auth';
 import { 
   getCurrentUser, 
@@ -65,6 +67,10 @@ import {
   saveCctvCableTypes,
   saveWaterDeviceTypes,
   saveWaterPipeTypes,
+  saveUrlProtocols,
+  saveDnsRecordTypes,
+  INITIAL_URL_PROTOCOLS,
+  INITIAL_DNS_RECORD_TYPES,
   INITIAL_ELECTRICITY_DEVICES,
   INITIAL_ELECTRICITY_CABLES,
   INITIAL_CCTV_DEVICES,
@@ -157,6 +163,8 @@ export const App: React.FC = () => {
     if (clean === '/admin/jaringan-cctv' || clean === '/admin/cctv') return 'cctv';
     if (clean === '/admin/jaringan-air' || clean === '/admin/air' || clean === '/admin/water') return 'water';
     if (clean === '/admin/rekaman-dns' || clean === '/admin/dns') return 'dns';
+    if (clean === '/admin/protokol-url' || clean === '/admin/url-protocols') return 'url_protocols';
+    if (clean === '/admin/tipe-record-dns' || clean === '/admin/dns-record-types') return 'dns_record_types';
     if (clean === '/admin/layanan-ip' || clean === '/admin/services') return 'services';
     if (clean === '/admin/kategori-perangkat' || clean === '/admin/kategori' || clean === '/admin/categories') return 'categories';
     if (clean === '/admin/tipe-perangkat-lan' || clean === '/admin/lan-device-types') return 'lan_device_types';
@@ -183,6 +191,8 @@ export const App: React.FC = () => {
       case 'cctv': return '/admin/jaringan-cctv';
       case 'water': return '/admin/jaringan-air';
       case 'dns': return '/admin/rekaman-dns';
+      case 'url_protocols': return '/admin/protokol-url';
+      case 'dns_record_types': return '/admin/tipe-record-dns';
       case 'services': return '/admin/layanan-ip';
       case 'categories': return '/admin/kategori-perangkat';
       case 'lan_device_types': return '/admin/tipe-perangkat-lan';
@@ -296,6 +306,8 @@ export const App: React.FC = () => {
   const [cctvCables, setCctvCables] = useState<CctvCableRun[]>([]);
   const [waterDevices, setWaterDevices] = useState<WaterDevice[]>([]);
   const [waterPipes, setWaterPipes] = useState<WaterPipeRun[]>([]);
+  const [urlProtocols, setUrlProtocols] = useState<UrlProtocolItem[]>([]);
+  const [dnsRecordTypes, setDnsRecordTypes] = useState<DnsRecordTypeItem[]>([]);
   const [lanLocations, setLanLocations] = useState<LanLocation[]>([]);
   const [lanZones, setLanZones] = useState<LanZone[]>([]);
   const [lanDevices, setLanDevices] = useState<LanDevice[]>([]);
@@ -331,6 +343,12 @@ export const App: React.FC = () => {
         if (data['netipam_device_categories_v1']) setCategories(data['netipam_device_categories_v1']);
         if (data['netipam_dns_records_v1']) setDnsRecords(data['netipam_dns_records_v1']);
         if (data['netipam_sub_domains_v1']) setSubDomains(data['netipam_sub_domains_v1']);
+
+        const serverUrlProtocols = data['netipam_url_protocols_v1'];
+        setUrlProtocols(serverUrlProtocols && serverUrlProtocols.length > 0 ? serverUrlProtocols : (INITIAL_URL_PROTOCOLS || []));
+
+        const serverDnsRecordTypes = data['netipam_dns_record_types_v1'];
+        setDnsRecordTypes(serverDnsRecordTypes && serverDnsRecordTypes.length > 0 ? serverDnsRecordTypes : (INITIAL_DNS_RECORD_TYPES || []));
 
         // Sektor LAN (Lokasi/Sekolah, Ruangan/Lab, Fisik & Jalur Kabel)
         setLanLocations(data['netipam_lan_locations_v1'] || []);
@@ -703,6 +721,18 @@ export const App: React.FC = () => {
     }
   }, [waterPipeTypes, isSyncing]);
 
+  useEffect(() => {
+    if (!isSyncing) {
+      saveUrlProtocols(urlProtocols);
+    }
+  }, [urlProtocols, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveDnsRecordTypes(dnsRecordTypes);
+    }
+  }, [dnsRecordTypes, isSyncing]);
+
 
 
 
@@ -870,6 +900,8 @@ export const App: React.FC = () => {
     cctvCableTypes?: any[];
     waterDeviceTypes?: any[];
     waterPipeTypes?: any[];
+    urlProtocols?: any[];
+    dnsRecordTypes?: any[];
   }, isDemo: boolean = false) => {
     if (data.lanLocations) {
       setLanLocations(data.lanLocations);
@@ -974,6 +1006,14 @@ export const App: React.FC = () => {
     if (data.subDomains) {
       setSubDomains(data.subDomains);
       saveSubDomains(data.subDomains);
+    }
+    if (data.urlProtocols) {
+      setUrlProtocols(data.urlProtocols);
+      saveUrlProtocols(data.urlProtocols);
+    }
+    if (data.dnsRecordTypes) {
+      setDnsRecordTypes(data.dnsRecordTypes);
+      saveDnsRecordTypes(data.dnsRecordTypes);
     }
     
     if (data.groups && data.groups.length > 0) {
@@ -1751,6 +1791,36 @@ export const App: React.FC = () => {
     showSuccess('Jenis Pipa Air Dihapus', `Jenis Pipa "${target?.name || id}" berhasil dihapus.`);
   };
 
+  // 8. Master Protokol URL
+  const handleSaveUrlProtocol = (typeItem: any) => {
+    const isEdit = urlProtocols.some(t => t.id === typeItem.id);
+    setUrlProtocols(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      return exists ? prev.map(t => t.id === typeItem.id ? typeItem : t) : [...prev, typeItem];
+    });
+    showSuccess(isEdit ? 'Protokol URL Diperbarui' : 'Protokol URL Ditambahkan', `Protokol "${typeItem.name}" (${typeItem.code}) berhasil disimpan.`);
+  };
+  const handleDeleteUrlProtocol = (id: string) => {
+    const target = urlProtocols.find(t => t.id === id);
+    setUrlProtocols(prev => prev.filter(t => t.id !== id));
+    showSuccess('Protokol URL Dihapus', `Protokol "${target?.name || id}" berhasil dihapus.`);
+  };
+
+  // 9. Master Tipe Record DNS
+  const handleSaveDnsRecordType = (typeItem: any) => {
+    const isEdit = dnsRecordTypes.some(t => t.id === typeItem.id);
+    setDnsRecordTypes(prev => {
+      const exists = prev.some(t => t.id === typeItem.id);
+      return exists ? prev.map(t => t.id === typeItem.id ? typeItem : t) : [...prev, typeItem];
+    });
+    showSuccess(isEdit ? 'Tipe Record DNS Diperbarui' : 'Tipe Record DNS Ditambahkan', `Tipe Record "${typeItem.name}" (${typeItem.code}) berhasil disimpan.`);
+  };
+  const handleDeleteDnsRecordType = (id: string) => {
+    const target = dnsRecordTypes.find(t => t.id === id);
+    setDnsRecordTypes(prev => prev.filter(t => t.id !== id));
+    showSuccess('Tipe Record DNS Dihapus', `Tipe Record "${target?.name || id}" berhasil dihapus.`);
+  };
+
   const totalUsedIps = allocations.filter(a => a.status === 'used').length;
 
   const getTabTitle = (tab: NavTab) => {
@@ -1762,6 +1832,8 @@ export const App: React.FC = () => {
       case 'water': return 'Jaringan AIR (Irigasi & Pompa)';
       case 'groups': return 'Manajemen Alamat IP (Subnet & CIDR)';
       case 'dns': return 'Manajemen DNS Server';
+      case 'url_protocols': return 'Master Skema Protokol URL';
+      case 'dns_record_types': return 'Master Tipe Record DNS';
       case 'services': return 'Layanan & Port IP';
       case 'categories': return 'Kategori Perangkat';
       case 'lan_device_types': return 'Master Tipe Perangkat LAN';
@@ -1814,6 +1886,8 @@ export const App: React.FC = () => {
         totalWaterDeviceTypes={waterDeviceTypes.length}
         totalWaterPipeTypes={waterPipeTypes.length}
         totalDnsRecords={dnsRecords.length}
+        totalUrlProtocols={urlProtocols.length}
+        totalDnsRecordTypes={dnsRecordTypes.length}
         totalCategories={categories.length}
         totalUsers={users.length}
         totalServices={services.length}
@@ -2605,6 +2679,37 @@ export const App: React.FC = () => {
                 setPrintParentDomain(parent);
                 setIsPrintModalOpen(true);
               }}
+              onNavigateTab={handleSelectTab}
+            />
+          )}
+
+          {/* TAB: PROTOKOL URL */}
+          {currentTab === 'url_protocols' && (
+            <MasterTypeView
+              title="Protokol URL & Skema Layanan"
+              subtitle="Kelola master protokol dan skema URL web (HTTP, HTTPS, SSH, FTP, MySQL, Redis, dll)"
+              badgeLabel="Skema Protokol"
+              addLabel="Tambah Protokol URL"
+              icon={Link2}
+              themeColor="indigo"
+              items={urlProtocols}
+              onSaveItem={handleSaveUrlProtocol}
+              onDeleteItem={handleDeleteUrlProtocol}
+            />
+          )}
+
+          {/* TAB: TIPE RECORD DNS */}
+          {currentTab === 'dns_record_types' && (
+            <MasterTypeView
+              title="Tipe Record DNS"
+              subtitle="Kelola master tipe rekaman DNS jaringan (A, AAAA, CNAME, PTR, MX, TXT, NS, SRV, SOA, dll)"
+              badgeLabel="Tipe Record DNS"
+              addLabel="Tambah Tipe Record"
+              icon={BookmarkCheck}
+              themeColor="indigo"
+              items={dnsRecordTypes}
+              onSaveItem={handleSaveDnsRecordType}
+              onDeleteItem={handleDeleteDnsRecordType}
             />
           )}
 
@@ -2972,6 +3077,8 @@ export const App: React.FC = () => {
               cctvCableTypes={cctvCableTypes}
               waterDeviceTypes={waterDeviceTypes}
               waterPipeTypes={waterPipeTypes}
+              urlProtocols={urlProtocols}
+              dnsRecordTypes={dnsRecordTypes}
               onImportData={handleImportData}
               onWipeAllData={handleWipeAllData}
             />
@@ -3069,6 +3176,8 @@ export const App: React.FC = () => {
           editRecord={editingDnsRecord}
           groups={groups}
           allocations={allocations}
+          urlProtocols={urlProtocols}
+          dnsRecordTypes={dnsRecordTypes}
         />
       )}
 

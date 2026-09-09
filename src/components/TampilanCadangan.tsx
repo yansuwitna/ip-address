@@ -67,6 +67,8 @@ interface BackupViewProps {
   cctvCableTypes?: any[];
   waterDeviceTypes?: any[];
   waterPipeTypes?: any[];
+  urlProtocols?: any[];
+  dnsRecordTypes?: any[];
   onImportData: (data: {
     groups?: IPGroup[];
     allocations?: IPAllocation[];
@@ -75,6 +77,8 @@ interface BackupViewProps {
     services?: IPService[];
     dnsRecords?: DnsRecord[];
     subDomains?: SubDomainRecord[];
+    urlProtocols?: any[];
+    dnsRecordTypes?: any[];
     electricityDevices?: ElectricityDevice[];
     electricityCables?: ElectricityCableRun[];
     cctvDevices?: CctvDevice[];
@@ -125,6 +129,8 @@ export const BackupView: React.FC<BackupViewProps> = ({
   cctvCableTypes = [],
   waterDeviceTypes = [],
   waterPipeTypes = [],
+  urlProtocols = [],
+  dnsRecordTypes = [],
   onImportData,
   onWipeAllData
 }) => {
@@ -187,7 +193,9 @@ export const BackupView: React.FC<BackupViewProps> = ({
       cctvDeviceTypes,
       cctvCableTypes,
       waterDeviceTypes,
-      waterPipeTypes
+      waterPipeTypes,
+      urlProtocols,
+      dnsRecordTypes
     );
     setHasBackedUp(true);
     showSuccess('Cadangan Berhasil Diunduh', 'Berkas cadangan format JSON berhasil disimpan.');
@@ -302,7 +310,11 @@ export const BackupView: React.FC<BackupViewProps> = ({
       dataToRestore.waterPipes = pendingRestoreData.waterPipes;
       dataToRestore.waterPipeTypes = pendingRestoreData.waterPipeTypes;
     }
-    if (restoreDns) dataToRestore.dnsRecords = pendingRestoreData.dnsRecords;
+    if (restoreDns) {
+      dataToRestore.dnsRecords = pendingRestoreData.dnsRecords;
+      dataToRestore.urlProtocols = pendingRestoreData.urlProtocols;
+      dataToRestore.dnsRecordTypes = pendingRestoreData.dnsRecordTypes;
+    }
     if (restoreSub) dataToRestore.subDomains = pendingRestoreData.subDomains;
     if (restoreServices) dataToRestore.services = pendingRestoreData.services;
     if (restoreCategories) dataToRestore.categories = pendingRestoreData.categories;

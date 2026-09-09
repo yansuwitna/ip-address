@@ -186,7 +186,9 @@ async function startServer() {
         cctvDeviceTypes,
         cctvCableTypes,
         waterDeviceTypes,
-        waterPipeTypes
+        waterPipeTypes,
+        urlProtocols,
+        dnsRecordTypes
       ] = await Promise.all([
         prisma.user.findMany(),
         prisma.iPGroup.findMany(),
@@ -213,7 +215,9 @@ async function startServer() {
         prisma.cctvDeviceTypeModel.findMany(),
         prisma.cctvCableType.findMany(),
         prisma.waterDeviceTypeModel.findMany(),
-        prisma.waterPipeType.findMany()
+        prisma.waterPipeType.findMany(),
+        prisma.urlProtocol.findMany(),
+        prisma.dnsRecordTypeModel.findMany()
       ]);
       
       res.json({
@@ -242,7 +246,9 @@ async function startServer() {
         'netipam_cctv_device_types_v1': cctvDeviceTypes,
         'netipam_cctv_cable_types_v1': cctvCableTypes,
         'netipam_water_device_types_v1': waterDeviceTypes,
-        'netipam_water_pipe_types_v1': waterPipeTypes
+        'netipam_water_pipe_types_v1': waterPipeTypes,
+        'netipam_url_protocols_v1': urlProtocols,
+        'netipam_dns_record_types_v1': dnsRecordTypes
       });
     } catch (error) {
       console.error(error);
@@ -348,6 +354,12 @@ async function startServer() {
         case 'netipam_water_pipe_types_v1':
           await replaceTable(prisma.waterPipeType, data);
           break;
+        case 'netipam_url_protocols_v1':
+          await replaceTable(prisma.urlProtocol, data);
+          break;
+        case 'netipam_dns_record_types_v1':
+          await replaceTable(prisma.dnsRecordTypeModel, data);
+          break;
         default:
           return res.status(400).json({ error: 'Unknown key' });
       }
@@ -387,7 +399,9 @@ async function startServer() {
         prisma.cctvDeviceTypeModel.deleteMany({}),
         prisma.cctvCableType.deleteMany({}),
         prisma.waterDeviceTypeModel.deleteMany({}),
-        prisma.waterPipeType.deleteMany({})
+        prisma.waterPipeType.deleteMany({}),
+        prisma.urlProtocol.deleteMany({}),
+        prisma.dnsRecordTypeModel.deleteMany({})
       ]);
       res.json({ success: true });
     } catch (error) {

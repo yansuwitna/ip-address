@@ -131,3 +131,26 @@ export interface SubDomainRecord {
   forward?: string;
   createdAt: string;
 }
+
+export interface UrlProtocolItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DnsRecordTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+

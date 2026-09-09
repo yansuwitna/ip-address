@@ -17,7 +17,9 @@ import {
   Video,
   Droplets,
   Server,
-  DoorOpen
+  DoorOpen,
+  Link2,
+  BookmarkCheck
 } from 'lucide-react';
 import { User } from '../types/auth';
 import { showConfirm } from '../utils/swal';
@@ -30,6 +32,8 @@ export type NavTab =
   | 'water' 
   | 'groups' 
   | 'dns' 
+  | 'url_protocols'
+  | 'dns_record_types'
   | 'services' 
   | 'categories' 
   | 'lan_device_types'
@@ -68,6 +72,8 @@ interface SidebarProps {
   totalWaterDeviceTypes?: number;
   totalWaterPipeTypes?: number;
   totalDnsRecords?: number;
+  totalUrlProtocols?: number;
+  totalDnsRecordTypes?: number;
   totalCategories?: number;
   totalUsers?: number;
   totalServices?: number;
@@ -226,7 +232,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  // 6. IP dan DNS (Alamat IP, Manajemen DNS, Kategori Hardware)
+  // 6. IP dan DNS (Alamat IP, Manajemen DNS, Protokol URL, Tipe Record DNS, Kategori Hardware)
   const ipDnsItems: NavItem[] = [
     {
       id: 'groups',
@@ -240,6 +246,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Manajemen DNS',
       icon: Globe,
       description: 'Domain & Record Server',
+      activeColor: 'bg-indigo-600'
+    },
+    {
+      id: 'url_protocols',
+      label: 'Protokol URL',
+      icon: Link2,
+      description: 'Master Skema Protokol URL',
+      activeColor: 'bg-indigo-600'
+    },
+    {
+      id: 'dns_record_types',
+      label: 'Tipe Record DNS',
+      icon: BookmarkCheck,
+      description: 'Master Tipe DNS (A, CNAME, dll)',
       activeColor: 'bg-indigo-600'
     },
     {

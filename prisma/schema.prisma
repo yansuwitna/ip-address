@@ -473,3 +473,30 @@ model WaterPipeType {
   @@map("tipe_pipa_air")
 }
 
+model UrlProtocol {
+  id          String   @id @map("id")
+  name        String   @map("nama_protokol")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("protokol_url")
+}
+
+model DnsRecordTypeModel {
+  id          String   @id @map("id")
+  name        String   @map("nama_tipe")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("tipe_record_dns")
+}
+
+
