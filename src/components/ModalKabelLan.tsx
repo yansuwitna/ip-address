@@ -168,7 +168,7 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs overflow-hidden font-poppins animate-in fade-in duration-150">
-      <div className="relative w-full max-w-4xl mx-auto bg-white dark:bg-slate-900 border-0 sm:border sm:border-slate-200 sm:dark:border-slate-800 rounded-none sm:rounded-3xl shadow-2xl overflow-hidden h-full sm:h-auto sm:max-h-[96vh] sm:my-auto flex flex-col animate-in zoom-in-95 duration-150">
+      <div className="relative w-full max-w-4xl mx-auto bg-white dark:bg-slate-900 border-x border-b border-t-0 border-slate-200/80 dark:border-slate-800 rounded-none sm:rounded-b-2xl sm:rounded-t-none shadow-2xl overflow-hidden h-full flex flex-col animate-in zoom-in-95 duration-150">
         
         {/* Header Modal */}
         <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-blue-600/10 flex items-center justify-between flex-shrink-0">

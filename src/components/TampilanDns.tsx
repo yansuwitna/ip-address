@@ -196,30 +196,6 @@ export const DnsView: React.FC<DnsViewProps> = ({
         </div>
 
         <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center sm:justify-start gap-2 w-full lg:w-auto">
-          {/* Pintasan ke Protokol URL */}
-          {onNavigateTab && (
-            <button
-              onClick={() => onNavigateTab('url_protocols')}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
-              title="Kelola Master Skema Protokol URL"
-            >
-              <Link2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              <span>Protokol URL</span>
-            </button>
-          )}
-
-          {/* Pintasan ke Tipe Record DNS */}
-          {onNavigateTab && (
-            <button
-              onClick={() => onNavigateTab('dns_record_types')}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
-              title="Kelola Master Tipe DNS (A, CNAME, dll)"
-            >
-              <BookmarkCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>Tipe Record</span>
-            </button>
-          )}
-
           {/* Uji Resolusi Simulator Button */}
           <button
             onClick={() => {

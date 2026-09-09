@@ -157,7 +157,7 @@ export const DnsModal: React.FC<DnsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs overflow-hidden font-poppins animate-in fade-in duration-150">
-      <div className="bg-white dark:bg-slate-900 border-0 sm:border sm:border-slate-200 sm:dark:border-slate-800 rounded-none sm:rounded-3xl p-6 sm:p-7 max-w-2xl w-full mx-auto shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 h-full sm:h-auto sm:max-h-[96vh] sm:my-auto overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 border-x border-b border-t-0 border-slate-200 dark:border-slate-800 rounded-none sm:rounded-b-2xl sm:rounded-t-none p-6 sm:p-7 max-w-2xl w-full mx-auto shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 h-full overflow-y-auto">
         
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
