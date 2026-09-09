@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Cable, Save, AlertCircle, Lock } from 'lucide-react';
 import { LanCableRun, LanCableType, CableRunStatus, LanDevice, LanLocation, LanZone, LanCableTypeItem } from '../types/jaringanUtilitas';
+import { ModalPortal } from './ModalPortal';
 
 interface LanCableModalProps {
   isOpen: boolean;
@@ -167,6 +168,7 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
   };
 
   return (
+    <ModalPortal>
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
       <div className="relative w-full max-w-4xl mx-auto bg-white dark:bg-slate-900 border-x border-b border-t-0 border-slate-200/80 dark:border-slate-800 rounded-none sm:rounded-b-2xl sm:rounded-t-none shadow-2xl overflow-hidden max-h-dvh flex flex-col animate-in zoom-in-95 duration-150">
         
@@ -561,5 +563,6 @@ export const LanCableModal: React.FC<LanCableModalProps> = ({
 
       </div>
     </div>
+    </ModalPortal>
   );
 };

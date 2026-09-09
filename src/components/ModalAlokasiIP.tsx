@@ -4,6 +4,7 @@ import { IPGroup, IPAllocation, DeviceType, IPStatus, DeviceCategory } from '../
 import { isValidIpv4, isIpInCidr, isValidMac, findNextAvailableIp } from '../utils/kalkulatorIp';
 import { DEFAULT_DEVICE_CATEGORIES } from '../utils/penyimpanan';
 import { showWarning } from '../utils/swal';
+import { ModalPortal } from './ModalPortal';
 
 interface IPAllocationModalProps {
   isOpen: boolean;
@@ -148,6 +149,7 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
   if (!isOpen) return null;
 
   return (
+    <ModalPortal>
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
       <div className="bg-white dark:bg-slate-900 border-x border-b border-t-0 border-slate-200 dark:border-slate-700 rounded-none sm:rounded-b-2xl sm:rounded-t-none w-full max-w-2xl mx-auto shadow-2xl overflow-hidden max-h-dvh flex flex-col animate-in zoom-in-95 duration-150">
         
@@ -364,5 +366,6 @@ export const IPAllocationModal: React.FC<IPAllocationModalProps> = ({
 
       </div>
     </div>
+    </ModalPortal>
   );
 };

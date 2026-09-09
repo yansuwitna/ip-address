@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Building2, Save, AlertCircle } from 'lucide-react';
 import { LanLocation } from '../types/jaringanUtilitas';
+import { ModalPortal } from './ModalPortal';
 
 interface LanLocationModalProps {
   isOpen: boolean;
@@ -88,6 +89,7 @@ export const LanLocationModal: React.FC<LanLocationModalProps> = ({
   };
 
   return (
+    <ModalPortal>
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
       <div className="bg-white dark:bg-slate-900 border-x border-b border-t-0 border-slate-200 dark:border-slate-800 rounded-none sm:rounded-b-2xl sm:rounded-t-none w-full max-w-2xl mx-auto shadow-2xl overflow-hidden max-h-dvh flex flex-col animate-in zoom-in-95 duration-150">
         
@@ -227,5 +229,6 @@ export const LanLocationModal: React.FC<LanLocationModalProps> = ({
 
       </div>
     </div>
+    </ModalPortal>
   );
 };

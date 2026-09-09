@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { X, Network, Info, Check } from 'lucide-react';
 import { IPGroup } from '../types/ipam';
 import { isValidCidr, parseCidr, isValidIpv4 } from '../utils/kalkulatorIp';
+import { ModalPortal } from './ModalPortal';
 
 interface GroupModalProps {
   isOpen: boolean;
@@ -109,6 +110,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
   if (!isOpen) return null;
 
   return (
+    <ModalPortal>
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
       <div className="bg-white dark:bg-slate-900 border-x border-b border-t-0 border-slate-200 dark:border-slate-700 rounded-none sm:rounded-b-2xl sm:rounded-t-none w-full max-w-2xl mx-auto shadow-2xl overflow-hidden max-h-dvh flex flex-col animate-in zoom-in-95 duration-150">
         
@@ -298,5 +300,6 @@ export const GroupModal: React.FC<GroupModalProps> = ({
 
       </div>
     </div>
+    </ModalPortal>
   );
 };

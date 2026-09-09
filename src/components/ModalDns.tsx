@@ -11,6 +11,7 @@ import {
   Shield
 } from 'lucide-react';
 import { DnsRecord, DnsRecordType, DnsRecordStatus, IPGroup, IPAllocation, UrlProtocolItem, DnsRecordTypeItem } from '../types/ipam';
+import { ModalPortal } from './ModalPortal';
 
 interface DnsModalProps {
   isOpen: boolean;
@@ -156,6 +157,7 @@ export const DnsModal: React.FC<DnsModalProps> = ({
     : defaultProtocols.map(p => ({ code: p, label: `${p}://` }));
 
   return (
+    <ModalPortal>
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
       <div className="bg-white dark:bg-slate-900 border-x border-b border-t-0 border-slate-200 dark:border-slate-800 rounded-none sm:rounded-b-2xl sm:rounded-t-none p-6 sm:p-7 max-w-2xl w-full mx-auto shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 max-h-dvh overflow-y-auto">
         
@@ -402,5 +404,6 @@ export const DnsModal: React.FC<DnsModalProps> = ({
 
       </div>
     </div>
+    </ModalPortal>
   );
 };

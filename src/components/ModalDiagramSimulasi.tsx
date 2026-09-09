@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { ModalPortal } from './ModalPortal';
 import { 
   Network, 
   Cable, 
@@ -452,6 +453,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
   const HeaderIcon = utilityConfig.icon;
 
   return (
+    <ModalPortal>
     <div className="fixed inset-0 z-[9999] bg-slate-950/90 backdrop-blur-md flex flex-col font-poppins animate-in fade-in duration-200 overflow-hidden">
       
       {/* Header Bar */}
@@ -1018,5 +1020,6 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
       </div>
 
     </div>
+    </ModalPortal>
   );
 };

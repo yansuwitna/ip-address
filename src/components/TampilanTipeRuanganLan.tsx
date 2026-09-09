@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { LanRoomTypeItem } from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess } from '../utils/swal';
+import { ModalPortal } from './ModalPortal';
 
 interface LanRoomTypesViewProps {
   roomTypes: LanRoomTypeItem[];
@@ -229,6 +230,7 @@ export const LanRoomTypesView: React.FC<LanRoomTypesViewProps> = ({
       </div>
 
       {isModalOpen && (
+        <ModalPortal>
         <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
           <div className="bg-white dark:bg-slate-900 rounded-none sm:rounded-b-2xl sm:rounded-t-none border-x border-b border-t-0 border-slate-200/90 dark:border-slate-800 shadow-2xl max-w-2xl w-full mx-auto overflow-hidden max-h-dvh flex flex-col animate-in zoom-in-95 duration-150">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
@@ -327,6 +329,7 @@ export const LanRoomTypesView: React.FC<LanRoomTypesViewProps> = ({
             </form>
           </div>
         </div>
+        </ModalPortal>
       )}
 
     </div>

@@ -14,6 +14,7 @@ import {
   WaterPipeRun 
 } from '../types/jaringanUtilitas';
 import { User } from '../types/auth';
+import { ModalPortal } from './ModalPortal';
 
 interface PrintModalProps {
   isOpen: boolean;
@@ -138,6 +139,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
   }
 
   return (
+    <ModalPortal>
     <div className="fixed inset-0 z-[9999] bg-slate-100 dark:bg-slate-950 flex flex-col overflow-hidden animate-in fade-in duration-200 print-modal-root print:static print:z-auto print:bg-white print:overflow-visible print:h-auto">
       
       {/* Container Full Page */}
@@ -822,5 +824,6 @@ export const PrintModal: React.FC<PrintModalProps> = ({
       </div>
 
     </div>
+    </ModalPortal>
   );
 };

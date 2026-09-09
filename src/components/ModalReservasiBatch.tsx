@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { X, Layers, AlertCircle } from 'lucide-react';
 import { IPGroup, IPAllocation, IPStatus } from '../types/ipam';
 import { ipToInt, intToIp, isValidIpv4, isIpInCidr } from '../utils/kalkulatorIp';
+import { ModalPortal } from './ModalPortal';
 
 interface BatchReserveModalProps {
   isOpen: boolean;
@@ -107,6 +108,7 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
   if (!isOpen) return null;
 
   return (
+    <ModalPortal>
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
       <div className="bg-white dark:bg-slate-900 border-x border-b border-t-0 border-slate-200 dark:border-slate-700 rounded-none sm:rounded-b-2xl sm:rounded-t-none w-full max-w-2xl mx-auto shadow-2xl overflow-hidden max-h-dvh flex flex-col animate-in zoom-in-95 duration-150">
         
@@ -253,5 +255,6 @@ export const BatchReserveModal: React.FC<BatchReserveModalProps> = ({
 
       </div>
     </div>
+    </ModalPortal>
   );
 };

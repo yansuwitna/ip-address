@@ -19,6 +19,7 @@ import {
   Download
 } from 'lucide-react';
 import { User, UserAccount } from '../types/auth';
+import { ModalPortal } from './ModalPortal';
 
 interface UsersViewProps {
   users: UserAccount[];
@@ -474,6 +475,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
       )}
 
       {isModalOpen && (
+        <ModalPortal>
         <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
           <div className="bg-white dark:bg-slate-900 border-x border-b border-t-0 border-slate-200/90 dark:border-slate-800 rounded-none sm:rounded-b-2xl sm:rounded-t-none p-6 sm:p-7 max-w-xl w-full mx-auto shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 max-h-dvh overflow-y-auto">
             
@@ -644,6 +646,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
 
           </div>
         </div>
+        </ModalPortal>
       )}
 
     </div>
