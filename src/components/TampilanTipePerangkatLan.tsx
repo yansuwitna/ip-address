@@ -241,8 +241,8 @@ export const LanDeviceTypesView: React.FC<LanDeviceTypesViewProps> = ({
 
       {/* Modal Add / Edit */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs overflow-hidden font-poppins animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-none sm:rounded-3xl border-0 sm:border sm:border-slate-200/90 sm:dark:border-slate-800 shadow-2xl max-w-2xl w-full mx-auto overflow-hidden h-full sm:h-auto sm:max-h-[96vh] sm:my-auto flex flex-col animate-in zoom-in-95 duration-150">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-xl border border-indigo-100 dark:border-indigo-800/60">

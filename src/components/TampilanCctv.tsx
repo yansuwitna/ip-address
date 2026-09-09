@@ -19,10 +19,12 @@ import {
   Route,
   ShieldCheck,
   Tag,
-  Printer
+  Printer,
+  Sparkles
 } from 'lucide-react';
 import { CctvDevice, CctvCableRun, CctvStatus, CctvDeviceType, LanLocation, LanZone } from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
+import { ModalDiagramSimulasi } from './ModalDiagramSimulasi';
 
 interface CctvViewProps {
   locations: LanLocation[];
@@ -69,6 +71,7 @@ export const CctvView: React.FC<CctvViewProps> = ({
 }) => {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
+  const [isSimulationModalOpen, setIsSimulationModalOpen] = useState(false);
 
   const [activeSubTab, setActiveSubTab] = useState<'devices' | 'cables'>('devices');
   const [searchQuery, setSearchQuery] = useState('');
@@ -606,6 +609,19 @@ export const CctvView: React.FC<CctvViewProps> = ({
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>
               </button>
+
+              {/* Tombol Simulasi Topologi CCTV & Jalur Sinyal */}
+              {activeLocation && activeZone && (
+                <button
+                  onClick={() => setIsSimulationModalOpen(true)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-rose-600/25 hover:shadow-rose-600/40 active:scale-[0.99]"
+                  title="Buka Simulasi Topologi CCTV & Jalur Sinyal"
+                >
+                  <Sparkles className="w-4 h-4 text-rose-200 animate-pulse" />
+                  <span>Simulasi Topologi</span>
+                </button>
+              )}
+
               {onOpenPrintDetail && activeLocation && activeZone && (
                 <button
                   onClick={() => onOpenPrintDetail(activeLocation, activeZone)}
@@ -980,6 +996,19 @@ export const CctvView: React.FC<CctvViewProps> = ({
             </div>
           )}
         </div>
+      )}
+
+      {/* Modal Simulasi Topologi CCTV */}
+      {isSimulationModalOpen && activeLocation && activeZone && (
+        <ModalDiagramSimulasi
+          isOpen={isSimulationModalOpen}
+          onClose={() => setIsSimulationModalOpen(false)}
+          location={activeLocation}
+          zone={activeZone}
+          devices={devices}
+          cables={cables}
+          utilityType="cctv"
+        />
       )}
     </div>
   );

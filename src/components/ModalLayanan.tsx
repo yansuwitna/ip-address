@@ -138,9 +138,9 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:items-center sm:pt-4 p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs overflow-hidden font-poppins animate-in fade-in duration-150">
       <div 
-        className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 my-8 space-y-5 animate-in fade-in zoom-in-95 duration-200"
+        className="bg-white dark:bg-slate-900 border-0 sm:border sm:border-slate-100 rounded-none sm:rounded-3xl max-w-2xl w-full mx-auto p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200 h-full sm:h-auto sm:max-h-[96vh] sm:my-auto overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}

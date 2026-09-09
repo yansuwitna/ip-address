@@ -21,10 +21,12 @@ import {
   Cable,
   FolderTree,
   Tag,
-  Printer
+  Printer,
+  Sparkles
 } from 'lucide-react';
 import { ElectricityDevice, ElectricityCableRun, ElectricalStatus, ElectricityDeviceType, LanLocation, LanZone } from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
+import { ModalDiagramSimulasi } from './ModalDiagramSimulasi';
 
 interface ElectricityViewProps {
   locations: LanLocation[];
@@ -71,6 +73,7 @@ export const ElectricityView: React.FC<ElectricityViewProps> = ({
 }) => {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
+  const [isSimulationModalOpen, setIsSimulationModalOpen] = useState(false);
 
   const [activeSubTab, setActiveSubTab] = useState<'components' | 'cables'>('components');
   const [searchQuery, setSearchQuery] = useState('');
@@ -609,6 +612,19 @@ export const ElectricityView: React.FC<ElectricityViewProps> = ({
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>
               </button>
+
+              {/* Tombol Simulasi Diagram Topologi Distribusi Listrik */}
+              {activeLocation && activeZone && (
+                <button
+                  onClick={() => setIsSimulationModalOpen(true)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-amber-600/25 hover:shadow-amber-600/40 active:scale-[0.99]"
+                  title="Buka Simulasi Diagram Distribusi Listrik & Jalur Kabel"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
+                  <span>Simulasi Topologi</span>
+                </button>
+              )}
+
               {onOpenPrintDetail && activeLocation && activeZone && (
                 <button
                   onClick={() => onOpenPrintDetail(activeLocation, activeZone)}
@@ -999,6 +1015,19 @@ export const ElectricityView: React.FC<ElectricityViewProps> = ({
             </div>
           )}
         </div>
+      )}
+
+      {/* Modal Simulasi Topologi Listrik */}
+      {isSimulationModalOpen && activeLocation && activeZone && (
+        <ModalDiagramSimulasi
+          isOpen={isSimulationModalOpen}
+          onClose={() => setIsSimulationModalOpen(false)}
+          location={activeLocation}
+          zone={activeZone}
+          devices={devices}
+          cables={cables}
+          utilityType="listrik"
+        />
       )}
     </div>
   );

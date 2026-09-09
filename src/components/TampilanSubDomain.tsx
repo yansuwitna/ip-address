@@ -297,10 +297,9 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
         </div>
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:items-center sm:pt-4 p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto font-poppins">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs overflow-hidden font-poppins animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 border-0 sm:border sm:border-slate-200 dark:border-slate-700 rounded-none sm:rounded-3xl w-full max-w-2xl mx-auto shadow-2xl overflow-hidden h-full sm:h-auto sm:max-h-[96vh] sm:my-auto flex flex-col animate-in zoom-in-95 duration-150">
             <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
               <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <Globe className="w-5 h-5 text-blue-600" />

@@ -17,10 +17,12 @@ import {
   ArrowLeft,
   Route,
   Activity,
-  Printer
+  Printer,
+  Sparkles
 } from 'lucide-react';
 import { WaterDevice, WaterPipeRun, WaterStatus, WaterDeviceType, LanLocation, LanZone } from '../types/jaringanUtilitas';
 import { showConfirm, showSuccess, showWarning } from '../utils/swal';
+import { ModalDiagramSimulasi } from './ModalDiagramSimulasi';
 
 interface WaterViewProps {
   locations: LanLocation[];
@@ -67,6 +69,7 @@ export const WaterView: React.FC<WaterViewProps> = ({
 }) => {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
+  const [isSimulationModalOpen, setIsSimulationModalOpen] = useState(false);
 
   const [activeSubTab, setActiveSubTab] = useState<'devices' | 'pipes'>('devices');
   const [searchQuery, setSearchQuery] = useState('');
@@ -607,6 +610,19 @@ export const WaterView: React.FC<WaterViewProps> = ({
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>
               </button>
+
+              {/* Tombol Simulasi Jaringan Distribusi Air & Pipa */}
+              {activeLocation && activeZone && (
+                <button
+                  onClick={() => setIsSimulationModalOpen(true)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-cyan-600/25 hover:shadow-cyan-600/40 active:scale-[0.99]"
+                  title="Buka Simulasi Distribusi Air & Jalur Pipa"
+                >
+                  <Sparkles className="w-4 h-4 text-cyan-200 animate-pulse" />
+                  <span>Simulasi Topologi</span>
+                </button>
+              )}
+
               {onOpenPrintDetail && activeLocation && activeZone && (
                 <button
                   onClick={() => onOpenPrintDetail(activeLocation, activeZone)}
@@ -984,6 +1000,19 @@ export const WaterView: React.FC<WaterViewProps> = ({
             </div>
           )}
         </div>
+      )}
+
+      {/* Modal Simulasi Topologi Air & Irigasi */}
+      {isSimulationModalOpen && activeLocation && activeZone && (
+        <ModalDiagramSimulasi
+          isOpen={isSimulationModalOpen}
+          onClose={() => setIsSimulationModalOpen(false)}
+          location={activeLocation}
+          zone={activeZone}
+          devices={devices}
+          cables={pipes}
+          utilityType="air"
+        />
       )}
     </div>
   );

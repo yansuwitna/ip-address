@@ -344,8 +344,8 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
 
       {/* Modal Tambah / Edit Kategori */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs overflow-hidden font-poppins animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-none sm:rounded-3xl border-0 sm:border sm:border-slate-200/90 sm:dark:border-slate-800 shadow-2xl max-w-2xl w-full mx-auto overflow-hidden h-full sm:h-auto sm:max-h-[96vh] sm:my-auto flex flex-col animate-in zoom-in-95 duration-150">
             
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
