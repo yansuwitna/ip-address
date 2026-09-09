@@ -325,7 +325,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
     setPendingRestoreData(null);
     showSuccess(
       'Pemulihan Sukses',
-      'Data pilihan Anda berhasil dipulihkan. Anda akan otomatis dialihkan ke halaman login untuk memperbarui sesi.'
+      'Seluruh data pilihan Anda berhasil dipulihkan ke sistem dan database.'
     );
   };
 
@@ -542,10 +542,10 @@ export const BackupView: React.FC<BackupViewProps> = ({
                   <input type="checkbox" checked={restoreLan} onChange={() => setRestoreLan(!restoreLan)} className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300" />
                   <div className="flex-1">
                     <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 transition-colors">
-                      Jaringan LAN & Lokasi
+                      Jaringan LAN, Lokasi & Master LAN
                     </span>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      {pendingRestoreData.lanLocations?.length || 0} Lokasi, {pendingRestoreData.lanZones?.length || 0} Lab/Ruang, {pendingRestoreData.lanDevices?.length || 0} Switch/Rack, {pendingRestoreData.lanCables?.length || 0} Kabel LAN
+                      {pendingRestoreData.lanLocations?.length || 0} Lokasi, {pendingRestoreData.lanZones?.length || 0} Lab/Ruang, {pendingRestoreData.lanDevices?.length || 0} Switch/Rack, {pendingRestoreData.lanCables?.length || 0} Kabel LAN, {pendingRestoreData.lanDeviceTypes?.length || 0} Tipe Perangkat, {pendingRestoreData.lanCableTypes?.length || 0} Jenis Kabel, {pendingRestoreData.lanRoomTypes?.length || 0} Tipe Ruangan
                     </p>
                   </div>
                 </label>
@@ -566,10 +566,10 @@ export const BackupView: React.FC<BackupViewProps> = ({
                   <input type="checkbox" checked={restoreElectricity} onChange={() => setRestoreElectricity(!restoreElectricity)} className="w-4 h-4 rounded text-amber-500 focus:ring-amber-500 border-slate-300" />
                   <div className="flex-1">
                     <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-amber-500 transition-colors">
-                      Jaringan Listrik & Kabel
+                      Jaringan Listrik & Master Listrik
                     </span>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      {pendingRestoreData.electricityDevices?.length || 0} Panel/UPS, {pendingRestoreData.electricityCables?.length || 0} Jalur Kabel Listrik
+                      {pendingRestoreData.electricityDevices?.length || 0} Panel/UPS, {pendingRestoreData.electricityCables?.length || 0} Kabel Listrik, {pendingRestoreData.electricityDeviceTypes?.length || 0} Tipe Komponen, {pendingRestoreData.electricityCableTypes?.length || 0} Jenis Kabel
                     </p>
                   </div>
                 </label>
@@ -578,10 +578,10 @@ export const BackupView: React.FC<BackupViewProps> = ({
                   <input type="checkbox" checked={restoreCctv} onChange={() => setRestoreCctv(!restoreCctv)} className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-slate-300" />
                   <div className="flex-1">
                     <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-rose-600 transition-colors">
-                      Jaringan CCTV & Kamera
+                      Jaringan CCTV & Master CCTV
                     </span>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      {pendingRestoreData.cctvDevices?.length || 0} Kamera/NVR, {pendingRestoreData.cctvCables?.length || 0} Kabel CCTV/PoE
+                      {pendingRestoreData.cctvDevices?.length || 0} Kamera/NVR, {pendingRestoreData.cctvCables?.length || 0} Kabel CCTV, {pendingRestoreData.cctvDeviceTypes?.length || 0} Tipe Hardware, {pendingRestoreData.cctvCableTypes?.length || 0} Jenis Kabel
                     </p>
                   </div>
                 </label>
@@ -590,10 +590,10 @@ export const BackupView: React.FC<BackupViewProps> = ({
                   <input type="checkbox" checked={restoreWater} onChange={() => setRestoreWater(!restoreWater)} className="w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500 border-slate-300" />
                   <div className="flex-1">
                     <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-cyan-600 transition-colors">
-                      Jaringan AIR & Pipa Irigasi
+                      Jaringan AIR & Master Pipa
                     </span>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      {pendingRestoreData.waterDevices?.length || 0} Pompa/Toren, {pendingRestoreData.waterPipes?.length || 0} Jalur Pipa Distribusi
+                      {pendingRestoreData.waterDevices?.length || 0} Pompa/Toren, {pendingRestoreData.waterPipes?.length || 0} Pipa, {pendingRestoreData.waterDeviceTypes?.length || 0} Tipe Alat, {pendingRestoreData.waterPipeTypes?.length || 0} Jenis Pipa
                     </p>
                   </div>
                 </label>
@@ -602,10 +602,10 @@ export const BackupView: React.FC<BackupViewProps> = ({
                   <input type="checkbox" checked={restoreDns} onChange={() => setRestoreDns(!restoreDns)} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" />
                   <div className="flex-1">
                     <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 transition-colors">
-                      Data Domain Utama (DNS)
+                      Data Domain Utama (DNS) & Master Record
                     </span>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      {pendingRestoreData.dnsRecords?.length || 0} Record Domain
+                      {pendingRestoreData.dnsRecords?.length || 0} Domain, {pendingRestoreData.urlProtocols?.length || 0} Protokol URL, {pendingRestoreData.dnsRecordTypes?.length || 0} Tipe Record
                     </p>
                   </div>
                 </label>

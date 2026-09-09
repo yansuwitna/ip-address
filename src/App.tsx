@@ -1020,13 +1020,16 @@ export const App: React.FC = () => {
       setSelectedGroupId(data.groups[0].id);
     }
     
-    // Automatically log out upon data import/restore if not demo
-    if (!isDemo) {
-      logoutUser();
-      setCurrentUser(null);
-      setAuthView('login');
-      setIsViewingPublicHome(false);
-      syncBrowserUrl('/masuk');
+    // If users list was imported, check if current user is still valid; if users were modified or not present, re-authenticate
+    if (!isDemo && data.users && data.users.length > 0) {
+      const stillExists = currentUser ? data.users.some(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) : false;
+      if (!stillExists) {
+        logoutUser();
+        setCurrentUser(null);
+        setAuthView('login');
+        setIsViewingPublicHome(false);
+        syncBrowserUrl('/masuk');
+      }
     }
   };
 
