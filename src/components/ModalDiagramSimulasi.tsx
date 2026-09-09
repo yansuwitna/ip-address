@@ -571,26 +571,49 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
     };
   };
 
+  const rafRef = useRef<number | null>(null);
+
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!draggingNodeId || !dragStartRef.current) return;
 
-    const dx = (e.clientX - dragStartRef.current.mouseX) / zoom;
-    const dy = (e.clientY - dragStartRef.current.mouseY) / zoom;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
 
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-      hasDraggedRef.current = true;
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
     }
 
-    const newX = Math.round(Math.max(80, Math.min(1020, dragStartRef.current.nodeX + dx)));
-    const newY = Math.round(Math.max(40, Math.min(800, dragStartRef.current.nodeY + dy)));
+    rafRef.current = requestAnimationFrame(() => {
+      if (!dragStartRef.current || !draggingNodeId) return;
 
-    setCustomPositions(prev => ({
-      ...prev,
-      [draggingNodeId]: { x: newX, y: newY }
-    }));
+      const dx = (clientX - dragStartRef.current.mouseX) / zoom;
+      const dy = (clientY - dragStartRef.current.mouseY) / zoom;
+
+      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+        hasDraggedRef.current = true;
+      }
+
+      const newX = Math.round(Math.max(75, Math.min(1025, dragStartRef.current.nodeX + dx)));
+      const newY = Math.round(Math.max(35, Math.min(805, dragStartRef.current.nodeY + dy)));
+
+      setCustomPositions(prev => {
+        if (prev[draggingNodeId]?.x === newX && prev[draggingNodeId]?.y === newY) {
+          return prev;
+        }
+        return {
+          ...prev,
+          [draggingNodeId]: { x: newX, y: newY }
+        };
+      });
+    });
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+
     if (draggingNodeId) {
       try {
         (e.currentTarget as Element).releasePointerCapture(e.pointerId);
@@ -847,7 +870,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                         strokeWidth={strokeWidth}
                         strokeOpacity={isHighlighted ? 1 : (isSourceVirtual || isTargetVirtual ? 0.8 : 0.7)}
                         strokeDasharray={cable.status === 'fault' || cable.status === 'leaking' ? '6 4' : (isSourceVirtual || isTargetVirtual ? '5 3' : undefined)}
-                        className="transition-all group-hover:stroke-opacity-100"
+                        className="group-hover:stroke-opacity-100"
                         style={{ filter: isHighlighted ? 'url(#glow-dynamic)' : undefined }}
                       />
 
