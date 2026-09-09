@@ -354,7 +354,89 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
-          {/* 1. SEKTOR LAN (Jaringan LAN, Tipe Perangkat LAN, Jenis Kabel LAN) */}
+          {/* 1. IP DAN DNS (DI BAWAH DASHBOARD) */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>IP dan DNS</span>
+            </div>
+
+            {ipDnsItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id || (item.id === 'groups' && currentTab === 'services');
+              const activeBg = item.activeColor || 'bg-indigo-600';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? `${activeBg} text-white shadow-sm font-bold`
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 2. RUANGAN & LOKASI (DI BAWAH IP DAN DNS) */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>Ruang & Lokasi</span>
+            </div>
+
+            {roomItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              const activeBg = item.activeColor || 'bg-emerald-600';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? `${activeBg} text-white shadow-sm font-bold`
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 3. SEKTOR LAN */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
               <span>Jaringan LAN</span>
@@ -395,7 +477,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
 
-          {/* 2. SEKTOR LISTRIK (Jaringan Listrik, Tipe Perangkat Listrik, Jenis Kabel Listrik) */}
+          {/* 4. SEKTOR LISTRIK */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
               <span>Jaringan Listrik</span>
@@ -436,7 +518,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
 
-          {/* 3. SEKTOR CCTV (Jaringan CCTV, Tipe Hardware CCTV, Jenis Kabel CCTV) */}
+          {/* 5. SEKTOR CCTV */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
               <span>Jaringan CCTV</span>
@@ -477,7 +559,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
 
-          {/* 4. SEKTOR AIR (Jaringan AIR, Tipe Alat & Sistem Air, Jenis Pipa Air) */}
+          {/* 6. SEKTOR AIR */}
           <div className="space-y-1">
             <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
               <span>Jaringan AIR</span>
@@ -501,88 +583,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <div className="flex items-center gap-3">
                     <Icon className={`w-4 h-4 transition-colors ${
                       isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-cyan-600 dark:group-hover:text-cyan-400'
-                    }`} />
-                    <div className="text-left">
-                      <div>{item.label}</div>
-                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
-                        {item.description}
-                      </div>
-                    </div>
-                  </div>
-
-                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
-                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
-                  }`} />
-                </button>
-              );
-            })}
-          </div>
-
-          {/* 5. RUANGAN & LOKASI (Kelompok Berbeda untuk Tipe Ruang) */}
-          <div className="space-y-1">
-            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-              <span>Ruangan & Lokasi</span>
-            </div>
-
-            {roomItems.map(item => {
-              const Icon = item.icon;
-              const isActive = currentTab === item.id;
-              const activeBg = item.activeColor || 'bg-emerald-600';
-
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
-                    isActive
-                      ? `${activeBg} text-white shadow-sm font-bold`
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 transition-colors ${
-                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
-                    }`} />
-                    <div className="text-left">
-                      <div>{item.label}</div>
-                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
-                        {item.description}
-                      </div>
-                    </div>
-                  </div>
-
-                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
-                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
-                  }`} />
-                </button>
-              );
-            })}
-          </div>
-
-          {/* 3. IP DAN DNS (ALAMAT IP, MANAJEMEN DNS, KATEGORI HARDWARE) */}
-          <div className="space-y-1">
-            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-              <span>IP dan DNS</span>
-            </div>
-
-            {ipDnsItems.map(item => {
-              const Icon = item.icon;
-              const isActive = currentTab === item.id || (item.id === 'groups' && currentTab === 'services');
-              const activeBg = item.activeColor || 'bg-indigo-600';
-
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
-                    isActive
-                      ? `${activeBg} text-white shadow-sm font-bold`
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 transition-colors ${
-                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
                     }`} />
                     <div className="text-left">
                       <div>{item.label}</div>
