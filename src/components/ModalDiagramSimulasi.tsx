@@ -334,195 +334,359 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
     }
   }, [storageKey, utilityType, location.id, zone.id]);
 
-  // Dimensi Kanvas SVG dinamis sesuai orientasi
+  // Dimensi Kanvas SVG dinamis sesuai orientasi dan jumlah node (bisa melebar dan memanjang sesuai kebutuhan)
   const canvasDimensions = useMemo(() => {
-    return layoutOrientation === 'horizontal' 
-      ? { width: 1260, height: 760 } 
-      : { width: 1100, height: 840 };
-  }, [layoutOrientation]);
-
-  // Hitung posisi koordinat graf (X, Y) untuk setiap node perangkat terdaftar
-  const nodePositions = useMemo(() => {
-    const positions: Record<string, NodePosition> = {};
-    const tiers = [
-      categorizedNodes.tier1,
-      categorizedNodes.tier2,
-      categorizedNodes.tier3,
-      categorizedNodes.tier4
-    ];
+    const totalCount = Math.max(zoneDevices.length, 1);
 
     if (layoutOrientation === 'horizontal') {
-      // --- TOPOLOGI HORIZONTAL (Kiri ke Kanan) ---
-      // Tier 1 (Core/Source) di paling kiri -> Tier 4 (End Device) di paling kanan
-      const tierX = [130, 420, 750, 1070];
-      const canvasHeight = canvasDimensions.height;
-
-      tiers.forEach((tierDevices, tierIdx) => {
-        const count = tierDevices.length;
-        if (count === 0) return;
-
-        const spacing = canvasHeight / (count + 1);
-        tierDevices.forEach((dev, idx) => {
-          // Jika dalam 1 kolom ada banyak perangkat, beri variasi X selang-seling agar tidak menumpuk
-          const staggerX = count > 4 ? (idx % 2 === 1 ? 30 : -30) : 0;
-          const defaultX = tierX[tierIdx] + staggerX;
-          const defaultY = Math.round(spacing * (idx + 1));
-
-          const custom = customPositions[dev.id];
-          positions[dev.id] = {
-            x: custom ? custom.x : defaultX,
-            y: custom ? custom.y : defaultY,
-            tier: tierIdx + 1
-          };
-        });
-      });
+      const calculatedWidth = Math.max(1600, 5 * 380 + 200);
+      const calculatedHeight = Math.max(860, totalCount * 90 + 160);
+      return { width: calculatedWidth, height: calculatedHeight };
     } else {
-      // --- TOPOLOGI VERTIKAL (Atas ke Bawah) ---
-      // Tier 1 (Core/Source) di paling atas -> Tier 4 (End Device) di paling bawah
-      const canvasWidth = canvasDimensions.width;
-      const tierY = [110, 290, 480, 670];
+      const calculatedWidth = Math.max(1600, totalCount * 140 + 240);
+      const calculatedHeight = Math.max(1000, 5 * 220 + 200);
+      return { width: calculatedWidth, height: calculatedHeight };
+    }
+  }, [layoutOrientation, zoneDevices.length]);
 
-      tiers.forEach((tierDevices, tierIdx) => {
-        const count = tierDevices.length;
-        if (count === 0) return;
+  // Hitung posisi koordinat graf (X, Y) menggunakan Algoritma Tata Letak Pohon Topologis (Topological Subtree Allocation)
+  // Menjamin setiap perangkat anak berada tepat di area bawah/samping perangkat induknya tanpa persilangan kabel!
+  const nodePositions = useMemo(() => {
+    const positions: Record<string, NodePosition> = {};
+    if (zoneDevices.length === 0) return positions;
 
-        const spacing = canvasWidth / (count + 1);
-        tierDevices.forEach((dev, idx) => {
-          const staggerY = count > 4 ? (idx % 2 === 1 ? 32 : -32) : 0;
-          const defaultX = Math.round(spacing * (idx + 1));
-          const defaultY = tierY[tierIdx] + staggerY;
+    // 1. Bangun graf adjacency list dan in-degree berdasarkan jalur kabel fisik yang ada
+    const adj = new Map<string, string[]>();
+    const inDegree = new Map<string, number>();
+    const nameToId = new Map<string, string>();
+    
+    zoneDevices.forEach(d => {
+      adj.set(d.id, []);
+      inDegree.set(d.id, 0);
+      if (d.name) nameToId.set(d.name.toLowerCase(), d.id);
+    });
 
-          const custom = customPositions[dev.id];
-          positions[dev.id] = {
-            x: custom ? custom.x : defaultX,
-            y: custom ? custom.y : defaultY,
-            tier: tierIdx + 1
-          };
-        });
+    zoneCables.forEach(c => {
+      const sId = c.sourceDeviceId || (c.sourceDeviceName ? nameToId.get(c.sourceDeviceName.toLowerCase()) : undefined);
+      const tId = c.targetDeviceId || (c.targetDeviceName ? nameToId.get(c.targetDeviceName.toLowerCase()) : undefined);
+      if (sId && tId && sId !== tId && adj.has(sId) && adj.has(tId)) {
+        if (!adj.get(sId)!.includes(tId)) {
+          adj.get(sId)!.push(tId);
+          inDegree.set(tId, (inDegree.get(tId) || 0) + 1);
+        }
+      }
+    });
+
+    // 2. Tentukan Node Akar (Root Nodes) - Node dengan inDegree 0 (misal: Modem, Router, Trafo, Toren)
+    let roots = zoneDevices.filter(d => inDegree.get(d.id) === 0);
+    if (roots.length === 0) {
+      // Jika graf memiliki loop/siklus, pilih perangkat bertipe router/switch/core sebagai root fallback
+      const candidate = zoneDevices.find(d => {
+        const t = (d.type || '').toLowerCase();
+        return t.includes('router') || t.includes('core') || t.includes('modem') || t.includes('gateway');
+      }) || zoneDevices[0];
+      roots = [candidate];
+    }
+
+    // 3. Tentukan kedalaman level topologi (Topological Level Depth) via BFS
+    const levelMap = new Map<string, number>();
+    roots.forEach(r => levelMap.set(r.id, 0));
+
+    const queue = [...roots.map(r => r.id)];
+    const visitedInBfs = new Set<string>(queue);
+
+    while (queue.length > 0) {
+      const u = queue.shift()!;
+      const currentLevel = levelMap.get(u) || 0;
+      const children = adj.get(u) || [];
+
+      children.forEach(v => {
+        const nextLevel = currentLevel + 1;
+        if (!levelMap.has(v) || levelMap.get(v)! < nextLevel) {
+          levelMap.set(v, nextLevel);
+        }
+        if (!visitedInBfs.has(v)) {
+          visitedInBfs.add(v);
+          queue.push(v);
+        }
       });
     }
 
-    // Cek perangkat berdasarkan kecocokan nama jika id kosong
-    zoneDevices.forEach(dev => {
-      if (!positions[dev.id] && dev.name) {
-        const custom = customPositions[dev.id] || customPositions[dev.name.toLowerCase()];
-        positions[dev.name.toLowerCase()] = {
-          x: custom ? custom.x : 200,
-          y: custom ? custom.y : 200,
-          tier: 2
+    // Berikan level untuk perangkat yang tidak terhubung kabel
+    zoneDevices.forEach(d => {
+      if (!levelMap.has(d.id)) {
+        levelMap.set(d.id, 1);
+      }
+    });
+
+    // 4. Hitung lebar span (jumlah daun/subtree leaf span) untuk membagi ruang kanvas secara presisi
+    const spanCache = new Map<string, number>();
+    const calcSpan = (u: string, vis = new Set<string>()): number => {
+      if (vis.has(u)) return 1;
+      vis.add(u);
+      const children = (adj.get(u) || []).filter(v => (levelMap.get(v) || 0) > (levelMap.get(u) || 0));
+      if (children.length === 0) return 1;
+      const sum = children.reduce((acc, ch) => acc + calcSpan(ch, new Set(vis)), 0);
+      spanCache.set(u, sum);
+      return sum;
+    };
+
+    roots.forEach(r => calcSpan(r.id));
+
+    // 5. Alokasi Koordinat Subtree secara Rekursif (Menjamin anak berada tepat di bawah/samping induknya)
+    if (layoutOrientation === 'horizontal') {
+      // --- ORIENTASI HORIZONTAL (Kiri ke Kanan) ---
+      const levelSpacingX = 360;
+      const startX = 140;
+      const totalCanvasHeight = canvasDimensions.height;
+
+      const layoutSubtreeHorizontal = (u: string, minY: number, maxY: number, visited = new Set<string>()) => {
+        if (visited.has(u)) return;
+        visited.add(u);
+
+        const lvl = levelMap.get(u) || 0;
+        const midY = Math.round((minY + maxY) / 2);
+        const autoX = startX + lvl * levelSpacingX;
+
+        const custom = customPositions[u];
+        positions[u] = {
+          x: custom ? custom.x : autoX,
+          y: custom ? custom.y : midY,
+          tier: lvl + 1
         };
+
+        const children = (adj.get(u) || []).filter(v => (levelMap.get(v) || 0) > lvl);
+        if (children.length === 0) return;
+
+        const totalSpan = children.reduce((sum, ch) => sum + (spanCache.get(ch) || calcSpan(ch)), 0);
+        let curY = minY;
+        const availableHeight = maxY - minY;
+
+        children.forEach(ch => {
+          const chSpan = spanCache.get(ch) || calcSpan(ch);
+          const chHeight = (chSpan / totalSpan) * availableHeight;
+          layoutSubtreeHorizontal(ch, curY, curY + chHeight, visited);
+          curY += chHeight;
+        });
+      };
+
+      const totalRootSpan = roots.reduce((acc, r) => acc + (spanCache.get(r.id) || 1), 0);
+      let curRootY = 40;
+      roots.forEach(r => {
+        const rSpan = spanCache.get(r.id) || 1;
+        const rHeight = (rSpan / totalRootSpan) * (totalCanvasHeight - 80);
+        layoutSubtreeHorizontal(r.id, curRootY, curRootY + rHeight);
+        curRootY += rHeight;
+      });
+
+    } else {
+      // --- ORIENTASI VERTIKAL (Atas ke Bawah) ---
+      const levelSpacingY = 220;
+      const startY = 110;
+      const totalCanvasWidth = canvasDimensions.width;
+
+      const layoutSubtreeVertical = (u: string, minX: number, maxX: number, visited = new Set<string>()) => {
+        if (visited.has(u)) return;
+        visited.add(u);
+
+        const lvl = levelMap.get(u) || 0;
+        const midX = Math.round((minX + maxX) / 2);
+        const autoY = startY + lvl * levelSpacingY;
+
+        const custom = customPositions[u];
+        positions[u] = {
+          x: custom ? custom.x : midX,
+          y: custom ? custom.y : autoY,
+          tier: lvl + 1
+        };
+
+        const children = (adj.get(u) || []).filter(v => (levelMap.get(v) || 0) > lvl);
+        if (children.length === 0) return;
+
+        const totalSpan = children.reduce((sum, ch) => sum + (spanCache.get(ch) || calcSpan(ch)), 0);
+        let curX = minX;
+        const availableWidth = maxX - minX;
+
+        children.forEach(ch => {
+          const chSpan = spanCache.get(ch) || calcSpan(ch);
+          const chWidth = (chSpan / totalSpan) * availableWidth;
+          layoutSubtreeVertical(ch, curX, curX + chWidth, visited);
+          curX += chWidth;
+        });
+      };
+
+      const totalRootSpan = roots.reduce((acc, r) => acc + (spanCache.get(r.id) || 1), 0);
+      let curRootX = 60;
+      roots.forEach(r => {
+        const rSpan = spanCache.get(r.id) || 1;
+        const rWidth = (rSpan / totalRootSpan) * (totalCanvasWidth - 120);
+        layoutSubtreeVertical(r.id, curRootX, curRootX + rWidth);
+        curRootX += rWidth;
+      });
+    }
+
+    // 6. Tempatkan perangkat mandiri yang tersisa jika ada
+    let unplacedIdx = 0;
+    zoneDevices.forEach(d => {
+      if (!positions[d.id]) {
+        const custom = customPositions[d.id];
+        positions[d.id] = {
+          x: custom ? custom.x : 160 + unplacedIdx * 180,
+          y: custom ? custom.y : canvasDimensions.height - 100,
+          tier: 4
+        };
+        unplacedIdx++;
       }
     });
 
     return positions;
-  }, [categorizedNodes, zoneDevices, customPositions, layoutOrientation, canvasDimensions]);
+  }, [zoneDevices, zoneCables, customPositions, layoutOrientation, canvasDimensions]);
 
-  // Helper Cerdas untuk membaca posisi relatif perangkat target (apakah di bawah, di atas, di samping kanan, atau di samping kiri)
-  // Menghitung titik jangkar (docking port) tepat di tepi kartu perangkat (140x52px, center di 0,0)
-  const getNodeBorderPort = (
+  // Helper Cerdas untuk membaca posisi relatif target dan sisi docking sesuai layoutOrientation
+  // Horizontal: HANYA KANAN & KIRI (tidak pernah top/bottom)
+  // Vertikal: HANYA ATAS & BAWAH (tidak pernah left/right)
+  const getDockSide = (
     center: { x: number; y: number },
-    target: { x: number; y: number },
-    isVirtual: boolean
-  ) => {
-    if (isVirtual) return { x: center.x, y: center.y, side: 'center' as const };
-
+    target: { x: number; y: number }
+  ): 'top' | 'bottom' | 'left' | 'right' => {
     const dx = target.x - center.x;
     const dy = target.y - center.y;
-    const halfW = 70; // Setengah lebar kartu perangkat (140px / 2)
-    const halfH = 26; // Setengah tinggi kartu perangkat (52px / 2)
 
-    // Rasio kemiringan sudut untuk menentukan bidang kontak
-    // Membaca posisi apakah perangkat dominan berada di bawah/atas atau di sampingnya
-    if (Math.abs(dy) * halfW >= Math.abs(dx) * halfH) {
-      // Vertikal: Posisi di bawah atau di atas
-      if (dy >= 0) {
-        // Target di BAWAHNYA -> Port keluar dari sisi BAWAH kartu
-        const offsetX = Math.max(-42, Math.min(42, dx * 0.25));
-        return { x: center.x + offsetX, y: center.y + halfH, side: 'bottom' as const };
-      } else {
-        // Target di ATASNYA -> Port keluar dari sisi ATAS kartu
-        const offsetX = Math.max(-42, Math.min(42, dx * 0.25));
-        return { x: center.x + offsetX, y: center.y - halfH, side: 'top' as const };
-      }
+    if (layoutOrientation === 'horizontal') {
+      // Pada mode horizontal, semua koneksi murni keluar/masuk dari SISI KIRI atau KANAN
+      return dx >= 0 ? 'right' : 'left';
     } else {
-      // Horizontal: Posisi di samping kanan atau di samping kiri
-      if (dx >= 0) {
-        // Target di SAMPING KANAN -> Port keluar dari sisi KANAN kartu
-        const offsetY = Math.max(-14, Math.min(14, dy * 0.25));
-        return { x: center.x + halfW, y: center.y + offsetY, side: 'right' as const };
-      } else {
-        // Target di SAMPING KIRI -> Port keluar dari sisi KIRI kartu
-        const offsetY = Math.max(-14, Math.min(14, dy * 0.25));
-        return { x: center.x - halfW, y: center.y + offsetY, side: 'left' as const };
-      }
+      // Pada mode vertikal, semua koneksi murni keluar/masuk dari SISI ATAS atau BAWAH
+      return dy >= 0 ? 'bottom' : 'top';
     }
   };
 
-  // Kalkulasi kabel/pipa yang tidak memiliki salah satu atau kedua ujung perangkat fisik
+  // Helper menghitung posisi port fisik di batas kartu berdasarkan slot terdistribusi pada sisi tersebut
+  const getNodeBorderPort = (
+    center: { x: number; y: number },
+    side: 'top' | 'bottom' | 'left' | 'right' | 'center',
+    isVirtual: boolean,
+    slotIndex: number = 0,
+    totalSlots: number = 1
+  ) => {
+    if (isVirtual || side === 'center') return { x: center.x, y: center.y, side: 'center' as const };
+
+    const halfW = 70; // Setengah lebar kartu perangkat (140px / 2)
+    const halfH = 26; // Setengah tinggi kartu perangkat (52px / 2)
+
+    // Hitung offset penyebaran port terisolasi pada sisi yang sama dari kiri ke kanan (-44px s/d +44px) atau atas ke bawah (-14px s/d +14px)
+    const spreadFraction = totalSlots > 1 ? (slotIndex / (totalSlots - 1) - 0.5) * 2 : 0;
+
+    if (side === 'bottom') {
+      const portOffsetX = totalSlots > 1 ? Math.round(spreadFraction * 44) : 0;
+      return { x: center.x + portOffsetX, y: center.y + halfH, side: 'bottom' as const };
+    } else if (side === 'top') {
+      const portOffsetX = totalSlots > 1 ? Math.round(spreadFraction * 44) : 0;
+      return { x: center.x + portOffsetX, y: center.y - halfH, side: 'top' as const };
+    } else if (side === 'right') {
+      const portOffsetY = totalSlots > 1 ? Math.round(spreadFraction * 16) : 0;
+      return { x: center.x + halfW, y: center.y + portOffsetY, side: 'right' as const };
+    } else {
+      const portOffsetY = totalSlots > 1 ? Math.round(spreadFraction * 16) : 0;
+      return { x: center.x - halfW, y: center.y + portOffsetY, side: 'left' as const };
+    }
+  };
+
+  // Kalkulasi kabel/pipa dengan pembagian slot docking port agar tidak saling bertumpuk di 1 titik
   const processedCables = useMemo(() => {
     let unattachedIndex = 0;
 
-    return zoneCables.map(cable => {
-      // 1. Cari koordinat titik awal (Source)
+    // Resolusi koordinat awal & penentuan sisi kontak (side) untuk semua kabel
+    const preliminary = zoneCables.map(cable => {
       let sPos: { x: number; y: number } | null = null;
       let isSourceVirtual = false;
-
-      if (cable.sourceDeviceId && nodePositions[cable.sourceDeviceId]) {
-        sPos = nodePositions[cable.sourceDeviceId];
-      } else if (cable.sourceDeviceName) {
-        const found = zoneDevices.find(d => d.name?.toLowerCase() === cable.sourceDeviceName?.toLowerCase());
-        if (found && nodePositions[found.id]) {
-          sPos = nodePositions[found.id];
-        }
+      const sId = cable.sourceDeviceId || (zoneDevices.find(d => d.name?.toLowerCase() === cable.sourceDeviceName?.toLowerCase())?.id);
+      if (sId && nodePositions[sId]) {
+        sPos = nodePositions[sId];
       }
 
-      // 2. Cari koordinat titik akhir (Target)
       let tPos: { x: number; y: number } | null = null;
       let isTargetVirtual = false;
-
-      if (cable.targetDeviceId && nodePositions[cable.targetDeviceId]) {
-        tPos = nodePositions[cable.targetDeviceId];
-      } else if (cable.targetDeviceName) {
-        const found = zoneDevices.find(d => d.name?.toLowerCase() === cable.targetDeviceName?.toLowerCase());
-        if (found && nodePositions[found.id]) {
-          tPos = nodePositions[found.id];
-        }
+      const tId = cable.targetDeviceId || (zoneDevices.find(d => d.name?.toLowerCase() === cable.targetDeviceName?.toLowerCase())?.id);
+      if (tId && nodePositions[tId]) {
+        tPos = nodePositions[tId];
       }
 
-      // 3. Jika salah satu atau kedua ujungnya tidak terdaftar sebagai perangkat:
       if (!sPos && !tPos) {
         const col = (unattachedIndex % 4);
         const row = Math.floor(unattachedIndex / 4);
         unattachedIndex++;
-
-        const startX = 140 + col * 240;
-        const startY = 720 + row * 80;
-        sPos = { x: startX, y: startY };
-        tPos = { x: startX + 160, y: startY + 40 };
+        sPos = { x: 140 + col * 240, y: 720 + row * 80 };
+        tPos = { x: 140 + col * 240 + 160, y: 720 + row * 80 + 40 };
         isSourceVirtual = true;
         isTargetVirtual = true;
       } else if (!sPos && tPos) {
-        sPos = { 
-          x: Math.max(60, tPos.x - 130), 
-          y: Math.max(70, tPos.y - 110) 
-        };
+        sPos = { x: Math.max(60, tPos.x - 130), y: Math.max(70, tPos.y - 110) };
         isSourceVirtual = true;
       } else if (sPos && !tPos) {
-        tPos = { 
-          x: Math.min(canvasDimensions.width - 60, sPos.x + 130), 
-          y: Math.min(canvasDimensions.height - 60, sPos.y + 110) 
-        };
+        tPos = { x: Math.min(canvasDimensions.width - 60, sPos.x + 130), y: Math.min(canvasDimensions.height - 60, sPos.y + 110) };
         isTargetVirtual = true;
       }
 
-      // 4. Hitung port docking cerdas di batas tepi perangkat
-      const dockSource = getNodeBorderPort(sPos!, tPos!, isSourceVirtual);
-      const dockTarget = getNodeBorderPort(tPos!, sPos!, isTargetVirtual);
+      const sourceSide: 'top' | 'bottom' | 'left' | 'right' | 'center' = isSourceVirtual ? 'center' : getDockSide(sPos!, tPos!);
+      const targetSide: 'top' | 'bottom' | 'left' | 'right' | 'center' = isTargetVirtual ? 'center' : getDockSide(tPos!, sPos!);
 
       return {
         cable,
-        sourcePos: sPos!,
-        targetPos: tPos!,
+        sId,
+        tId,
+        sPos: sPos!,
+        tPos: tPos!,
+        sourceSide,
+        targetSide,
+        isSourceVirtual,
+        isTargetVirtual
+      };
+    });
+
+    // Petakan dan urutkan kabel per (nodeId + side) berdasarkan posisi fisik target
+    // Ini menjamin kabel pada sisi yang sama terurut secara geometris dari kiri ke kanan (atau atas ke bawah)
+    // sehingga jalur kabel yang keluar memancar rapi sejajar tanpa pernah saling bersilangan!
+    const nodeSideMap = new Map<string, Array<{ cableId: string; sortKey: number }>>();
+
+    preliminary.forEach(({ cable, sId, tId, sPos, tPos, sourceSide, targetSide, isSourceVirtual, isTargetVirtual }) => {
+      if (sId && !isSourceVirtual) {
+        const key = `${sId}_${sourceSide}`;
+        if (!nodeSideMap.has(key)) nodeSideMap.set(key, []);
+        // Jika kabel keluar dari sisi vertikal (top/bottom), urutkan berdasarkan sumbu X target (kiri ke kanan)
+        // Jika kabel keluar dari sisi horizontal (left/right), urutkan berdasarkan sumbu Y target (atas ke bawah)
+        const sortKey = (sourceSide === 'top' || sourceSide === 'bottom') ? tPos.x : tPos.y;
+        nodeSideMap.get(key)!.push({ cableId: cable.id, sortKey });
+      }
+
+      if (tId && !isTargetVirtual) {
+        const key = `${tId}_${targetSide}`;
+        if (!nodeSideMap.has(key)) nodeSideMap.set(key, []);
+        // Pada sisi target, urutkan port penerima sesuai posisi sumber
+        const sortKey = (targetSide === 'top' || targetSide === 'bottom') ? sPos.x : sPos.y;
+        nodeSideMap.get(key)!.push({ cableId: cable.id, sortKey });
+      }
+    });
+
+    const slotAssignmentMap = new Map<string, { index: number; total: number }>();
+    nodeSideMap.forEach((list, key) => {
+      list.sort((a, b) => a.sortKey - b.sortKey);
+      list.forEach((item, idx) => {
+        slotAssignmentMap.set(`${key}_${item.cableId}`, { index: idx, total: list.length });
+      });
+    });
+
+    return preliminary.map(({ cable, sId, tId, sPos, tPos, sourceSide, targetSide, isSourceVirtual, isTargetVirtual }) => {
+      const sSlot = (sId && slotAssignmentMap.get(`${sId}_${sourceSide}_${cable.id}`)) || { index: 0, total: 1 };
+      const tSlot = (tId && slotAssignmentMap.get(`${tId}_${targetSide}_${cable.id}`)) || { index: 0, total: 1 };
+
+      const dockSource = getNodeBorderPort(sPos, sourceSide, isSourceVirtual, sSlot.index, sSlot.total);
+      const dockTarget = getNodeBorderPort(tPos, targetSide, isTargetVirtual, tSlot.index, tSlot.total);
+
+      return {
+        cable,
+        sourcePos: sPos,
+        targetPos: tPos,
         dockSource,
         dockTarget,
         isSourceVirtual,
@@ -897,20 +1061,20 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
       {/* Main Workspace */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative print:overflow-visible print:block print:h-auto">
 
-        {/* 1. Canvas SVG Viewport */}
-        <div className="flex-1 overflow-auto bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-6 flex justify-center items-center select-none relative min-h-0 print:bg-white print:p-0 print:overflow-visible print:block">
+        {/* 1. Canvas SVG Viewport - Deep navy with cyberpunk dot matrix */}
+        <div className="flex-1 overflow-auto bg-[#070d19] p-6 sm:p-10 flex justify-start items-start select-none relative min-h-0 print:bg-white print:p-0 print:overflow-visible print:block">
           
-          {/* Subtle Grid Background (Hidden when printing) */}
+          {/* Cyberpunk Matrix Dot Grid Background (Hidden when printing) */}
           <div 
-            className="absolute inset-0 pointer-events-none opacity-20 print:hidden"
+            className="absolute inset-0 pointer-events-none opacity-25 print:hidden"
             style={{
-              backgroundImage: `radial-gradient(circle, ${utilityConfig.accentColor} 1px, transparent 1px)`,
-              backgroundSize: '24px 24px'
+              backgroundImage: `radial-gradient(#38bdf8 1px, transparent 1px)`,
+              backgroundSize: '28px 28px'
             }}
           />
 
           {zoneDevices.length === 0 && zoneCables.length === 0 ? (
-            <div className="text-center p-8 bg-slate-900/60 border border-slate-800 rounded-3xl max-w-md z-10 mx-4">
+            <div className="text-center p-8 bg-slate-900/60 border border-slate-800 rounded-3xl max-w-md z-10 m-auto">
               <HeaderIcon className="w-12 h-12 text-slate-600 mx-auto mb-3" />
               <h4 className="text-sm font-bold text-slate-300">Belum Ada Komponen di Area Ini</h4>
               <p className="text-xs text-slate-500 mt-1">
@@ -919,19 +1083,40 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
             </div>
           ) : (
             <div 
-              className="origin-center transition-transform duration-75 relative p-4 print:p-0 print:transform-none print:w-full print:flex print:justify-center"
+              className="origin-top-left transition-transform duration-75 relative p-4 m-auto print:p-0 print:transform-none print:w-full print:flex print:justify-center print:items-center print:overflow-hidden print-single-image-wrapper"
               style={{ transform: `scale(${zoom})` }}
             >
               <svg 
                 ref={svgContainerRef}
+                viewBox={`0 0 ${canvasDimensions.width} ${canvasDimensions.height}`}
                 width={canvasDimensions.width} 
                 height={canvasDimensions.height} 
-                className="overflow-visible select-none"
+                className="overflow-visible select-none print:w-full print:h-auto print:max-h-[880px] print:object-contain"
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
                 onPointerLeave={handlePointerUp}
               >
                 <defs>
+                  {/* Neon Glow Filter */}
+                  <filter id="glow-neon" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur1" />
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur2" />
+                    <feMerge>
+                      <feMergeNode in="blur2" />
+                      <feMergeNode in="blur1" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+
+                  {/* Soft Background Glow */}
+                  <filter id="soft-glow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="6" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+
                   <filter id="glow-dynamic" x="-20%" y="-20%" width="140%" height="140%">
                     <feGaussianBlur stdDeviation="3" result="blur" />
                     <feMerge>
@@ -941,15 +1126,45 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                   </filter>
                 </defs>
 
-                {/* Layer 1: Garis Jalur Kabel/Pipa - Terhubung ke Tepi Perangkat Cerdas & Rapi */}
+                {/* Layer 0: Radial Rings / Concentric Halo untuk Core / Switch Utama (seperti pada gambar referensi) */}
+                {zoneDevices.map(dev => {
+                  const pos = nodePositions[dev.id];
+                  if (!pos) return null;
+                  const t = (dev.type || '').toLowerCase();
+                  const isCentral = t.includes('switch') || t.includes('router') || t.includes('core') || t.includes('trafo') || t.includes('nvr') || t.includes('tank');
+                  if (!isCentral) return null;
+
+                  return (
+                    <g key={`halo-${dev.id}`} transform={`translate(${pos.x}, ${pos.y})`} className="pointer-events-none opacity-40">
+                      <circle
+                        r="68"
+                        fill="none"
+                        stroke="#38bdf8"
+                        strokeWidth="1"
+                        strokeDasharray="4 6"
+                        strokeOpacity="0.4"
+                      />
+                      <circle
+                        r="88"
+                        fill="none"
+                        stroke="#0284c7"
+                        strokeWidth="0.8"
+                        strokeOpacity="0.25"
+                      />
+                    </g>
+                  );
+                })}
+
+                {/* Layer 1: Garis Jalur Kabel/Pipa Neon Bercahaya (Cyberpunk Glow & Animated Pulses) */}
                 {processedCables.map(({ cable, sourcePos, targetPos, dockSource, dockTarget, isSourceVirtual, isTargetVirtual }) => {
                   const isSelected = selectedCableId === cable.id;
                   const isRelatedToDevice = selectedDeviceId && relatedCableIds.has(cable.id);
                   const isHighlighted = isSelected || isRelatedToDevice;
 
                   const statusStyle = getStatusColor(cable.status);
-                  const strokeColor = isHighlighted ? utilityConfig.accentColor : statusStyle.stroke;
-                  const strokeWidth = isHighlighted ? 3.5 : 2;
+                  const baseStrokeColor = isHighlighted ? utilityConfig.accentColor : statusStyle.stroke;
+                  // Warna neon utama: biru muda cyan menyala atau hijau emerald
+                  const neonColor = cable.status === 'fault' || cable.status === 'leaking' ? '#ef4444' : baseStrokeColor;
 
                   // Gunakan dockSource dan dockTarget pada batas tepi node perangkat
                   const sx = dockSource.x;
@@ -962,21 +1177,20 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                   const dist = Math.hypot(deltaX, deltaY);
 
                   // Kalkulasi Kontrol Bezier Cerdas berdasarkan SISI KELUAR & MASUK kabel
-                  // Memastikan jalur keluar lurus tegak lurus dari bodi perangkat (ortogonal / curve profesional)
-                  const offsetDist = Math.min(90, Math.max(30, dist * 0.35));
+                  const offsetDist = Math.min(100, Math.max(35, dist * 0.38));
                   
                   let cp1x = sx;
                   let cp1y = sy;
                   let cp2x = tx;
                   let cp2y = ty;
 
-                  // Orientasi vektor awal dari sisi dockSource (keluar tegak lurus bodi kartu)
+                  // Orientasi vektor awal dari sisi dockSource
                   if (dockSource.side === 'bottom') cp1y = sy + offsetDist;
                   else if (dockSource.side === 'top') cp1y = sy - offsetDist;
                   else if (dockSource.side === 'right') cp1x = sx + offsetDist;
                   else if (dockSource.side === 'left') cp1x = sx - offsetDist;
 
-                  // Orientasi vektor akhir ke sisi dockTarget (masuk tegak lurus bodi kartu)
+                  // Orientasi vektor akhir ke sisi dockTarget
                   if (dockTarget.side === 'bottom') cp2y = ty + offsetDist;
                   else if (dockTarget.side === 'top') cp2y = ty - offsetDist;
                   else if (dockTarget.side === 'right') cp2x = tx + offsetDist;
@@ -1011,51 +1225,41 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                         d={pathD}
                         fill="none"
                         stroke="transparent"
-                        strokeWidth="18"
+                        strokeWidth="24"
                       />
 
-                      {/* Main cable line */}
+                      {/* 1. Neon Glow Halo (Garis tebal transparan berpijar di belakang kabel) */}
                       <path
                         d={pathD}
                         fill="none"
-                        stroke={strokeColor}
-                        strokeWidth={strokeWidth}
-                        strokeOpacity={isHighlighted ? 1 : (isSourceVirtual || isTargetVirtual ? 0.8 : 0.7)}
-                        strokeDasharray={cable.status === 'fault' || cable.status === 'leaking' ? '6 4' : (isSourceVirtual || isTargetVirtual ? '5 3' : undefined)}
-                        className="group-hover:stroke-opacity-100"
-                        style={{ filter: isHighlighted ? 'url(#glow-dynamic)' : undefined }}
+                        stroke={neonColor}
+                        strokeWidth={isHighlighted ? 9 : 6}
+                        strokeOpacity={isHighlighted ? 0.6 : 0.35}
+                        strokeLinecap="round"
+                        style={{ filter: 'url(#glow-neon)' }}
                       />
 
-                      {/* Dot konektor kecil di ujung kabel batas perangkat */}
-                      {!isSourceVirtual && (
-                        <circle
-                          cx={sx}
-                          cy={sy}
-                          r={isHighlighted ? 3.5 : 2.5}
-                          fill={strokeColor}
-                          stroke="#0f172a"
-                          strokeWidth="1"
-                        />
-                      )}
-                      {!isTargetVirtual && (
-                        <circle
-                          cx={tx}
-                          cy={ty}
-                          r={isHighlighted ? 3.5 : 2.5}
-                          fill={strokeColor}
-                          stroke="#0f172a"
-                          strokeWidth="1"
-                        />
-                      )}
+                      {/* 2. Main Cable Core (Garis tegas solid) */}
+                      <path
+                        d={pathD}
+                        fill="none"
+                        stroke={neonColor}
+                        strokeWidth={isHighlighted ? 3.5 : 2.5}
+                        strokeOpacity={1}
+                        strokeDasharray={cable.status === 'fault' || cable.status === 'leaking' ? '6 4' : undefined}
+                        strokeLinecap="round"
+                      />
 
+                      {/* 3. Animated Flow: Garis putih putus-putus tebal bergerak persis seperti gambar referensi */}
                       {showAnimatedFlow && (cable.status === 'connected' || cable.status === 'normal' || cable.status === 'online' || cable.status === 'active') && (
                         <path
                           d={pathD}
                           fill="none"
-                          stroke={utilityConfig.particleColor}
-                          strokeWidth={strokeWidth + 1}
-                          strokeDasharray="4 28"
+                          stroke="#ffffff"
+                          strokeWidth="2.5"
+                          strokeDasharray="7 14"
                           strokeLinecap="round"
+                          strokeOpacity="0.95"
                           className="pointer-events-none"
                         >
                           <animate
@@ -1068,10 +1272,32 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                         </path>
                       )}
 
+                      {/* Dot konektor di ujung batas perangkat */}
+                      {!isSourceVirtual && (
+                        <circle
+                          cx={sx}
+                          cy={sy}
+                          r={isHighlighted ? 4 : 3}
+                          fill={neonColor}
+                          stroke="#080e1a"
+                          strokeWidth="1.5"
+                        />
+                      )}
+                      {!isTargetVirtual && (
+                        <circle
+                          cx={tx}
+                          cy={ty}
+                          r={isHighlighted ? 4 : 3}
+                          fill={neonColor}
+                          stroke="#080e1a"
+                          strokeWidth="1.5"
+                        />
+                      )}
+
                       {isSourceVirtual && (
                         <g transform={`translate(${sourcePos.x}, ${sourcePos.y})`}>
-                          <circle r="6" fill="#0f172a" stroke={strokeColor} strokeWidth="2" />
-                          <circle r="2.5" fill={strokeColor} />
+                          <circle r="6" fill="#080e1a" stroke={neonColor} strokeWidth="2" />
+                          <circle r="2.5" fill={neonColor} />
                           <text x="10" y="4" fill="#94a3b8" fontSize="9" fontWeight="600" className="pointer-events-none">
                             {cable.sourceLocation || cable.sourceDeviceName || 'Titik Asal'}
                           </text>
@@ -1080,34 +1306,36 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
 
                       {isTargetVirtual && (
                         <g transform={`translate(${targetPos.x}, ${targetPos.y})`}>
-                          <circle r="6" fill="#0f172a" stroke={strokeColor} strokeWidth="2" />
-                          <circle r="2.5" fill={strokeColor} />
+                          <circle r="6" fill="#080e1a" stroke={neonColor} strokeWidth="2" />
+                          <circle r="2.5" fill={neonColor} />
                           <text x="10" y="4" fill="#94a3b8" fontSize="9" fontWeight="600" className="pointer-events-none">
                             {cable.targetLocation || cable.targetDeviceName || 'Titik Tujuan'}
                           </text>
                         </g>
                       )}
 
-                      {/* Cable Badge Label */}
+                      {/* Pill Badge Label Kabel di Tengah Jalur */}
                       <g transform={`translate(${midX}, ${midY})`} className="pointer-events-none">
                         <rect
-                          x="-42"
-                          y="-10"
-                          width="84"
-                          height="20"
-                          rx="6"
-                          fill="#0f172a"
-                          stroke={isHighlighted ? utilityConfig.accentColor : '#334155'}
-                          strokeWidth="1"
+                          x="-38"
+                          y="-9"
+                          width="76"
+                          height="18"
+                          rx="9"
+                          fill="#0b1329"
+                          stroke={isHighlighted ? utilityConfig.accentColor : '#1e3a8a'}
+                          strokeWidth="1.2"
+                          className="shadow-md"
                         />
                         <text
                           x="0"
-                          y="3"
+                          y="3.5"
                           textAnchor="middle"
-                          fill={isHighlighted ? utilityConfig.accentColor : '#cbd5e1'}
-                          fontSize="9"
-                          fontWeight="700"
+                          fill={isHighlighted ? '#67e8f9' : '#38bdf8'}
+                          fontSize="8.5"
+                          fontWeight="800"
                           fontFamily="monospace"
+                          letterSpacing="0.5"
                         >
                           {cableCodeDisplay}
                         </text>
@@ -1116,7 +1344,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                   );
                 })}
 
-                {/* Layer 2: Node Perangkat Fisik */}
+                {/* Layer 2: Node Perangkat Fisik (Kartu Neumorphic Cyberpunk) */}
                 {zoneDevices.map(dev => {
                   const pos = nodePositions[dev.id];
                   if (!pos) return null;
@@ -1126,115 +1354,138 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                   const isHighlighted = isSelected || isConnectedToSelectedCable;
                   const statusStyle = getStatusColor(dev.status);
 
-                    const isDraggingThis = draggingNodeId === dev.id;
+                  const isDraggingThis = draggingNodeId === dev.id;
 
-                    return (
-                      <g
-                        key={dev.id}
-                        transform={`translate(${pos.x}, ${pos.y})`}
-                        onPointerDown={(e) => handleNodePointerDown(e, dev.id)}
-                        onClick={() => {
-                          // Jika baru saja digeser (drag), jangan picu pemilihan klik
-                          if (hasDraggedRef.current) return;
-                          setSelectedDeviceId(dev.id);
-                          setSelectedCableId(null);
-                          setIsMobilePanelOpen(true);
-                        }}
-                        className={`group ${isDraggingThis ? 'cursor-grabbing' : 'cursor-grab'} select-none`}
-                        style={{ touchAction: 'none' }}
-                      >
-                        {isHighlighted && (
-                          <circle
-                            r="42"
-                            fill="none"
-                            stroke={utilityConfig.accentColor}
-                            strokeWidth="2"
-                            strokeOpacity="0.8"
-                            className="animate-ping pointer-events-none"
-                          />
-                        )}
+                  // Label sub-detail yang bersih (hindari undefinedV)
+                  let detailText = '-';
+                  if (utilityType === 'listrik') {
+                    detailText = dev.voltage ? `${dev.voltage}V` : (dev.code || '-');
+                  } else if (utilityType === 'air') {
+                    detailText = dev.pipeDiameter ? `Ø ${dev.pipeDiameter}` : (dev.code || '-');
+                  } else {
+                    // LAN / CCTV
+                    detailText = dev.ipAddress || dev.code || '-';
+                  }
 
-                        {/* Background kartu node perangkat */}
+                  return (
+                    <g
+                      key={dev.id}
+                      transform={`translate(${pos.x}, ${pos.y})`}
+                      onPointerDown={(e) => handleNodePointerDown(e, dev.id)}
+                      onClick={() => {
+                        if (hasDraggedRef.current) return;
+                        setSelectedDeviceId(dev.id);
+                        setSelectedCableId(null);
+                        setIsMobilePanelOpen(true);
+                      }}
+                      className={`group ${isDraggingThis ? 'cursor-grabbing' : 'cursor-grab'} select-none`}
+                      style={{ touchAction: 'none' }}
+                    >
+                      {/* Active glowing ring when selected */}
+                      {isHighlighted && (
                         <rect
-                          x="-70"
-                          y="-26"
-                          width="140"
-                          height="52"
-                          rx="14"
-                          fill={isDraggingThis ? '#334155' : isHighlighted ? '#1e293b' : '#0f172a'}
-                          stroke={isDraggingThis ? '#60a5fa' : isHighlighted ? utilityConfig.accentColor : '#334155'}
-                          strokeWidth={isDraggingThis || isHighlighted ? 2.5 : 1.5}
-                          className="transition-colors group-hover:stroke-slate-500 shadow-xl"
+                          x="-74"
+                          y="-30"
+                          width="148"
+                          height="60"
+                          rx="18"
+                          fill="none"
+                          stroke={utilityConfig.accentColor}
+                          strokeWidth="2"
+                          strokeOpacity="0.8"
+                          className="animate-pulse pointer-events-none"
                         />
+                      )}
 
-                        {/* Drag Handle Grip Icon (indikator visual perangkat bisa digeser) */}
-                        <g 
-                          transform="translate(-62, -18)" 
-                          className="opacity-40 group-hover:opacity-100 transition-opacity pointer-events-none"
-                        >
-                          <circle cx="0" cy="0" r="1.2" fill="#94a3b8" />
-                          <circle cx="3" cy="0" r="1.2" fill="#94a3b8" />
-                          <circle cx="0" cy="4" r="1.2" fill="#94a3b8" />
-                          <circle cx="3" cy="4" r="1.2" fill="#94a3b8" />
-                        </g>
+                      {/* Background kartu node perangkat */}
+                      <rect
+                        x="-70"
+                        y="-26"
+                        width="140"
+                        height="52"
+                        rx="14"
+                        fill={isDraggingThis ? '#1e293b' : isHighlighted ? '#0f172a' : '#0b1329'}
+                        stroke={isDraggingThis ? '#38bdf8' : isHighlighted ? utilityConfig.accentColor : '#1e293b'}
+                        strokeWidth={isDraggingThis || isHighlighted ? 2 : 1.2}
+                        className="transition-all group-hover:stroke-sky-500 shadow-2xl"
+                      />
 
-                        <g transform="translate(-48, 0)" className="pointer-events-none">
-                          <circle
-                            r="16"
-                            fill="#1e293b"
-                            stroke="#334155"
-                            strokeWidth="1"
-                          />
-                          <g transform="translate(-10, -10)">
-                            {renderDeviceIcon(dev.type)}
-                          </g>
-                        </g>
-
-                        <text
-                          x="-24"
-                          y="-6"
-                          fill="#f8fafc"
-                          fontSize="11"
-                          fontWeight="800"
-                          className="truncate pointer-events-none"
-                        >
-                          {dev.name && dev.name.length > 13 ? `${dev.name.substring(0, 12)}…` : (dev.name || 'Perangkat')}
-                        </text>
-
-                        <text
-                          x="-24"
-                          y="8"
-                          fill="#94a3b8"
-                          fontSize="9"
-                          fontWeight="500"
-                          fontFamily="monospace"
-                          className="pointer-events-none"
-                        >
-                          {dev.ipAddress || dev.code || dev.voltage ? `${dev.voltage}V` : dev.pipeDiameter || '-'}
-                        </text>
-
-                        <text
-                          x="-24"
-                          y="18"
-                          fill="#64748b"
-                          fontSize="8"
-                          className="capitalize pointer-events-none"
-                        >
-                          {(dev.type || '').replace(/_/g, ' ')}
-                        </text>
-
-                        <circle
-                          cx="58"
-                          cy="-16"
-                          r="4.5"
-                          fill={statusStyle.stroke}
-                          stroke="#0f172a"
-                          strokeWidth="1.5"
-                          className="pointer-events-none"
-                        />
+                      {/* Drag Handle Grip Icon (6 titik penanda drag di kiri atas) */}
+                      <g 
+                        transform="translate(-62, -18)" 
+                        className="opacity-40 group-hover:opacity-100 transition-opacity pointer-events-none"
+                      >
+                        <circle cx="0" cy="0" r="1.2" fill="#64748b" />
+                        <circle cx="3" cy="0" r="1.2" fill="#64748b" />
+                        <circle cx="0" cy="4" r="1.2" fill="#64748b" />
+                        <circle cx="3" cy="4" r="1.2" fill="#64748b" />
+                        <circle cx="0" cy="8" r="1.2" fill="#64748b" />
+                        <circle cx="3" cy="8" r="1.2" fill="#64748b" />
                       </g>
-                    );
-                  })}
+
+                      {/* Device Icon Circle */}
+                      <g transform="translate(-46, 0)" className="pointer-events-none">
+                        <circle
+                          r="16"
+                          fill="#0f172a"
+                          stroke="#1e293b"
+                          strokeWidth="1"
+                        />
+                        <g transform="translate(-10, -10)">
+                          {renderDeviceIcon(dev.type)}
+                        </g>
+                      </g>
+
+                      {/* Device Name */}
+                      <text
+                        x="-22"
+                        y="-7"
+                        fill="#ffffff"
+                        fontSize="11"
+                        fontWeight="800"
+                        className="truncate pointer-events-none tracking-wide"
+                      >
+                        {dev.name && dev.name.length > 13 ? `${dev.name.substring(0, 12)}…` : (dev.name || 'Perangkat')}
+                      </text>
+
+                      {/* Sub-detail: IP Address / Code / Volt (tanpa undefinedV) */}
+                      <text
+                        x="-22"
+                        y="7"
+                        fill="#94a3b8"
+                        fontSize="8.5"
+                        fontWeight="500"
+                        fontFamily="monospace"
+                        className="pointer-events-none"
+                      >
+                        {detailText}
+                      </text>
+
+                      {/* Device Type */}
+                      <text
+                        x="-22"
+                        y="18"
+                        fill="#64748b"
+                        fontSize="8"
+                        className="capitalize pointer-events-none"
+                      >
+                        {(dev.type || '').replace(/_/g, ' ')}
+                      </text>
+
+                      {/* Glowing Status Dot di Pojok Kanan Atas */}
+                      <circle
+                        cx="56"
+                        cy="-16"
+                        r="4"
+                        fill={statusStyle.stroke}
+                        stroke="#080e1a"
+                        strokeWidth="1.5"
+                        className="pointer-events-none"
+                        style={{ filter: 'drop-shadow(0 0 4px rgba(16, 185, 129, 0.7))' }}
+                      />
+                    </g>
+                  );
+                })}
               </svg>
             </div>
           )}

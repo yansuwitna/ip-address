@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, Prisma } = require('@prisma/client');
 const path = require('path');
 const crypto = require('crypto');
 
@@ -15,16 +15,35 @@ async function startServer() {
   // Helper to replace all records in a table
   async function replaceTable(model, dataArray) {
     const now = new Date().toISOString();
+    // Cari definisi model dari Prisma DMMF jika tersedia
+    const modelName = Object.keys(prisma).find(k => prisma[k] === model);
+    const dmmfModel = modelName ? Prisma.dmmf.datamodel.models.find(m => m.name.toLowerCase() === modelName.toLowerCase()) : null;
+    const allowedFields = dmmfModel ? new Set(dmmfModel.fields.map(f => f.name)) : null;
+
     const formattedData = (dataArray || []).map(item => {
       if (item && typeof item === 'object') {
-        return {
-          createdAt: item.createdAt || now,
-          updatedAt: item.updatedAt || now,
-          ...item,
-          // ensure non-empty strings for required audit timestamps
-          ...(item.createdAt ? {} : { createdAt: now }),
-          ...(item.updatedAt ? {} : { updatedAt: now })
-        };
+        const itemObj = { ...item };
+        
+        // Handle audit timestamps if supported by model
+        if (!allowedFields || allowedFields.has('createdAt')) {
+          itemObj.createdAt = itemObj.createdAt || now;
+        }
+        if (!allowedFields || allowedFields.has('updatedAt')) {
+          itemObj.updatedAt = itemObj.updatedAt || now;
+        }
+
+        // Filter to only allowed fields if known
+        if (allowedFields) {
+          const filtered = {};
+          for (const key of Object.keys(itemObj)) {
+            if (allowedFields.has(key)) {
+              filtered[key] = itemObj[key];
+            }
+          }
+          return filtered;
+        }
+
+        return itemObj;
       }
       return item;
     });
@@ -279,14 +298,27 @@ async function startServer() {
     try {
       switch (key) {
         case 'netipam_users_list_v1':
-          const encryptedUsers = data.map(u => {
-            if (u.password && !/^[a-f0-9]{64}$/i.test(u.password)) {
-              return {
-                ...u,
-                password: crypto.createHash('sha256').update(u.password).digest('hex')
-              };
-            }
-            return u;
+          const nowUser = new Date().toISOString();
+          const encryptedUsers = (Array.isArray(data) ? data : []).map((u, idx) => {
+            const rawPassword = u.password || 'admin123';
+            const password = (/^[a-f0-9]{64}$/i.test(rawPassword)) 
+              ? rawPassword 
+              : crypto.createHash('sha256').update(rawPassword).digest('hex');
+            
+            return {
+              id: u.id || `usr-${Date.now()}-${idx}`,
+              username: (u.username || u.name || `admin${idx || ''}`).trim().toLowerCase(),
+              name: (u.name || u.username || 'Administrator').trim(),
+              email: (u.email || `${(u.username || 'admin').trim().toLowerCase()}@local`).trim(),
+              password: password,
+              role: u.role || 'admin',
+              avatar: u.avatar || null,
+              appName: u.appName || null,
+              appLogo: u.appLogo || null,
+              lastLogin: u.lastLogin || null,
+              createdAt: u.createdAt || nowUser,
+              magicToken: u.magicToken || null
+            };
           });
           await replaceTable(prisma.user, encryptedUsers);
           break;
