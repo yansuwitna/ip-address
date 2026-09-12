@@ -96,11 +96,14 @@ export const MasterTypeView: React.FC<MasterTypeViewProps> = ({
       return;
     }
 
+    const now = new Date().toISOString();
     onSaveItem({
       id: editingItem ? editingItem.id : `type-${Date.now()}`,
       name: name.trim(),
       code: cleanCode,
-      description: description.trim()
+      description: description.trim(),
+      createdAt: (editingItem as any)?.createdAt || now,
+      updatedAt: now
     });
 
     setIsModalOpen(false);

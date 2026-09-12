@@ -77,12 +77,15 @@ export const LanDeviceTypesView: React.FC<LanDeviceTypesViewProps> = ({
       return;
     }
 
+    const now = new Date().toISOString();
     onSaveDeviceType({
       id: editingItem ? editingItem.id : `dt-${Date.now()}`,
       name: name.trim(),
       code: cleanCode,
       category,
-      description: description.trim()
+      description: description.trim(),
+      createdAt: editingItem?.createdAt || now,
+      updatedAt: now
     });
 
     setIsModalOpen(false);

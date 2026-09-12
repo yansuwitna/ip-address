@@ -14,9 +14,24 @@ async function startServer() {
 
   // Helper to replace all records in a table
   async function replaceTable(model, dataArray) {
+    const now = new Date().toISOString();
+    const formattedData = (dataArray || []).map(item => {
+      if (item && typeof item === 'object') {
+        return {
+          createdAt: item.createdAt || now,
+          updatedAt: item.updatedAt || now,
+          ...item,
+          // ensure non-empty strings for required audit timestamps
+          ...(item.createdAt ? {} : { createdAt: now }),
+          ...(item.updatedAt ? {} : { updatedAt: now })
+        };
+      }
+      return item;
+    });
+
     await prisma.$transaction([
       model.deleteMany({}),
-      model.createMany({ data: dataArray })
+      ...(formattedData.length > 0 ? [model.createMany({ data: formattedData })] : [])
     ]);
   }
 
