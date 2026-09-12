@@ -25,7 +25,8 @@ import {
   Move,
   RefreshCw,
   Columns,
-  Rows
+  Rows,
+  Printer
 } from 'lucide-react';
 import { LanLocation, LanZone } from '../types/jaringanUtilitas';
 
@@ -707,16 +708,43 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
     }
   };
 
+  const handlePrintDiagram = useCallback(() => {
+    window.print();
+  }, []);
+
   if (!isOpen) return null;
 
   const HeaderIcon = utilityConfig.icon;
 
   return (
     <ModalPortal>
-    <div className="fixed inset-0 z-[9999] bg-slate-950/90 backdrop-blur-md flex flex-col font-poppins animate-in fade-in duration-200 overflow-hidden">
+    <div className="fixed inset-0 z-[9999] bg-slate-950/90 backdrop-blur-md flex flex-col font-poppins animate-in fade-in duration-200 overflow-hidden print-modal-root print:static print:z-auto print:bg-white print:overflow-visible print:h-auto">
       
+      {/* Header Dokumen Khusus Print Resmi (Hanya Muncul Saat Print A4) */}
+      <div className="hidden print:block border-b-2 border-slate-900 pb-3 mb-4 text-black break-inside-avoid">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center font-black text-base">
+              NET
+            </div>
+            <div>
+              <h1 className="text-lg font-black tracking-tight text-slate-900 uppercase">
+                {utilityConfig.title}
+              </h1>
+              <p className="text-xs text-slate-600 font-medium">
+                Lokasi: <span className="font-bold text-slate-900">{location.name}</span> • Zona: <span className="font-bold text-slate-900">{zone.name} ({zone.code})</span> • Orientasi: <span className="font-bold text-slate-900 capitalize">{layoutOrientation}</span>
+              </p>
+            </div>
+          </div>
+          <div className="text-right text-[11px] text-slate-600">
+            <p>Tanggal Cetak: <span className="font-bold text-slate-900">{new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
+            <p>Waktu: <span className="font-bold text-slate-900">{new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span></p>
+          </div>
+        </div>
+      </div>
+
       {/* Header Bar */}
-      <div className="bg-slate-900 border-b border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 flex-shrink-0 shadow-lg">
+      <div className="print:hidden bg-slate-900 border-b border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 flex-shrink-0 shadow-lg">
         <div className="flex items-center justify-between sm:justify-start gap-3">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <div className={`p-2 sm:p-2.5 bg-gradient-to-tr ${utilityConfig.headerGradient} text-white rounded-2xl shadow-md flex-shrink-0`}>
@@ -831,6 +859,16 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
             <span className="sm:hidden">Reset</span>
           </button>
 
+          {/* Tombol Cetak Topologi Simulasi */}
+          <button
+            onClick={handlePrintDiagram}
+            className="px-3 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/30 transition-all cursor-pointer"
+            title="Cetak Diagram Desain Simulasi Topologi (Format Dokumen Resmi)"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Cetak</span>
+          </button>
+
           {/* Mobile Inspector Toggle */}
           <button
             onClick={() => setIsMobilePanelOpen(!isMobilePanelOpen)}
@@ -857,14 +895,14 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
       </div>
 
       {/* Main Workspace */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative print:overflow-visible print:block print:h-auto">
 
         {/* 1. Canvas SVG Viewport */}
-        <div className="flex-1 overflow-auto bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-6 flex justify-center items-center select-none relative min-h-0">
+        <div className="flex-1 overflow-auto bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-6 flex justify-center items-center select-none relative min-h-0 print:bg-white print:p-0 print:overflow-visible print:block">
           
-          {/* Subtle Grid Background */}
+          {/* Subtle Grid Background (Hidden when printing) */}
           <div 
-            className="absolute inset-0 pointer-events-none opacity-20"
+            className="absolute inset-0 pointer-events-none opacity-20 print:hidden"
             style={{
               backgroundImage: `radial-gradient(circle, ${utilityConfig.accentColor} 1px, transparent 1px)`,
               backgroundSize: '24px 24px'
@@ -881,7 +919,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
             </div>
           ) : (
             <div 
-              className="origin-center transition-transform duration-75 relative p-4"
+              className="origin-center transition-transform duration-75 relative p-4 print:p-0 print:transform-none print:w-full print:flex print:justify-center"
               style={{ transform: `scale(${zoom})` }}
             >
               <svg 
@@ -1202,9 +1240,9 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
           )}
         </div>
 
-        {/* 2. Responsive Sidebar / Bottom Sheet Info Panel */}
+        {/* 2. Responsive Sidebar / Bottom Sheet Info Panel (Hidden on print) */}
         <div className={`
-          bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-800 p-4 sm:p-5 overflow-y-auto flex flex-col gap-4 flex-shrink-0 shadow-2xl z-20 transition-all duration-300
+          print:hidden bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-800 p-4 sm:p-5 overflow-y-auto flex flex-col gap-4 flex-shrink-0 shadow-2xl z-20 transition-all duration-300
           ${isMobilePanelOpen ? 'max-h-[60vh] h-auto lg:h-full lg:max-h-none' : 'max-h-0 lg:max-h-none lg:h-full hidden lg:flex'}
           lg:w-80 xl:w-96
         `}>
