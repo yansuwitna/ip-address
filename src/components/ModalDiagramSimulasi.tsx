@@ -23,7 +23,9 @@ import {
   ChevronUp,
   ChevronDown,
   Move,
-  RefreshCw
+  RefreshCw,
+  Columns,
+  Rows
 } from 'lucide-react';
 import { LanLocation, LanZone } from '../types/jaringanUtilitas';
 
@@ -248,22 +250,56 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
     return { tier1, tier2, tier3, tier4 };
   }, [zoneDevices, utilityType]);
 
-  // State posisi kustom yang bisa digeser (drag & drop)
+  // State orientasi topologi: 'vertical' (Atas ke Bawah) atau 'horizontal' (Kiri ke Kanan)
+  const orientationStorageKey = useMemo(() => {
+    return `simulasi_orient_${utilityType}_${location.id}_${zone.id}`;
+  }, [utilityType, location.id, zone.id]);
+
+  const [layoutOrientation, setLayoutOrientation] = useState<'vertical' | 'horizontal'>(() => {
+    try {
+      const saved = localStorage.getItem(`simulasi_orient_${utilityType}_${location.id}_${zone.id}`);
+      return saved === 'horizontal' ? 'horizontal' : 'vertical';
+    } catch {
+      return 'vertical';
+    }
+  });
+
+  // Ganti orientasi dan simpan ke localStorage
+  const handleToggleOrientation = useCallback((newOrient: 'vertical' | 'horizontal') => {
+    setLayoutOrientation(newOrient);
+    try {
+      localStorage.setItem(orientationStorageKey, newOrient);
+    } catch (e) {
+      console.warn('Gagal menyimpan preferensi orientasi:', e);
+    }
+    // Bersihkan posisi kustom agar otomatis tersusun sesuai layout baru
+    setCustomPositions({});
+    try {
+      localStorage.removeItem(`simulasi_pos_${utilityType}_${location.id}_${zone.id}_${newOrient}`);
+    } catch {}
+  }, [orientationStorageKey, utilityType, location.id, zone.id]);
+
+  // State posisi kustom yang bisa digeser (drag & drop) per orientasi
   const [customPositions, setCustomPositions] = useState<Record<string, { x: number; y: number }>>({});
   const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
   const dragStartRef = useRef<{ mouseX: number; mouseY: number; nodeX: number; nodeY: number } | null>(null);
   const hasDraggedRef = useRef<boolean>(false);
   const svgContainerRef = useRef<SVGSVGElement | null>(null);
 
-  // Storage key per zona dan utilitas
+  // Storage key per zona, utilitas, dan orientasi
   const storageKey = useMemo(() => {
-    return `simulasi_pos_${utilityType}_${location.id}_${zone.id}`;
-  }, [utilityType, location.id, zone.id]);
+    return `simulasi_pos_${utilityType}_${location.id}_${zone.id}_${layoutOrientation}`;
+  }, [utilityType, location.id, zone.id, layoutOrientation]);
 
-  // Muat posisi tersimpan dari localStorage saat komponen / zona dibuka
+  // Muat posisi tersimpan dari localStorage saat komponen / zona / orientasi dibuka
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(storageKey);
+      // Cek format spesifik orientasi terlebih dahulu
+      let saved = localStorage.getItem(storageKey);
+      if (!saved && layoutOrientation === 'vertical') {
+        // Fallback untuk backward compatibility ke key lama
+        saved = localStorage.getItem(`simulasi_pos_${utilityType}_${location.id}_${zone.id}`);
+      }
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
@@ -275,7 +311,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
       console.warn('Gagal memuat posisi simulasi:', e);
     }
     setCustomPositions({});
-  }, [storageKey]);
+  }, [storageKey, layoutOrientation, utilityType, location.id, zone.id]);
 
   // Simpan posisi kustom ke localStorage saat posisi berubah
   const saveCustomPositions = useCallback((newPositions: Record<string, { x: number; y: number }>) => {
@@ -291,10 +327,18 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
     setCustomPositions({});
     try {
       localStorage.removeItem(storageKey);
+      localStorage.removeItem(`simulasi_pos_${utilityType}_${location.id}_${zone.id}`);
     } catch (e) {
       console.warn('Gagal mereset posisi simulasi:', e);
     }
-  }, [storageKey]);
+  }, [storageKey, utilityType, location.id, zone.id]);
+
+  // Dimensi Kanvas SVG dinamis sesuai orientasi
+  const canvasDimensions = useMemo(() => {
+    return layoutOrientation === 'horizontal' 
+      ? { width: 1260, height: 760 } 
+      : { width: 1100, height: 840 };
+  }, [layoutOrientation]);
 
   // Hitung posisi koordinat graf (X, Y) untuk setiap node perangkat terdaftar
   const nodePositions = useMemo(() => {
@@ -306,31 +350,56 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
       categorizedNodes.tier4
     ];
 
-    const canvasWidth = 1100;
-    // Jarak Y yang lebih leluasa dan proporsional untuk mencegah tumpang tindih
-    const tierY = [110, 290, 480, 670];
+    if (layoutOrientation === 'horizontal') {
+      // --- TOPOLOGI HORIZONTAL (Kiri ke Kanan) ---
+      // Tier 1 (Core/Source) di paling kiri -> Tier 4 (End Device) di paling kanan
+      const tierX = [130, 420, 750, 1070];
+      const canvasHeight = canvasDimensions.height;
 
-    tiers.forEach((tierDevices, tierIdx) => {
-      const count = tierDevices.length;
-      if (count === 0) return;
+      tiers.forEach((tierDevices, tierIdx) => {
+        const count = tierDevices.length;
+        if (count === 0) return;
 
-      const spacing = canvasWidth / (count + 1);
-      tierDevices.forEach((dev, idx) => {
-        // Jika dalam 1 baris ada lebih dari 4 perangkat, beri variasi Y selang-seling agar tidak bertabrakan
-        const staggerY = count > 4 ? (idx % 2 === 1 ? 32 : -32) : 0;
-        const defaultX = Math.round(spacing * (idx + 1));
-        const defaultY = tierY[tierIdx] + staggerY;
+        const spacing = canvasHeight / (count + 1);
+        tierDevices.forEach((dev, idx) => {
+          // Jika dalam 1 kolom ada banyak perangkat, beri variasi X selang-seling agar tidak menumpuk
+          const staggerX = count > 4 ? (idx % 2 === 1 ? 30 : -30) : 0;
+          const defaultX = tierX[tierIdx] + staggerX;
+          const defaultY = Math.round(spacing * (idx + 1));
 
-        // Gunakan posisi kustom yang digeser user jika ada
-        const custom = customPositions[dev.id];
-
-        positions[dev.id] = {
-          x: custom ? custom.x : defaultX,
-          y: custom ? custom.y : defaultY,
-          tier: tierIdx + 1
-        };
+          const custom = customPositions[dev.id];
+          positions[dev.id] = {
+            x: custom ? custom.x : defaultX,
+            y: custom ? custom.y : defaultY,
+            tier: tierIdx + 1
+          };
+        });
       });
-    });
+    } else {
+      // --- TOPOLOGI VERTIKAL (Atas ke Bawah) ---
+      // Tier 1 (Core/Source) di paling atas -> Tier 4 (End Device) di paling bawah
+      const canvasWidth = canvasDimensions.width;
+      const tierY = [110, 290, 480, 670];
+
+      tiers.forEach((tierDevices, tierIdx) => {
+        const count = tierDevices.length;
+        if (count === 0) return;
+
+        const spacing = canvasWidth / (count + 1);
+        tierDevices.forEach((dev, idx) => {
+          const staggerY = count > 4 ? (idx % 2 === 1 ? 32 : -32) : 0;
+          const defaultX = Math.round(spacing * (idx + 1));
+          const defaultY = tierY[tierIdx] + staggerY;
+
+          const custom = customPositions[dev.id];
+          positions[dev.id] = {
+            x: custom ? custom.x : defaultX,
+            y: custom ? custom.y : defaultY,
+            tier: tierIdx + 1
+          };
+        });
+      });
+    }
 
     // Cek perangkat berdasarkan kecocokan nama jika id kosong
     zoneDevices.forEach(dev => {
@@ -345,39 +414,45 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
     });
 
     return positions;
-  }, [categorizedNodes, zoneDevices, customPositions]);
+  }, [categorizedNodes, zoneDevices, customPositions, layoutOrientation, canvasDimensions]);
 
-  // Helper untuk menghitung titik jangkar (docking point) kabel pada tepi batas node perangkat (140x52px, center at 0,0)
-  // Ini memastikan kabel TIDAK ditutup atau menembus badan perangkat
+  // Helper Cerdas untuk membaca posisi relatif perangkat target (apakah di bawah, di atas, di samping kanan, atau di samping kiri)
+  // Menghitung titik jangkar (docking port) tepat di tepi kartu perangkat (140x52px, center di 0,0)
   const getNodeBorderPort = (
     center: { x: number; y: number },
     target: { x: number; y: number },
     isVirtual: boolean
   ) => {
-    if (isVirtual) return { x: center.x, y: center.y };
+    if (isVirtual) return { x: center.x, y: center.y, side: 'center' as const };
 
     const dx = target.x - center.x;
     const dy = target.y - center.y;
     const halfW = 70; // Setengah lebar kartu perangkat (140px / 2)
     const halfH = 26; // Setengah tinggi kartu perangkat (52px / 2)
 
-    // Jika target dominan di atas atau bawah (vertical flow)
+    // Rasio kemiringan sudut untuk menentukan bidang kontak
+    // Membaca posisi apakah perangkat dominan berada di bawah/atas atau di sampingnya
     if (Math.abs(dy) * halfW >= Math.abs(dx) * halfH) {
+      // Vertikal: Posisi di bawah atau di atas
       if (dy >= 0) {
-        // Target di bawah -> port keluar dari sisi BAWAH
-        return { x: center.x + Math.max(-45, Math.min(45, dx * 0.2)), y: center.y + halfH };
+        // Target di BAWAHNYA -> Port keluar dari sisi BAWAH kartu
+        const offsetX = Math.max(-42, Math.min(42, dx * 0.25));
+        return { x: center.x + offsetX, y: center.y + halfH, side: 'bottom' as const };
       } else {
-        // Target di atas -> port keluar dari sisi ATAS
-        return { x: center.x + Math.max(-45, Math.min(45, dx * 0.2)), y: center.y - halfH };
+        // Target di ATASNYA -> Port keluar dari sisi ATAS kartu
+        const offsetX = Math.max(-42, Math.min(42, dx * 0.25));
+        return { x: center.x + offsetX, y: center.y - halfH, side: 'top' as const };
       }
     } else {
-      // Jika target dominan di kiri atau kanan (horizontal flow)
+      // Horizontal: Posisi di samping kanan atau di samping kiri
       if (dx >= 0) {
-        // Target di kanan -> port keluar dari sisi KANAN
-        return { x: center.x + halfW, y: center.y + Math.max(-14, Math.min(14, dy * 0.2)) };
+        // Target di SAMPING KANAN -> Port keluar dari sisi KANAN kartu
+        const offsetY = Math.max(-14, Math.min(14, dy * 0.25));
+        return { x: center.x + halfW, y: center.y + offsetY, side: 'right' as const };
       } else {
-        // Target di kiri -> port keluar dari sisi KIRI
-        return { x: center.x - halfW, y: center.y + Math.max(-14, Math.min(14, dy * 0.2)) };
+        // Target di SAMPING KIRI -> Port keluar dari sisi KIRI kartu
+        const offsetY = Math.max(-14, Math.min(14, dy * 0.25));
+        return { x: center.x - halfW, y: center.y + offsetY, side: 'left' as const };
       }
     }
   };
@@ -433,13 +508,13 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
         isSourceVirtual = true;
       } else if (sPos && !tPos) {
         tPos = { 
-          x: Math.min(1040, sPos.x + 130), 
-          y: Math.min(780, sPos.y + 110) 
+          x: Math.min(canvasDimensions.width - 60, sPos.x + 130), 
+          y: Math.min(canvasDimensions.height - 60, sPos.y + 110) 
         };
         isTargetVirtual = true;
       }
 
-      // 4. Hitung port docking di tepi batas perangkat agar kabel tidak tertutup kartu perangkat
+      // 4. Hitung port docking cerdas di batas tepi perangkat
       const dockSource = getNodeBorderPort(sPos!, tPos!, isSourceVirtual);
       const dockTarget = getNodeBorderPort(tPos!, sPos!, isTargetVirtual);
 
@@ -453,7 +528,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
         isTargetVirtual
       };
     });
-  }, [zoneCables, nodePositions, zoneDevices]);
+  }, [zoneCables, nodePositions, zoneDevices, canvasDimensions]);
 
   // Perangkat aktif terpilih
   const activeDevice = useMemo(() => {
@@ -593,8 +668,10 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
         hasDraggedRef.current = true;
       }
 
-      const newX = Math.round(Math.max(75, Math.min(1025, dragStartRef.current.nodeX + dx)));
-      const newY = Math.round(Math.max(35, Math.min(805, dragStartRef.current.nodeY + dy)));
+      const maxX = canvasDimensions.width - 75;
+      const maxY = canvasDimensions.height - 35;
+      const newX = Math.round(Math.max(75, Math.min(maxX, dragStartRef.current.nodeX + dx)));
+      const newY = Math.round(Math.max(35, Math.min(maxY, dragStartRef.current.nodeY + dy)));
 
       setCustomPositions(prev => {
         if (prev[draggingNodeId]?.x === newX && prev[draggingNodeId]?.y === newY) {
@@ -686,6 +763,34 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
             <span className="hidden sm:inline">Aliran Jalur {showAnimatedFlow ? 'Aktif' : 'Off'}</span>
             <span className="sm:hidden">{showAnimatedFlow ? 'Aliran ON' : 'OFF'}</span>
           </button>
+
+          {/* Toggle Orientasi: Vertikal (Atas-Bawah) vs Horizontal (Kiri-Kanan) */}
+          <div className="flex items-center bg-slate-800/90 border border-slate-700 rounded-xl p-0.5 shadow-xs">
+            <button
+              onClick={() => handleToggleOrientation('vertical')}
+              className={`px-2 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                layoutOrientation === 'vertical'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+              }`}
+              title="Tata letak vertikal (Alur dari atas ke bawah)"
+            >
+              <Rows className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Vertikal</span>
+            </button>
+            <button
+              onClick={() => handleToggleOrientation('horizontal')}
+              className={`px-2 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                layoutOrientation === 'horizontal'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+              }`}
+              title="Tata letak horizontal (Alur dari kiri ke kanan)"
+            >
+              <Columns className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Horizontal</span>
+            </button>
+          </div>
 
           {/* Zoom Controls */}
           <div className="flex items-center bg-slate-800/90 border border-slate-700 rounded-xl p-0.5 shadow-xs">
@@ -781,8 +886,8 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
             >
               <svg 
                 ref={svgContainerRef}
-                width="1100" 
-                height="840" 
+                width={canvasDimensions.width} 
+                height={canvasDimensions.height} 
                 className="overflow-visible select-none"
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
@@ -798,7 +903,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                   </filter>
                 </defs>
 
-                {/* Layer 1: Garis Jalur Kabel/Pipa - Terhubung ke Tepi Perangkat (TIDAK TERTUTUP) */}
+                {/* Layer 1: Garis Jalur Kabel/Pipa - Terhubung ke Tepi Perangkat Cerdas & Rapi */}
                 {processedCables.map(({ cable, sourcePos, targetPos, dockSource, dockTarget, isSourceVirtual, isTargetVirtual }) => {
                   const isSelected = selectedCableId === cable.id;
                   const isRelatedToDevice = selectedDeviceId && relatedCableIds.has(cable.id);
@@ -818,24 +923,33 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                   const deltaY = ty - sy;
                   const dist = Math.hypot(deltaX, deltaY);
 
-                  // Hitung kontrol kurva Bezier yang luwes dan menjauh dari node
+                  // Kalkulasi Kontrol Bezier Cerdas berdasarkan SISI KELUAR & MASUK kabel
+                  // Memastikan jalur keluar lurus tegak lurus dari bodi perangkat (ortogonal / curve profesional)
+                  const offsetDist = Math.min(90, Math.max(30, dist * 0.35));
+                  
                   let cp1x = sx;
                   let cp1y = sy;
                   let cp2x = tx;
                   let cp2y = ty;
 
-                  if (Math.abs(deltaY) >= Math.abs(deltaX) * 0.5) {
-                    // Vertical curve
-                    const bend = Math.min(100, Math.max(30, Math.abs(deltaY) * 0.45));
-                    const dirY = deltaY >= 0 ? 1 : -1;
-                    cp1y = sy + dirY * bend;
-                    cp2y = ty - dirY * bend;
-                  } else {
-                    // Horizontal curve
-                    const bend = Math.min(100, Math.max(30, Math.abs(deltaX) * 0.45));
-                    const dirX = deltaX >= 0 ? 1 : -1;
-                    cp1x = sx + dirX * bend;
-                    cp2x = tx - dirX * bend;
+                  // Orientasi vektor awal dari sisi dockSource (keluar tegak lurus bodi kartu)
+                  if (dockSource.side === 'bottom') cp1y = sy + offsetDist;
+                  else if (dockSource.side === 'top') cp1y = sy - offsetDist;
+                  else if (dockSource.side === 'right') cp1x = sx + offsetDist;
+                  else if (dockSource.side === 'left') cp1x = sx - offsetDist;
+
+                  // Orientasi vektor akhir ke sisi dockTarget (masuk tegak lurus bodi kartu)
+                  if (dockTarget.side === 'bottom') cp2y = ty + offsetDist;
+                  else if (dockTarget.side === 'top') cp2y = ty - offsetDist;
+                  else if (dockTarget.side === 'right') cp2x = tx + offsetDist;
+                  else if (dockTarget.side === 'left') cp2x = tx - offsetDist;
+
+                  // Jika kedua ujungnya virtual, gunakan kurva santai
+                  if (isSourceVirtual && isTargetVirtual) {
+                    cp1x = sx + deltaX * 0.25;
+                    cp1y = sy + deltaY * 0.1;
+                    cp2x = tx - deltaX * 0.25;
+                    cp2y = ty - deltaY * 0.1;
                   }
 
                   const pathD = `M ${sx} ${sy} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${tx} ${ty}`;
