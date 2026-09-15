@@ -30,6 +30,8 @@ import {
   CctvCableRun,
   WaterDevice, 
   WaterPipeRun,
+  SoundDevice,
+  SoundCableRun,
   LanDevice, 
   LanCableRun, 
   LanLocation, 
@@ -54,7 +56,9 @@ interface BackupViewProps {
   cctvDevices?: CctvDevice[];
   cctvCables?: CctvCableRun[];
   waterDevices?: WaterDevice[];
+  soundDevices?: SoundDevice[];
   waterPipes?: WaterPipeRun[];
+  soundCables?: SoundCableRun[];
   lanLocations?: LanLocation[];
   lanZones?: LanZone[];
   lanDevices?: LanDevice[];
@@ -67,7 +71,9 @@ interface BackupViewProps {
   cctvDeviceTypes?: any[];
   cctvCableTypes?: any[];
   waterDeviceTypes?: any[];
+  soundDeviceTypes?: any[];
   waterPipeTypes?: any[];
+  soundCableTypes?: any[];
   urlProtocols?: any[];
   dnsRecordTypes?: any[];
   onImportData: (data: {
@@ -85,7 +91,9 @@ interface BackupViewProps {
     cctvDevices?: CctvDevice[];
     cctvCables?: CctvCableRun[];
     waterDevices?: WaterDevice[];
+  soundDevices?: SoundDevice[];
     waterPipes?: WaterPipeRun[];
+  soundCables?: SoundCableRun[];
     lanLocations?: LanLocation[];
     lanZones?: LanZone[];
     lanDevices?: LanDevice[];
@@ -98,7 +106,9 @@ interface BackupViewProps {
     cctvDeviceTypes?: any[];
     cctvCableTypes?: any[];
     waterDeviceTypes?: any[];
+  soundDeviceTypes?: any[];
     waterPipeTypes?: any[];
+  soundCableTypes?: any[];
   }, isDemo?: boolean) => void;
   onWipeAllData: () => Promise<void> | void;
 }
@@ -116,7 +126,9 @@ export const BackupView: React.FC<BackupViewProps> = ({
   cctvDevices = [],
   cctvCables = [],
   waterDevices = [],
+  soundDevices = [],
   waterPipes = [],
+  soundCables = [],
   lanLocations = [],
   lanZones = [],
   lanDevices = [],
@@ -129,7 +141,9 @@ export const BackupView: React.FC<BackupViewProps> = ({
   cctvDeviceTypes = [],
   cctvCableTypes = [],
   waterDeviceTypes = [],
+  soundDeviceTypes = [],
   waterPipeTypes = [],
+  soundCableTypes = [],
   urlProtocols = [],
   dnsRecordTypes = [],
   onImportData,
@@ -179,6 +193,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
       electricityDevices,
       cctvDevices,
       waterDevices,
+      soundDevices,
       lanDevices,
       lanCables,
       lanLocations,
@@ -186,6 +201,7 @@ export const BackupView: React.FC<BackupViewProps> = ({
       electricityCables,
       cctvCables,
       waterPipes,
+      soundCables,
       lanDeviceTypes,
       lanRoomTypes,
       lanCableTypes,
@@ -195,6 +211,8 @@ export const BackupView: React.FC<BackupViewProps> = ({
       cctvCableTypes,
       waterDeviceTypes,
       waterPipeTypes,
+      soundDeviceTypes,
+      soundCableTypes,
       urlProtocols,
       dnsRecordTypes
     );

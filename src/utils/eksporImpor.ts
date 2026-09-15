@@ -7,6 +7,8 @@ import {
   CctvCableRun,
   WaterDevice, 
   WaterPipeRun,
+  SoundDevice,
+  SoundCableRun,
   LanDevice, 
   LanCableRun, 
   LanLocation, 
@@ -31,6 +33,8 @@ export interface ComprehensiveExportOptions {
   cctvCables?: CctvCableRun[];
   waterDevices?: WaterDevice[];
   waterPipes?: WaterPipeRun[];
+  soundDevices?: SoundDevice[];
+  soundCables?: SoundCableRun[];
 }
 
 /**
@@ -52,6 +56,7 @@ export function exportAllToSingleXlsx(data: ComprehensiveExportOptions): void {
     cctvDevices = [],
     cctvCables = [],
     waterDevices = [],
+    soundDevices = [],
     waterPipes = [],
     dnsRecords = [],
     subDomains = []
@@ -488,6 +493,7 @@ export function exportBackupJson(
   electricityDevices?: ElectricityDevice[],
   cctvDevices?: CctvDevice[],
   waterDevices?: WaterDevice[],
+  soundDevices?: SoundDevice[],
   lanDevices?: LanDevice[],
   lanCables?: LanCableRun[],
   lanLocations?: LanLocation[],
@@ -495,6 +501,7 @@ export function exportBackupJson(
   electricityCables?: ElectricityCableRun[],
   cctvCables?: CctvCableRun[],
   waterPipes?: WaterPipeRun[],
+  soundCables?: SoundCableRun[],
   lanDeviceTypes?: any[],
   lanRoomTypes?: any[],
   lanCableTypes?: any[],
@@ -503,7 +510,9 @@ export function exportBackupJson(
   cctvDeviceTypes?: any[],
   cctvCableTypes?: any[],
   waterDeviceTypes?: any[],
+  soundDeviceTypes?: any[],
   waterPipeTypes?: any[],
+  soundCableTypes?: any[],
   urlProtocols?: any[],
   dnsRecordTypes?: any[]
 ): void {
@@ -537,9 +546,13 @@ export function exportBackupJson(
       cctvCables: cctvCables?.length || 0,
       cctvCableTypes: cctvCableTypes?.length || 0,
       waterDevices: waterDevices?.length || 0,
+      soundDevices: soundDevices?.length || 0,
       waterDeviceTypes: waterDeviceTypes?.length || 0,
+      soundDeviceTypes: soundDeviceTypes?.length || 0,
       waterPipes: waterPipes?.length || 0,
-      waterPipeTypes: waterPipeTypes?.length || 0
+      soundCables: soundCables?.length || 0,
+      waterPipeTypes: waterPipeTypes?.length || 0,
+      soundCableTypes: soundCableTypes?.length || 0
     },
     groups,
     allocations,
@@ -566,9 +579,13 @@ export function exportBackupJson(
     cctvCables: cctvCables || [],
     cctvCableTypes: cctvCableTypes || [],
     waterDevices: waterDevices || [],
+    soundDevices: soundDevices || [],
     waterDeviceTypes: waterDeviceTypes || [],
+    soundDeviceTypes: soundDeviceTypes || [],
     waterPipes: waterPipes || [],
-    waterPipeTypes: waterPipeTypes || []
+    soundCables: soundCables || [],
+    waterPipeTypes: waterPipeTypes || [],
+    soundCableTypes: soundCableTypes || []
   };
 
   const jsonStr = JSON.stringify(backupData, null, 2);
@@ -611,7 +628,9 @@ export function parseImportJson(fileContent: string): {
   cctvDeviceTypes?: any[];
   cctvCableTypes?: any[];
   waterDeviceTypes?: any[];
+  soundDeviceTypes?: any[];
   waterPipeTypes?: any[];
+  soundCableTypes?: any[];
 } {
   const parsed = JSON.parse(fileContent);
   if (!parsed || typeof parsed !== 'object') {
@@ -645,6 +664,8 @@ export function parseImportJson(fileContent: string): {
     cctvDeviceTypes: Array.isArray(parsed.cctvDeviceTypes) ? parsed.cctvDeviceTypes : undefined,
     cctvCableTypes: Array.isArray(parsed.cctvCableTypes) ? parsed.cctvCableTypes : undefined,
     waterDeviceTypes: Array.isArray(parsed.waterDeviceTypes) ? parsed.waterDeviceTypes : undefined,
-    waterPipeTypes: Array.isArray(parsed.waterPipeTypes) ? parsed.waterPipeTypes : undefined
+    soundDeviceTypes: Array.isArray(parsed.soundDeviceTypes) ? parsed.soundDeviceTypes : undefined,
+    waterPipeTypes: Array.isArray(parsed.waterPipeTypes) ? parsed.waterPipeTypes : undefined,
+    soundCableTypes: Array.isArray(parsed.soundCableTypes) ? parsed.soundCableTypes : undefined
   };
 }

@@ -54,6 +54,10 @@ import {
   saveCctvCables,
   saveWaterDevices,
   saveWaterPipes,
+  saveSoundDevices,
+  saveSoundCableRuns,
+  saveSoundDeviceTypes,
+  saveSoundCableTypes,
   saveLanDevices,
   saveLanCables,
   saveLanLocations,
@@ -914,7 +918,9 @@ export const App: React.FC = () => {
     cctvDevices?: CctvDevice[];
     cctvCables?: CctvCableRun[];
     waterDevices?: WaterDevice[];
+    soundDevices?: SoundDevice[];
     waterPipes?: WaterPipeRun[];
+    soundCables?: SoundCableRun[];
     lanLocations?: LanLocation[];
     lanZones?: LanZone[];
     lanDevices?: LanDevice[];
@@ -927,7 +933,9 @@ export const App: React.FC = () => {
     cctvDeviceTypes?: any[];
     cctvCableTypes?: any[];
     waterDeviceTypes?: any[];
+    soundDeviceTypes?: any[];
     waterPipeTypes?: any[];
+    soundCableTypes?: any[];
     urlProtocols?: any[];
     dnsRecordTypes?: any[];
   }, isDemo: boolean = false) => {
@@ -1006,6 +1014,23 @@ export const App: React.FC = () => {
     if (data.waterDeviceTypes) {
       setWaterDeviceTypes(data.waterDeviceTypes);
       saveWaterDeviceTypes(data.waterDeviceTypes);
+    }
+    
+    if (data.soundDevices) {
+      setSoundDevices(data.soundDevices);
+      saveSoundDevices(data.soundDevices);
+    }
+    if (data.soundCables) {
+      setSoundCables(data.soundCables);
+      saveSoundCableRuns(data.soundCables);
+    }
+    if (data.soundDeviceTypes) {
+      setSoundDeviceTypes(data.soundDeviceTypes);
+      saveSoundDeviceTypes(data.soundDeviceTypes);
+    }
+    if (data.soundCableTypes) {
+      setSoundCableTypes(data.soundCableTypes);
+      saveSoundCableTypes(data.soundCableTypes);
     }
     if (data.waterPipes) {
       setWaterPipes(data.waterPipes);
