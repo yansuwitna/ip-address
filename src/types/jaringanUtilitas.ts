@@ -423,3 +423,80 @@ export interface LanCableRun {
   createdAt: string;
   updatedAt: string;
 }
+
+// --- JARINGAN SOUND (TATA SUARA) ---
+export type SoundDeviceType = 
+  | 'speaker' 
+  | 'amplifier' 
+  | 'mixer' 
+  | 'microphone' 
+  | 'dsp' 
+  | 'other'
+  | string;
+
+export type SoundStatus = 'online' | 'offline' | 'maintenance';
+
+export interface SoundDevice {
+  id: string;
+  locationId?: string;
+  zoneId?: string;
+  name: string;
+  code?: string;
+  type: SoundDeviceType;
+  location: string;
+  brand?: string;
+  model?: string;
+  powerWatt?: number;
+  impedanceOhm?: number;
+  status: SoundStatus;
+  installationDate?: string;
+  pic?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SoundCableRun {
+  id: string;
+  locationId?: string;
+  zoneId?: string;
+  cableCode: string;
+  cableType: string;
+  sourceDeviceId?: string;
+  sourceDeviceName?: string;
+  sourcePort?: string;
+  sourceLocation: string;
+  targetDeviceId?: string;
+  targetDeviceName?: string;
+  targetPort?: string;
+  targetLocation: string;
+  pathwayRoute?: string;
+  lengthMeter?: number;
+  status: 'connected' | 'idle' | 'fault' | 'maintenance';
+  pic?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SoundDeviceTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SoundCableTypeItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}

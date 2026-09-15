@@ -222,7 +222,11 @@ async function startServer() {
         waterDeviceTypes,
         waterPipeTypes,
         urlProtocols,
-        dnsRecordTypes
+        dnsRecordTypes,
+        soundDevices,
+        soundCableRuns,
+        soundDeviceTypes,
+        soundCableTypes
       ] = await Promise.all([
         prisma.user.findMany(),
         prisma.iPGroup.findMany(),
@@ -251,7 +255,11 @@ async function startServer() {
         prisma.waterDeviceTypeModel.findMany(),
         prisma.waterPipeType.findMany(),
         prisma.urlProtocol.findMany(),
-        prisma.dnsRecordTypeModel.findMany()
+        prisma.dnsRecordTypeModel.findMany(),
+        prisma.soundDevice.findMany(),
+        prisma.soundCableRun.findMany(),
+        prisma.soundDeviceTypeModel.findMany(),
+        prisma.soundCableType.findMany()
       ]);
       
       res.json({
@@ -282,7 +290,15 @@ async function startServer() {
         'netipam_water_device_types_v1': waterDeviceTypes,
         'netipam_water_pipe_types_v1': waterPipeTypes,
         'netipam_url_protocols_v1': urlProtocols,
-        'netipam_dns_record_types_v1': dnsRecordTypes
+        'netipam_dns_record_types_v1': dnsRecordTypes,
+        'netipam_sound_devices_v1': soundDevices,
+        'netipam_sound_cables_v1': soundCableRuns,
+        'netipam_sound_device_types_v1': soundDeviceTypes,
+        'netipam_sound_cable_types_v1': soundCableTypes,
+        soundDevices,
+        soundCableRuns,
+        soundDeviceTypes,
+        soundCableTypes
       });
     } catch (error) {
       console.error(error);
@@ -407,6 +423,18 @@ async function startServer() {
         case 'netipam_dns_record_types_v1':
           await replaceTable(prisma.dnsRecordTypeModel, data);
           break;
+        case 'netipam_sound_devices_v1':
+          await replaceTable(prisma.soundDevice, data);
+          break;
+        case 'netipam_sound_cables_v1':
+          await replaceTable(prisma.soundCableRun, data);
+          break;
+        case 'netipam_sound_device_types_v1':
+          await replaceTable(prisma.soundDeviceTypeModel, data);
+          break;
+        case 'netipam_sound_cable_types_v1':
+          await replaceTable(prisma.soundCableType, data);
+          break;
         default:
           return res.status(400).json({ error: 'Unknown key' });
       }
@@ -448,7 +476,11 @@ async function startServer() {
         prisma.waterDeviceTypeModel.deleteMany({}),
         prisma.waterPipeType.deleteMany({}),
         prisma.urlProtocol.deleteMany({}),
-        prisma.dnsRecordTypeModel.deleteMany({})
+        prisma.dnsRecordTypeModel.deleteMany({}),
+        prisma.soundDevice.deleteMany({}),
+        prisma.soundCableRun.deleteMany({}),
+        prisma.soundDeviceTypeModel.deleteMany({}),
+        prisma.soundCableType.deleteMany({})
       ]);
       res.json({ success: true });
     } catch (error) {

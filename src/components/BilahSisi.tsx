@@ -15,6 +15,7 @@ import {
   Moon,
   Zap,
   Video,
+  Volume2,
   Droplets,
   Server,
   DoorOpen,
@@ -45,6 +46,9 @@ export type NavTab =
   | 'cctv_cable_types'
   | 'water_device_types'
   | 'water_pipe_types'
+  | 'sound'
+  | 'sound_device_types'
+  | 'sound_cable_types'
   | 'users' 
   | 'backup';
 
@@ -220,6 +224,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
       activeColor: 'bg-cyan-600'
     }
   ];
+  // 5. Sektor SOUND (Jaringan Tata Suara)
+  const soundGroupItems: NavItem[] = [
+    {
+      id: 'sound',
+      label: 'Jaringan Sound',
+      icon: Volume2,
+      description: 'Speaker, Amp & Mixer',
+      activeColor: 'bg-indigo-500'
+    },
+    {
+      id: 'sound_device_types',
+      label: 'Tipe Hardware Sound',
+      icon: Volume2,
+      description: 'Master Jenis Alat Suara',
+      activeColor: 'bg-indigo-500'
+    },
+    {
+      id: 'sound_cable_types',
+      label: 'Jenis Kabel Sound',
+      icon: Volume2,
+      description: 'Master Tipe Kabel Audio',
+      activeColor: 'bg-indigo-500'
+    }
+  ];
+
 
   // 5. Ruangan & Lokasi (Kelompok Terpisah)
   const roomItems: NavItem[] = [
@@ -664,6 +693,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
               );
             })}
           </div>
+          {/* 7. SEKTOR SOUND */}
+          <div className="space-y-1">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>Jaringan Sound</span>
+            </div>
+
+            {soundGroupItems.map(item => {
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              const activeBg = item.activeColor || 'bg-indigo-500';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                    isActive
+                      ? `${activeBg} text-white shadow-sm font-bold`
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                    }`} />
+                    <div className="text-left">
+                      <div>{item.label}</div>
+                      <div className={`text-[10px] font-normal ${isActive ? 'text-white/80' : 'text-slate-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+
+                  <ChevronRight className={`w-3.5 h-3.5 opacity-0 group-hover:opacity-60 transition-opacity ${
+                    isActive ? 'opacity-100 text-white' : 'text-slate-400'
+                  }`} />
+                </button>
+              );
+            })}
+          </div>
+
 
           {/* 4. SISTEM & UTILITAS */}
           <div className="space-y-1">

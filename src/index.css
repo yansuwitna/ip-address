@@ -170,3 +170,31 @@
     size: A4 landscape;
   }
 }
+
+@media print {
+  /* Diagram Simulasi Topologi Override for Print (White Theme) */
+  .sim-node-box {
+    fill: #ffffff !important;
+    stroke: #94a3b8 !important;
+  }
+  .sim-node-circle {
+    fill: #f8fafc !important;
+    stroke: #94a3b8 !important;
+  }
+  .sim-node-name {
+    fill: #0f172a !important;
+  }
+  .sim-node-detail {
+    fill: #475569 !important;
+  }
+  .sim-cable-badge {
+    fill: #ffffff !important;
+    stroke: #cbd5e1 !important;
+  }
+  .sim-cable-text {
+    fill: #0f172a !important;
+  }
+  .sim-connector-dot {
+    stroke: #ffffff !important;
+  }
+}

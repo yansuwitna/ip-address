@@ -89,7 +89,9 @@ import {
   INITIAL_CCTV_DEVICE_TYPES,
   INITIAL_CCTV_CABLE_TYPES,
   INITIAL_WATER_DEVICE_TYPES,
-  INITIAL_WATER_PIPE_TYPES
+  INITIAL_WATER_PIPE_TYPES,
+  INITIAL_SOUND_DEVICE_TYPES,
+  INITIAL_SOUND_CABLE_TYPES
 } from './utils/penyimpanan';
 import { exportToXlsx } from './utils/eksporImpor';
 import { parseCidr } from './utils/kalkulatorIp';
@@ -114,7 +116,7 @@ import {
   CctvCableTypeItem,
   WaterDeviceTypeItem,
   WaterPipeTypeItem
-} from './types/jaringanUtilitas';
+, SoundDevice, SoundCableRun, SoundDeviceTypeItem, SoundCableTypeItem, SoundStatus } from './types/jaringanUtilitas';
 
 import { HomeView } from './components/TampilanBeranda';
 import { Login } from './components/Masuk';
@@ -138,6 +140,9 @@ import { ElectricityView } from './components/TampilanListrik';
 import { ElectricityModal } from './components/ModalListrik';
 import { ElectricityCableModal } from './components/ModalKabelListrik';
 import { CctvView } from './components/TampilanCctv';
+import { SoundModal } from './components/ModalSound';
+import { SoundCableModal } from './components/ModalKabelSound';
+import { SoundView } from './components/TampilanSound';
 import { CctvModal } from './components/ModalCctv';
 import { CctvCableModal } from './components/ModalKabelCctv';
 import { WaterView } from './components/TampilanAir';
@@ -303,6 +308,12 @@ export const App: React.FC = () => {
   const [electricityDevices, setElectricityDevices] = useState<ElectricityDevice[]>([]);
   const [electricityCables, setElectricityCables] = useState<ElectricityCableRun[]>([]);
   const [cctvDevices, setCctvDevices] = useState<CctvDevice[]>([]);
+
+  const [soundDevices, setSoundDevices] = useState<SoundDevice[]>([]);
+  const [soundCables, setSoundCables] = useState<SoundCableRun[]>([]);
+  const [soundDeviceTypes, setSoundDeviceTypes] = useState<SoundDeviceTypeItem[]>(INITIAL_SOUND_DEVICE_TYPES || []);
+  const [soundCableTypes, setSoundCableTypes] = useState<SoundCableTypeItem[]>(INITIAL_SOUND_CABLE_TYPES || []);
+
   const [cctvCables, setCctvCables] = useState<CctvCableRun[]>([]);
   const [waterDevices, setWaterDevices] = useState<WaterDevice[]>([]);
   const [waterPipes, setWaterPipes] = useState<WaterPipeRun[]>([]);
@@ -380,6 +391,8 @@ export const App: React.FC = () => {
         setWaterPipes(data['netipam_water_pipes_v1'] || []);
         setWaterDeviceTypes(data['netipam_water_device_types_v1'] || INITIAL_WATER_DEVICE_TYPES || []);
         setWaterPipeTypes(data['netipam_water_pipe_types_v1'] || INITIAL_WATER_PIPE_TYPES || []);
+        setSoundDeviceTypes(data['netipam_sound_device_types_v1'] || INITIAL_SOUND_DEVICE_TYPES || []);
+        setSoundCableTypes(data['netipam_sound_cable_types_v1'] || INITIAL_SOUND_CABLE_TYPES || []);
         
         const serverUsers: UserAccount[] = data['netipam_users_list_v1'] || [];
         setUsers(serverUsers);
@@ -522,6 +535,11 @@ export const App: React.FC = () => {
   const [electricityCableDefaultLocationId, setElectricityCableDefaultLocationId] = useState<string | undefined>(undefined);
   const [electricityCableDefaultZoneId, setElectricityCableDefaultZoneId] = useState<string | undefined>(undefined);
 
+  const [isSoundModalOpen, setIsSoundModalOpen] = useState(false);
+  const [editingSoundDevice, setEditingSoundDevice] = useState<SoundDevice | null>(null);
+  
+  const [isSoundCableModalOpen, setIsSoundCableModalOpen] = useState(false);
+  const [editingSoundCable, setEditingSoundCable] = useState<SoundCableRun | null>(null);
   const [isCctvModalOpen, setIsCctvModalOpen] = useState(false);
   const [editingCctvDevice, setEditingCctvDevice] = useState<CctvDevice | null>(null);
   const [cctvDeviceDefaultLocationId, setCctvDeviceDefaultLocationId] = useState<string | undefined>(undefined);
@@ -539,6 +557,10 @@ export const App: React.FC = () => {
 
   const [isWaterPipeModalOpen, setIsWaterPipeModalOpen] = useState(false);
   const [editingWaterPipe, setEditingWaterPipe] = useState<WaterPipeRun | null>(null);
+  const [soundDeviceDefaultLocationId, setSoundDeviceDefaultLocationId] = useState<string | undefined>(undefined);
+  const [soundDeviceDefaultZoneId, setSoundDeviceDefaultZoneId] = useState<string | undefined>(undefined);
+  const [soundCableDefaultLocationId, setSoundCableDefaultLocationId] = useState<string | undefined>(undefined);
+  const [soundCableDefaultZoneId, setSoundCableDefaultZoneId] = useState<string | undefined>(undefined);
   const [waterPipeDefaultLocationId, setWaterPipeDefaultLocationId] = useState<string | undefined>(undefined);
   const [waterPipeDefaultZoneId, setWaterPipeDefaultZoneId] = useState<string | undefined>(undefined);
 
@@ -564,7 +586,7 @@ export const App: React.FC = () => {
 
   // Print Modal state
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [printType, setPrintType] = useState<'allocations' | 'dns' | 'sub_domains' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail'>('allocations');
+  const [printType, setPrintType] = useState<'allocations' | 'dns' | 'sub_domains' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail' | 'sound_detail'>('allocations');
   const [printLocation, setPrintLocation] = useState<LanLocation | undefined>(undefined);
   const [printZone, setPrintZone] = useState<LanZone | undefined>(undefined);
   const [printParentDomain, setPrintParentDomain] = useState<DnsRecord | undefined>(undefined);
@@ -839,6 +861,12 @@ export const App: React.FC = () => {
     setElectricityDevices([]);
     setElectricityCables([]);
     setCctvDevices([]);
+
+    setSoundDevices([]);
+    setSoundCables([]);
+    setSoundDeviceTypes(INITIAL_SOUND_DEVICE_TYPES || []);
+    setSoundCableTypes(INITIAL_SOUND_CABLE_TYPES || []);
+
     setCctvCables([]);
     setWaterDevices([]);
     setWaterPipes([]);
@@ -1300,6 +1328,78 @@ export const App: React.FC = () => {
 
   const handleDeleteElectricityDevice = (id: string) => {
     setElectricityDevices(prev => prev.filter(d => d.id !== id));
+  };
+
+
+  const handleSaveSoundDevice = (devData: Partial<SoundDevice>) => {
+    const now = new Date().toISOString();
+    if (devData.id) {
+      setSoundDevices(prev => prev.map(d => d.id === devData.id ? { ...d, ...devData, updatedAt: now } as SoundDevice : d));
+      showSuccess('Perangkat Sound berhasil diperbarui!');
+    } else {
+      const newDev: SoundDevice = {
+        ...devData,
+        id: `snd-${Date.now()}`,
+        createdAt: now,
+        updatedAt: now
+      } as SoundDevice;
+      setSoundDevices(prev => [...prev, newDev]);
+      showSuccess('Perangkat Sound baru berhasil ditambahkan!');
+    }
+  };
+
+  const handleDeleteSoundDevice = (id: string) => {
+    setSoundDevices(prev => prev.filter(d => d.id !== id));
+    // Also delete connected cables
+    setSoundCables(prev => prev.filter(c => c.sourceDeviceId !== id && c.targetDeviceId !== id));
+  };
+
+  const handleSaveSoundCable = (cableData: Partial<SoundCableRun>) => {
+    const now = new Date().toISOString();
+    if (cableData.id) {
+      setSoundCables(prev => prev.map(c => c.id === cableData.id ? { ...c, ...cableData, updatedAt: now } as SoundCableRun : c));
+      showSuccess('Jalur kabel Sound berhasil diperbarui!');
+    } else {
+      const newCable: SoundCableRun = {
+        ...cableData,
+        id: `snd-cbl-${Date.now()}`,
+        createdAt: now,
+        updatedAt: now
+      } as SoundCableRun;
+      setSoundCables(prev => [...prev, newCable]);
+      showSuccess('Jalur kabel Sound baru berhasil dicatat!');
+    }
+  };
+
+  const handleDeleteSoundCable = (id: string) => {
+    setSoundCables(prev => prev.filter(c => c.id !== id));
+  };
+
+  // SOUND TYPES
+  const handleSaveSoundDeviceType = (typeItem: any) => {
+    const now = new Date().toISOString();
+    if (typeItem.id) {
+      setSoundDeviceTypes(prev => prev.map(t => t.id === typeItem.id ? { ...t, ...typeItem, updatedAt: now } : t));
+    } else {
+      setSoundDeviceTypes(prev => [...prev, { ...typeItem, id: `st-${Date.now()}`, createdAt: now, updatedAt: now }]);
+    }
+  };
+
+  const handleDeleteSoundDeviceType = (id: string) => {
+    setSoundDeviceTypes(prev => prev.filter(t => t.id !== id));
+  };
+
+  const handleSaveSoundCableType = (typeItem: any) => {
+    const now = new Date().toISOString();
+    if (typeItem.id) {
+      setSoundCableTypes(prev => prev.map(t => t.id === typeItem.id ? { ...t, ...typeItem, updatedAt: now } : t));
+    } else {
+      setSoundCableTypes(prev => [...prev, { ...typeItem, id: `sct-${Date.now()}`, createdAt: now, updatedAt: now }]);
+    }
+  };
+
+  const handleDeleteSoundCableType = (id: string) => {
+    setSoundCableTypes(prev => prev.filter(t => t.id !== id));
   };
 
   const handleSaveCctvDevice = (devData: Partial<CctvDevice>) => {
@@ -1975,7 +2075,7 @@ export const App: React.FC = () => {
                 setLanLocationSystemType(loc.systemType || 'lan');
                 setIsLanLocationModalOpen(true);
               }}
-              onOpenAddZoneModal={(locId) => {
+                            onOpenAddZoneModal={(locId) => {
                 setEditingLanZone(null);
                 setLanZoneDefaultLocationId(locId);
                 setLanZoneSystemType('lan');
@@ -2908,6 +3008,71 @@ export const App: React.FC = () => {
             />
           )}
 
+          {/* TAB: JARINGAN SOUND */}
+          {currentTab === 'sound' && (
+            <SoundView
+              locations={lanLocations.filter(loc => loc.systemType === 'sound')}
+              zones={lanZones}
+              
+              devices={soundDevices}
+              cables={soundCables}
+              onSaveLocation={handleSaveLanLocation}
+              onDeleteLocation={handleDeleteLanLocation}
+              onSaveZone={handleSaveLanZone}
+              onDeleteZone={handleDeleteLanZone}
+              onSaveDevice={handleSaveSoundDevice}
+              onDeleteDevice={handleDeleteSoundDevice}
+              onSaveCable={handleSaveSoundCable}
+              onDeleteCable={handleDeleteSoundCable}
+              onOpenAddLocationModal={() => {
+                setEditingLanLocation(null);
+                setLanLocationSystemType('sound');
+                setIsLanLocationModalOpen(true);
+              }}
+              onOpenEditLocationModal={(loc) => {
+                setEditingLanLocation(loc);
+                setLanLocationSystemType(loc.systemType || 'sound');
+                setIsLanLocationModalOpen(true);
+              }}
+              onOpenAddZoneModal={(locId) => {
+                setEditingLanZone(null);
+                setLanZoneDefaultLocationId(locId);
+                setLanZoneSystemType('sound');
+                setIsLanZoneModalOpen(true);
+              }}
+              onOpenEditZoneModal={(zone) => {
+                setEditingLanZone(zone);
+                setIsLanZoneModalOpen(true);
+              }}
+              onOpenAddDeviceModal={(locId, zId) => {
+                setEditingSoundDevice(null);
+                setSoundDeviceDefaultLocationId(locId);
+                setSoundDeviceDefaultZoneId(zId);
+                setIsSoundModalOpen(true);
+              }}
+              onOpenEditDeviceModal={(device) => {
+                setEditingSoundDevice(device);
+                setIsSoundModalOpen(true);
+              }}
+              onOpenAddCableModal={(locId, zId) => {
+                setEditingSoundCable(null);
+                setSoundCableDefaultLocationId(locId);
+                setSoundCableDefaultZoneId(zId);
+                setIsSoundCableModalOpen(true);
+              }}
+              onOpenEditCableModal={(cable) => {
+                setEditingSoundCable(cable);
+                setIsSoundCableModalOpen(true);
+              }}
+              onOpenPrintDetail={(location, zone) => {
+                setPrintType('sound_detail');
+                setPrintLocation(location);
+                setPrintZone(zone);
+                setIsPrintModalOpen(true);
+              }}
+            />
+          )}
+
           {/* TAB 3: KATEGORI PERANGKAT */}
           {currentTab === 'categories' && (
             <CategoriesView
@@ -3226,6 +3391,10 @@ export const App: React.FC = () => {
         />
       )}
 
+      
+
+      
+
       {isCctvModalOpen && (
         <CctvModal
           isOpen={isCctvModalOpen}
@@ -3282,6 +3451,46 @@ export const App: React.FC = () => {
           deviceTypes={waterDeviceTypes}
           presetLocationId={waterDeviceDefaultLocationId}
           presetZoneId={waterDeviceDefaultZoneId}
+        />
+      )}
+
+      {isSoundModalOpen && (
+        <SoundModal
+          isOpen={isSoundModalOpen}
+          onClose={() => {
+            setIsSoundModalOpen(false);
+            setEditingSoundDevice(null);
+            setSoundDeviceDefaultLocationId(undefined);
+            setSoundDeviceDefaultZoneId(undefined);
+          }}
+          onSave={handleSaveSoundDevice}
+          editDevice={editingSoundDevice}
+          locations={lanLocations.filter(l => l.systemType === 'sound')}
+          zones={lanZones.filter(z => z.systemType === 'sound')}
+          deviceTypes={soundDeviceTypes}
+          presetLocationId={soundDeviceDefaultLocationId}
+          presetZoneId={soundDeviceDefaultZoneId}
+        />
+      )}
+
+      {isSoundCableModalOpen && (
+        <SoundCableModal
+          isOpen={isSoundCableModalOpen}
+          onClose={() => {
+            setIsSoundCableModalOpen(false);
+            setEditingSoundCable(null);
+            setSoundCableDefaultLocationId(undefined);
+            setSoundCableDefaultZoneId(undefined);
+          }}
+          onSave={handleSaveSoundCable}
+          editCable={editingSoundCable}
+          soundDevices={soundDevices}
+          
+          locations={lanLocations.filter(l => l.systemType === 'sound')}
+          zones={lanZones.filter(z => z.systemType === 'sound')}
+          cableTypes={soundCableTypes}
+          presetLocationId={soundCableDefaultLocationId}
+          presetZoneId={soundCableDefaultZoneId}
         />
       )}
 

@@ -1620,3 +1620,51 @@ export const INITIAL_LAN_CABLES: LanCableRun[] = [
     updatedAt: '2026-03-01T00:00:00Z'
   }
 ];
+
+export const STORAGE_KEY_SOUND = 'netipam_sound_devices_v1';
+export const STORAGE_KEY_SOUND_CABLES = 'netipam_sound_cables_v1';
+export const STORAGE_KEY_SOUND_DEVICE_TYPES = 'netipam_sound_device_types_v1';
+export const STORAGE_KEY_SOUND_CABLE_TYPES = 'netipam_sound_cable_types_v1';
+
+export const saveSoundDevices = (devices: any[]) => {
+  localStorage.setItem(STORAGE_KEY_SOUND, JSON.stringify(devices));
+  syncToServer(STORAGE_KEY_SOUND, devices);
+};
+
+export const getSoundDevices = (): any[] => {
+  const data = localStorage.getItem(STORAGE_KEY_SOUND);
+  return data ? JSON.parse(data) : [];
+};
+
+export const saveSoundCableRuns = (cables: any[]) => {
+  localStorage.setItem(STORAGE_KEY_SOUND_CABLES, JSON.stringify(cables));
+  syncToServer(STORAGE_KEY_SOUND_CABLES, cables);
+};
+
+export const getSoundCableRuns = (): any[] => {
+  const data = localStorage.getItem(STORAGE_KEY_SOUND_CABLES);
+  return data ? JSON.parse(data) : [];
+};
+
+export const saveSoundDeviceTypes = (types: any[]) => {
+  localStorage.setItem(STORAGE_KEY_SOUND_DEVICE_TYPES, JSON.stringify(types));
+  syncToServer(STORAGE_KEY_SOUND_DEVICE_TYPES, types);
+};
+
+export const getSoundDeviceTypes = (): any[] => {
+  const data = localStorage.getItem(STORAGE_KEY_SOUND_DEVICE_TYPES);
+  return data ? JSON.parse(data) : [];
+};
+
+export const saveSoundCableTypes = (types: any[]) => {
+  localStorage.setItem(STORAGE_KEY_SOUND_CABLE_TYPES, JSON.stringify(types));
+  syncToServer(STORAGE_KEY_SOUND_CABLE_TYPES, types);
+};
+
+export const getSoundCableTypes = (): any[] => {
+  const data = localStorage.getItem(STORAGE_KEY_SOUND_CABLE_TYPES);
+  return data ? JSON.parse(data) : [];
+};
+
+export const INITIAL_SOUND_DEVICE_TYPES: any[] = [];
+export const INITIAL_SOUND_CABLE_TYPES: any[] = [];

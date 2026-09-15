@@ -27,10 +27,11 @@ import {
   Columns,
   Rows,
   Printer
+, Volume2
 } from 'lucide-react';
 import { LanLocation, LanZone } from '../types/jaringanUtilitas';
 
-export type SimulationUtilityType = 'lan' | 'listrik' | 'cctv' | 'air';
+export type SimulationUtilityType = 'lan' | 'listrik' | 'cctv' | 'air' | 'sound';
 
 export interface GenericSimulationDevice {
   id: string;
@@ -159,6 +160,17 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
           cableLabel: 'Jalur Pipa Air',
           particleColor: '#a5f3fc'
         };
+      
+      case 'sound':
+        return {
+          title: 'Simulasi Topologi Jaringan Tata Suara (Sound) & Audio',
+          badgeText: 'Kabel Audio / Speaker',
+          icon: Volume2,
+          headerGradient: 'from-indigo-600 to-purple-600',
+          accentColor: '#6366f1',
+          cableLabel: 'Jalur Kabel Sound',
+          particleColor: '#c7d2fe'
+        };
       case 'lan':
       default:
         return {
@@ -217,7 +229,8 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
         else {
           tier4.push(d);
         }
-      } else if (utilityType === 'air') {
+      } else 
+    if (utilityType === 'air') {
         // Tier 1: Sumber Air (Toren / Tandon, Pompa Submersible)
         if (type.includes('water_tank') || type.includes('submersible') || type.includes('filter')) {
           tier1.push(d);
@@ -777,6 +790,12 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
       if (t.includes('nvr') || t.includes('dvr')) return <Server className="w-5 h-5 text-indigo-400" />;
       return <Video className="w-5 h-5 text-rose-400" />;
     }
+    
+    if (utilityType === 'sound') {
+      if (t.includes('mixer')) return <Layers className="w-5 h-5 text-purple-400" />;
+      if (t.includes('amplifier') || t.includes('dsp')) return <Server className="w-5 h-5 text-indigo-400" />;
+      return <Volume2 className="w-5 h-5 text-indigo-400" />;
+    }
     if (utilityType === 'air') {
       return <Droplets className="w-5 h-5 text-cyan-400" />;
     }
@@ -1281,7 +1300,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                           fill={neonColor}
                           stroke="#080e1a"
                           strokeWidth="1.5"
-                        />
+                         className="sim-connector-dot" />
                       )}
                       {!isTargetVirtual && (
                         <circle
@@ -1291,14 +1310,14 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                           fill={neonColor}
                           stroke="#080e1a"
                           strokeWidth="1.5"
-                        />
+                         className="sim-connector-dot" />
                       )}
 
                       {isSourceVirtual && (
                         <g transform={`translate(${sourcePos.x}, ${sourcePos.y})`}>
                           <circle r="6" fill="#080e1a" stroke={neonColor} strokeWidth="2" />
                           <circle r="2.5" fill={neonColor} />
-                          <text x="10" y="4" fill="#94a3b8" fontSize="9" fontWeight="600" className="pointer-events-none">
+                          <text x="10" y="4" fill="#94a3b8" fontSize="9" fontWeight="600" className="pointer-events-none sim-node-detail">
                             {cable.sourceLocation || cable.sourceDeviceName || 'Titik Asal'}
                           </text>
                         </g>
@@ -1308,7 +1327,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                         <g transform={`translate(${targetPos.x}, ${targetPos.y})`}>
                           <circle r="6" fill="#080e1a" stroke={neonColor} strokeWidth="2" />
                           <circle r="2.5" fill={neonColor} />
-                          <text x="10" y="4" fill="#94a3b8" fontSize="9" fontWeight="600" className="pointer-events-none">
+                          <text x="10" y="4" fill="#94a3b8" fontSize="9" fontWeight="600" className="pointer-events-none sim-node-detail">
                             {cable.targetLocation || cable.targetDeviceName || 'Titik Tujuan'}
                           </text>
                         </g>
@@ -1325,7 +1344,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                           fill="#0b1329"
                           stroke={isHighlighted ? utilityConfig.accentColor : '#1e3a8a'}
                           strokeWidth="1.2"
-                          className="shadow-md"
+                          className="shadow-md sim-cable-badge"
                         />
                         <text
                           x="0"
@@ -1336,6 +1355,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                           fontWeight="800"
                           fontFamily="monospace"
                           letterSpacing="0.5"
+                          className="sim-cable-text"
                         >
                           {cableCodeDisplay}
                         </text>
@@ -1360,7 +1380,8 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                   let detailText = '-';
                   if (utilityType === 'listrik') {
                     detailText = dev.voltage ? `${dev.voltage}V` : (dev.code || '-');
-                  } else if (utilityType === 'air') {
+                  } else 
+    if (utilityType === 'air') {
                     detailText = dev.pipeDiameter ? `Ø ${dev.pipeDiameter}` : (dev.code || '-');
                   } else {
                     // LAN / CCTV
@@ -1407,7 +1428,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                         fill={isDraggingThis ? '#1e293b' : isHighlighted ? '#0f172a' : '#0b1329'}
                         stroke={isDraggingThis ? '#38bdf8' : isHighlighted ? utilityConfig.accentColor : '#1e293b'}
                         strokeWidth={isDraggingThis || isHighlighted ? 2 : 1.2}
-                        className="transition-all group-hover:stroke-sky-500 shadow-2xl"
+                        className="transition-all group-hover:stroke-sky-500 shadow-2xl sim-node-box"
                       />
 
                       {/* Drag Handle Grip Icon (6 titik penanda drag di kiri atas) */}
@@ -1430,7 +1451,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                           fill="#0f172a"
                           stroke="#1e293b"
                           strokeWidth="1"
-                        />
+                         className="sim-node-circle" />
                         <g transform="translate(-10, -10)">
                           {renderDeviceIcon(dev.type)}
                         </g>
@@ -1443,7 +1464,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                         fill="#ffffff"
                         fontSize="11"
                         fontWeight="800"
-                        className="truncate pointer-events-none tracking-wide"
+                        className="truncate pointer-events-none tracking-wide sim-node-name"
                       >
                         {dev.name && dev.name.length > 13 ? `${dev.name.substring(0, 12)}…` : (dev.name || 'Perangkat')}
                       </text>
@@ -1456,7 +1477,7 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                         fontSize="8.5"
                         fontWeight="500"
                         fontFamily="monospace"
-                        className="pointer-events-none"
+                        className="pointer-events-none sim-node-detail"
                       >
                         {detailText}
                       </text>
@@ -1480,9 +1501,8 @@ export const ModalDiagramSimulasi: React.FC<ModalDiagramSimulasiProps> = ({
                         fill={statusStyle.stroke}
                         stroke="#080e1a"
                         strokeWidth="1.5"
-                        className="pointer-events-none"
-                        style={{ filter: 'drop-shadow(0 0 4px rgba(16, 185, 129, 0.7))' }}
-                      />
+                        className="pointer-events-none sim-connector-dot"
+                        style={{ filter: 'drop-shadow(0 0 4px rgba(16, 185, 129, 0.7))' }} />
                     </g>
                   );
                 })}

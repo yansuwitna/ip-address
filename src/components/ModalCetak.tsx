@@ -20,7 +20,7 @@ interface PrintModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-  type: 'allocations' | 'dns' | 'sub_domains' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail';
+  type: 'allocations' | 'dns' | 'sub_domains' | 'services' | 'lan_detail' | 'electricity_detail' | 'cctv_detail' | 'water_detail' | 'sound_detail';
   group?: IPGroup;
   groups?: IPGroup[];
   allocations?: IPAllocation[];
