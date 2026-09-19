@@ -2449,8 +2449,9 @@ export const App: React.FC = () => {
                         const usable = subnet ? subnet.usableHosts : 254;
                         const pct = usable > 0 ? Math.round(((used + resv) / usable) * 100) : 0;
                         const hasUsedIps = used > 0 || grpAllocs.length > 0;
+                        const grpAllocIds = grpAllocs.map(a => a.id);
                         const grpAllocIps = grpAllocs.map(a => a.ip);
-                        const grpServicesCount = services.filter(s => grpAllocIps.includes(s.ip)).length;
+                        const grpServicesCount = services.filter(s => (s.allocationId ? grpAllocIds.includes(s.allocationId) : grpAllocIps.includes(s.ip))).length;
 
                         return (
                           <div
@@ -2524,29 +2525,6 @@ export const App: React.FC = () => {
                                   <ArrowRight className="w-3.5 h-3.5" />
                                 </button>
 
-                                {/* Tombol Layanan & Port Subnet */}
-                                <button
-                                  onClick={() => {
-                                    setSelectedGroupId(grp.id);
-                                    const firstAlloc = grpAllocs[0];
-                                    setSelectedServiceIp(firstAlloc ? firstAlloc.id : 'all');
-                                    setCurrentTab('services');
-                                  }}
-                                  title={`Kelola Layanan & Port Subnet (${grpServicesCount} layanan terdaftar)`}
-                                  className={`p-2 rounded-xl transition-all cursor-pointer relative ${
-                                    grpServicesCount > 0
-                                      ? 'bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white shadow-2xs'
-                                      : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-                                  }`}
-                                >
-                                  <ServerCog className="w-4 h-4" />
-                                  {grpServicesCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center ring-1 ring-white">
-                                      {grpServicesCount}
-                                    </span>
-                                  )}
-                                </button>
-
                                 <button
                                   onClick={() => {
                                     setEditingGroup(grp);
@@ -2618,8 +2596,9 @@ export const App: React.FC = () => {
                               const usable = subnet ? subnet.usableHosts : 254;
                               const pct = usable > 0 ? Math.round(((used + resv) / usable) * 100) : 0;
                               const hasUsedIps = used > 0 || grpAllocs.length > 0;
+                              const grpAllocIds = grpAllocs.map(a => a.id);
                               const grpAllocIps = grpAllocs.map(a => a.ip);
-                              const grpServicesCount = services.filter(s => grpAllocIps.includes(s.ip)).length;
+                              const grpServicesCount = services.filter(s => (s.allocationId ? grpAllocIds.includes(s.allocationId) : grpAllocIps.includes(s.ip))).length;
 
                               return (
                                 <tr key={grp.id} className="hover:bg-blue-50/30 transition-colors">
@@ -2697,20 +2676,6 @@ export const App: React.FC = () => {
                                       >
                                         <span>Kelola Host</span>
                                         <ArrowRight className="w-3 h-3" />
-                                      </button>
-
-                                      {/* Tombol Icon Layanan pada Kolom Aksi */}
-                                      <button
-                                        onClick={() => {
-                                          setSelectedGroupId(grp.id);
-                                          const firstAlloc = grpAllocs[0];
-                                          setSelectedServiceIp(firstAlloc ? firstAlloc.id : 'all');
-                                          setCurrentTab('services');
-                                        }}
-                                        title={`Kelola Layanan & Port Subnet (${grpServicesCount} layanan terdaftar)`}
-                                        className="p-1.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white rounded-lg transition-all cursor-pointer"
-                                      >
-                                        <ServerCog className="w-3.5 h-3.5" />
                                       </button>
 
                                       <button

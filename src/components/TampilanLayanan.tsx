@@ -121,7 +121,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
       if (selectedIp !== 'all') {
         const selectedAlloc = allocations.find(a => a.id === selectedIp || a.ip === selectedIp);
         if (selectedAlloc) {
-          if (svc.allocationId !== selectedAlloc.id && svc.ip !== selectedAlloc.ip) return false;
+          if (svc.allocationId ? svc.allocationId !== selectedAlloc.id : svc.ip !== selectedAlloc.ip) return false;
         } else if (svc.ip !== selectedIp) {
           return false;
         }
@@ -129,7 +129,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
 
       // Filter by Subnet if set
       if (selectedSubnetId !== 'all') {
-        const alloc = allocations.find(a => a.id === svc.allocationId) || allocations.find(a => a.ip === svc.ip);
+        const alloc = allocations.find(a => (svc.allocationId ? a.id === svc.allocationId : a.ip === svc.ip));
         if (!alloc || alloc.groupId !== selectedSubnetId) return false;
       }
 
@@ -237,7 +237,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
               title="Kembali ke halaman kelola alokasi IP host"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-              <span>Kembali ke Kelola IP Host</span>
+              <span>Kembali</span>
             </button>
           )}
 
