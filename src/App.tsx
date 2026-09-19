@@ -2361,7 +2361,7 @@ export const App: React.FC = () => {
                       }}
                       onManageServices={(alloc) => {
                         setSelectedGroupId(alloc.groupId);
-                        setSelectedServiceIp(alloc.ip);
+                        setSelectedServiceIp(alloc.id);
                         setCurrentTab('services');
                       }}
                       onOpenPrint={() => {
@@ -2704,7 +2704,7 @@ export const App: React.FC = () => {
                                         onClick={() => {
                                           setSelectedGroupId(grp.id);
                                           const firstAlloc = grpAllocs[0];
-                                          setSelectedServiceIp(firstAlloc ? firstAlloc.ip : 'all');
+                                          setSelectedServiceIp(firstAlloc ? firstAlloc.id : 'all');
                                           setCurrentTab('services');
                                         }}
                                         title={`Kelola Layanan & Port Subnet (${grpServicesCount} layanan terdaftar)`}
