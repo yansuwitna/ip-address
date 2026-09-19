@@ -2529,7 +2529,7 @@ export const App: React.FC = () => {
                                   onClick={() => {
                                     setSelectedGroupId(grp.id);
                                     const firstAlloc = grpAllocs[0];
-                                    setSelectedServiceIp(firstAlloc ? firstAlloc.ip : 'all');
+                                    setSelectedServiceIp(firstAlloc ? firstAlloc.id : 'all');
                                     setCurrentTab('services');
                                   }}
                                   title={`Kelola Layanan & Port Subnet (${grpServicesCount} layanan terdaftar)`}
@@ -2782,7 +2782,7 @@ export const App: React.FC = () => {
                   : null;
 
                 if (ipToResolve) {
-                  const alloc = allocations.find(a => a.ip === ipToResolve);
+                  const alloc = allocations.find(a => a.id === ipToResolve || a.ip === ipToResolve);
                   if (alloc) {
                     setSelectedGroupId(alloc.groupId);
                   }
