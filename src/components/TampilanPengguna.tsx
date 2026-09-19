@@ -476,8 +476,9 @@ export const UsersView: React.FC<UsersViewProps> = ({
 
       {isModalOpen && (
         <ModalPortal>
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 sm:p-7 max-w-xl w-full mx-auto shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 max-h-dvh overflow-y-auto">
+        <div className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
+      <div className="min-h-full flex items-center justify-center p-0">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 sm:p-7 max-w-xl w-full mx-auto shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-3rem)] my-auto overflow-y-auto">
             
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2.5">
@@ -645,6 +646,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
             </form>
 
           </div>
+        </div>
         </div>
         </ModalPortal>
       )}

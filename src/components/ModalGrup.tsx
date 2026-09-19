@@ -111,8 +111,9 @@ export const GroupModal: React.FC<GroupModalProps> = ({
 
   return (
     <ModalPortal>
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl w-full max-w-2xl mx-auto shadow-2xl overflow-hidden max-h-dvh flex flex-col animate-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
+      <div className="min-h-full flex items-center justify-center p-0">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl w-full max-w-2xl mx-auto shadow-2xl overflow-hidden max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-3rem)] my-auto flex flex-col animate-in zoom-in-95 duration-150">
         
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -136,7 +137,8 @@ export const GroupModal: React.FC<GroupModalProps> = ({
         </div>
 
         {/* Modal Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
           {error && (
             <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-900/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs">
               {error}
@@ -281,7 +283,9 @@ export const GroupModal: React.FC<GroupModalProps> = ({
           </div>
 
           {/* Buttons */}
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:space-x-2 sm:gap-0 pt-3 border-t border-slate-100 w-full">
+          </div>
+
+          <div className="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800/80 flex-shrink-0 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:space-x-2 sm:gap-0 pt-3 border-t border-slate-100 w-full">
             <button
               type="button"
               onClick={onClose}
@@ -299,6 +303,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
         </form>
 
       </div>
+    </div>
     </div>
     </ModalPortal>
   );

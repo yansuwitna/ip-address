@@ -300,8 +300,9 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
 
       {isModalOpen && (
         <ModalPortal>
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl w-full max-w-2xl mx-auto shadow-2xl overflow-hidden max-h-dvh flex flex-col animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 bg-slate-900/60 backdrop-blur-xs font-poppins animate-in fade-in duration-150">
+      <div className="min-h-full flex items-center justify-center p-0">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl w-full max-w-2xl mx-auto shadow-2xl overflow-hidden max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-3rem)] my-auto flex flex-col animate-in zoom-in-95 duration-150">
             <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
               <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <Globe className="w-5 h-5 text-blue-600" />
@@ -309,7 +310,8 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
               </h3>
             </div>
 
-            <form onSubmit={submitModal} className="p-6 space-y-5">
+            <form onSubmit={submitModal} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          <div className="p-6 space-y-5 overflow-y-auto flex-1 min-h-0">
               
               <div className="space-y-4">
                 {/* Prefix Subdomain & Protocol */}
@@ -458,7 +460,9 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
               </div>
 
               {/* Actions Footer */}
-              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800 w-full">
+              </div>
+
+          <div className="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800/80 flex-shrink-0 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800 w-full">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
@@ -477,6 +481,7 @@ export const SubDomainView: React.FC<SubDomainViewProps> = ({
 
             </form>
           </div>
+        </div>
         </div>
         </ModalPortal>
       )}
