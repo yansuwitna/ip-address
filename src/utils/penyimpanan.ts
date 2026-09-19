@@ -7,7 +7,8 @@ import {
   DnsRecord, 
   SubDomainRecord,
   UrlProtocolItem,
-  DnsRecordTypeItem
+  DnsRecordTypeItem,
+  ServiceCategoryItem
 } from '../types/ipam';
 
 const STORAGE_KEYS = {
@@ -1668,3 +1669,30 @@ export const getSoundCableTypes = (): any[] => {
 
 export const INITIAL_SOUND_DEVICE_TYPES: any[] = [];
 export const INITIAL_SOUND_CABLE_TYPES: any[] = [];
+
+export const INITIAL_SERVICE_CATEGORIES: ServiceCategoryItem[] = [
+  { id: 'scat-1', name: 'Web & API Server', code: 'web', description: 'HTTP, HTTPS, Web Server (Nginx, Apache, Node, Web Admin)', icon: 'Globe', isDefault: true },
+  { id: 'scat-2', name: 'Basis Data (Database)', code: 'database', description: 'Database Server (MySQL, PostgreSQL, MongoDB, Redis, MSSQL)', icon: 'Database', isDefault: true },
+  { id: 'scat-3', name: 'Akses Remote / SSH', code: 'remote', description: 'Remote Access (SSH, RDP, Telnet, VNC Console)', icon: 'Terminal', isDefault: true },
+  { id: 'scat-4', name: 'Jaringan & Routing', code: 'network', description: 'Network Core & Services (Winbox, DNS, DHCP, NTP, API)', icon: 'Network', isDefault: true },
+  { id: 'scat-5', name: 'Keamanan & VPN', code: 'security', description: 'VPN & Security (OpenVPN, WireGuard, FortiGate SSL-VPN, Firewall)', icon: 'ShieldCheck', isDefault: true },
+  { id: 'scat-6', name: 'File & Storage Share', code: 'file', description: 'Storage & File Transfer (FTP, SMB, NFS, MinIO, NAS)', icon: 'HardDrive', isDefault: true },
+  { id: 'scat-7', name: 'Monitoring & Logging', code: 'monitoring', description: 'Metrics & Monitoring (Prometheus, Grafana, SNMP, Zabbix)', icon: 'Activity', isDefault: true },
+  { id: 'scat-8', name: 'Video & Streaming', code: 'streaming', description: 'Video Feed & Streaming (RTSP Camera, NVR, Streaming Server)', icon: 'Video', isDefault: true },
+  { id: 'scat-9', name: 'IoT & Sensor Smart Device', code: 'iot', description: 'IoT Broker & Smart Sensor (MQTT, Fingerprint, Smart Display)', icon: 'Cpu', isDefault: true },
+  { id: 'scat-10', name: 'Email & Messaging Service', code: 'mail', description: 'Mail Server (SMTP, IMAP, POP3, Mail Relay)', icon: 'ServerCog', isDefault: true },
+  { id: 'scat-11', name: 'Lainnya / General Service', code: 'other', description: 'Layanan dan daemon umum lainnya', icon: 'ServerCog', isDefault: true }
+];
+
+export const STORAGE_KEY_SERVICE_CATEGORIES = 'netipam_service_categories_v1';
+
+export const saveServiceCategories = (items: ServiceCategoryItem[]) => {
+  localStorage.setItem(STORAGE_KEY_SERVICE_CATEGORIES, JSON.stringify(items));
+  syncToServer(STORAGE_KEY_SERVICE_CATEGORIES, items);
+};
+
+export const getServiceCategories = (): ServiceCategoryItem[] => {
+  const data = localStorage.getItem(STORAGE_KEY_SERVICE_CATEGORIES);
+  return data ? JSON.parse(data) : INITIAL_SERVICE_CATEGORIES;
+};
+

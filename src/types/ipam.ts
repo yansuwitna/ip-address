@@ -154,3 +154,15 @@ export interface DnsRecordTypeItem {
   updatedAt?: string;
 }
 
+export interface ServiceCategoryItem {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+

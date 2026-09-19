@@ -68,6 +68,19 @@ model DeviceCategory {
   @@map("kategori_perangkat")
 }
 
+model ServiceCategoryModel {
+  id          String   @id @map("id")
+  name        String   @map("nama_kategori")
+  code        String   @unique @map("kode")
+  description String?  @map("deskripsi")
+  icon        String?  @map("ikon")
+  isDefault   Boolean? @default(false) @map("apakah_standar")
+  createdAt   String   @map("dibuat_pada")
+  updatedAt   String   @map("diperbarui_pada")
+
+  @@map("kategori_layanan")
+}
+
 model IPService {
   id           String  @id @map("id")
   allocationId String  @default("") @map("id_alokasi")

@@ -21,7 +21,7 @@ import {
   Link2,
   BookmarkCheck
 } from 'lucide-react';
-import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord, UrlProtocolItem, DnsRecordTypeItem } from './types/ipam';
+import { IPGroup, IPAllocation, DeviceCategory, IPService, DnsRecord, SubDomainRecord, UrlProtocolItem, DnsRecordTypeItem, ServiceCategoryItem } from './types/ipam';
 import { User, UserAccount } from './types/auth';
 import { 
   getCurrentUser, 
@@ -73,6 +73,9 @@ import {
   saveWaterPipeTypes,
   saveUrlProtocols,
   saveDnsRecordTypes,
+  saveServiceCategories,
+  getServiceCategories,
+  INITIAL_SERVICE_CATEGORIES,
   INITIAL_URL_PROTOCOLS,
   INITIAL_DNS_RECORD_TYPES,
   INITIAL_ELECTRICITY_DEVICES,
@@ -98,6 +101,7 @@ import {
   INITIAL_SOUND_CABLE_TYPES
 } from './utils/penyimpanan';
 import { exportToXlsx } from './utils/eksporImpor';
+import { ServiceCategoriesView } from './components/TampilanKategoriLayanan';
 import { parseCidr } from './utils/kalkulatorIp';
 import { showConfirm, showSuccess } from './utils/swal';
 import { 
@@ -176,6 +180,7 @@ export const App: React.FC = () => {
     if (clean === '/admin/tipe-record-dns' || clean === '/admin/dns-record-types') return 'dns_record_types';
     if (clean === '/admin/layanan-ip' || clean === '/admin/services') return 'services';
     if (clean === '/admin/kategori-perangkat' || clean === '/admin/kategori' || clean === '/admin/categories') return 'categories';
+    if (clean === '/admin/kategori-layanan' || clean === '/admin/service-categories') return 'service_categories';
     if (clean === '/admin/tipe-perangkat-lan' || clean === '/admin/lan-device-types') return 'lan_device_types';
     if (clean === '/admin/jenis-kabel-lan' || clean === '/admin/lan-cable-types') return 'lan_cable_types';
     if (clean === '/admin/tipe-ruangan-lan' || clean === '/admin/tipe-ruangan' || clean === '/admin/lan-room-types') return 'lan_room_types';
@@ -204,6 +209,7 @@ export const App: React.FC = () => {
       case 'dns_record_types': return '/admin/tipe-record-dns';
       case 'services': return '/admin/layanan-ip';
       case 'categories': return '/admin/kategori-perangkat';
+      case 'service_categories': return '/admin/kategori-layanan';
       case 'lan_device_types': return '/admin/tipe-perangkat-lan';
       case 'lan_cable_types': return '/admin/jenis-kabel-lan';
       case 'lan_room_types': return '/admin/tipe-ruangan-lan';
@@ -336,6 +342,7 @@ export const App: React.FC = () => {
   const [cctvCableTypes, setCctvCableTypes] = useState<CctvCableTypeItem[]>([]);
   const [waterDeviceTypes, setWaterDeviceTypes] = useState<WaterDeviceTypeItem[]>([]);
   const [waterPipeTypes, setWaterPipeTypes] = useState<WaterPipeTypeItem[]>([]);
+  const [serviceCategories, setServiceCategories] = useState<ServiceCategoryItem[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
   const [selectedServiceIp, setSelectedServiceIp] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'matrix' | 'table'>('matrix');
@@ -397,6 +404,9 @@ export const App: React.FC = () => {
         setWaterPipeTypes(data['netipam_water_pipe_types_v1'] || INITIAL_WATER_PIPE_TYPES || []);
         setSoundDeviceTypes(data['netipam_sound_device_types_v1'] || INITIAL_SOUND_DEVICE_TYPES || []);
         setSoundCableTypes(data['netipam_sound_cable_types_v1'] || INITIAL_SOUND_CABLE_TYPES || []);
+        
+        const serverServiceCategories = data['netipam_service_categories_v1'];
+        setServiceCategories(serverServiceCategories && serverServiceCategories.length > 0 ? serverServiceCategories : (INITIAL_SERVICE_CATEGORIES || []));
         
         const serverUsers: UserAccount[] = data['netipam_users_list_v1'] || [];
         setUsers(serverUsers);
@@ -758,6 +768,35 @@ export const App: React.FC = () => {
       saveDnsRecordTypes(dnsRecordTypes);
     }
   }, [dnsRecordTypes, isSyncing]);
+
+  useEffect(() => {
+    if (!isSyncing) {
+      saveServiceCategories(serviceCategories);
+    }
+  }, [serviceCategories, isSyncing]);
+
+  const handleSaveServiceCategory = (item: ServiceCategoryItem) => {
+    const isEdit = serviceCategories.some(c => c.id === item.id);
+    setServiceCategories(prev => {
+      const exists = prev.some(c => c.id === item.id);
+      if (exists) {
+        return prev.map(c => c.id === item.id ? item : c);
+      }
+      return [...prev, item];
+    });
+    showSuccess(
+      isEdit ? 'Kategori Layanan Diperbarui' : 'Kategori Layanan Disimpan',
+      `Kategori layanan "${item.name}" berhasil ${isEdit ? 'diubah' : 'ditambahkan'}.`
+    );
+  };
+
+  const handleDeleteServiceCategory = (id: string) => {
+    const target = serviceCategories.find(c => c.id === id);
+    setServiceCategories(prev => prev.filter(c => c.id !== id));
+    if (target) {
+      showSuccess('Kategori Layanan Dihapus', `Kategori "${target.name}" berhasil dihapus.`);
+    }
+  };
 
 
 
@@ -1964,6 +2003,7 @@ export const App: React.FC = () => {
       case 'dns_record_types': return 'Master Tipe Record DNS';
       case 'services': return 'Layanan & Port IP';
       case 'categories': return 'Kategori Perangkat';
+      case 'service_categories': return 'Kategori Layanan';
       case 'lan_device_types': return 'Master Tipe Perangkat LAN';
       case 'lan_cable_types': return 'Master Jenis Kabel LAN';
       case 'lan_room_types': return 'Master Tipe Ruangan LAN';
@@ -2731,6 +2771,7 @@ export const App: React.FC = () => {
               allocations={allocations}
               groups={groups}
               categories={categories}
+              serviceCategories={serviceCategories}
               focusedIp={selectedServiceIp}
               onSelectIp={(ip) => setSelectedServiceIp(ip)}
               onBackToGroups={(targetIp) => {
@@ -3105,6 +3146,16 @@ export const App: React.FC = () => {
               allocations={allocations}
               onSaveCategory={handleSaveCategory}
               onDeleteCategory={handleDeleteCategory}
+            />
+          )}
+
+          {/* TAB: KATEGORI LAYANAN */}
+          {currentTab === 'service_categories' && (
+            <ServiceCategoriesView
+              serviceCategories={serviceCategories}
+              services={services}
+              onSaveCategory={handleSaveServiceCategory}
+              onDeleteCategory={handleDeleteServiceCategory}
             />
           )}
 

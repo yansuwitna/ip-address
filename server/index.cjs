@@ -226,7 +226,8 @@ async function startServer() {
         soundDevices,
         soundCableRuns,
         soundDeviceTypes,
-        soundCableTypes
+        soundCableTypes,
+        serviceCategories
       ] = await Promise.all([
         prisma.user.findMany(),
         prisma.iPGroup.findMany(),
@@ -259,7 +260,8 @@ async function startServer() {
         prisma.soundDevice.findMany(),
         prisma.soundCableRun.findMany(),
         prisma.soundDeviceTypeModel.findMany(),
-        prisma.soundCableType.findMany()
+        prisma.soundCableType.findMany(),
+        prisma.serviceCategoryModel.findMany()
       ]);
       
       res.json({
@@ -295,6 +297,7 @@ async function startServer() {
         'netipam_sound_cables_v1': soundCableRuns,
         'netipam_sound_device_types_v1': soundDeviceTypes,
         'netipam_sound_cable_types_v1': soundCableTypes,
+        'netipam_service_categories_v1': serviceCategories,
         soundDevices,
         soundCableRuns,
         soundDeviceTypes,
@@ -435,6 +438,9 @@ async function startServer() {
         case 'netipam_sound_cable_types_v1':
           await replaceTable(prisma.soundCableType, data);
           break;
+        case 'netipam_service_categories_v1':
+          await replaceTable(prisma.serviceCategoryModel, data);
+          break;
         default:
           return res.status(400).json({ error: 'Unknown key' });
       }
@@ -480,7 +486,8 @@ async function startServer() {
         prisma.soundDevice.deleteMany({}),
         prisma.soundCableRun.deleteMany({}),
         prisma.soundDeviceTypeModel.deleteMany({}),
-        prisma.soundCableType.deleteMany({})
+        prisma.soundCableType.deleteMany({}),
+        prisma.serviceCategoryModel.deleteMany({})
       ]);
       res.json({ success: true });
     } catch (error) {

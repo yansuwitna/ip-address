@@ -38,7 +38,8 @@ import {
   ServiceCategory, 
   ServiceProtocol, 
   ServiceStatus,
-  DeviceCategory 
+  DeviceCategory,
+  ServiceCategoryItem
 } from '../types/ipam';
 import { 
   SERVICE_CATEGORIES, 
@@ -52,6 +53,7 @@ interface ServicesViewProps {
   allocations: IPAllocation[];
   groups: IPGroup[];
   categories?: DeviceCategory[];
+  serviceCategories?: ServiceCategoryItem[];
   focusedIp?: string | null;
   onSelectIp?: (ip: string | null) => void;
   onBackToGroups?: (targetIp?: string | null) => void;
@@ -64,6 +66,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
   allocations,
   groups,
   categories = [],
+  serviceCategories = [],
   focusedIp,
   onSelectIp,
   onBackToGroups,
@@ -100,10 +103,10 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
     setTimeout(() => setCopiedText(null), 2000);
   };
 
-  // Find allocation and group for currently focused IP
+  // Find allocation and group for currently focused IP or Allocation ID
   const activeAllocation = useMemo(() => {
     if (selectedIp === 'all') return null;
-    return allocations.find(a => a.ip === selectedIp) || null;
+    return allocations.find(a => a.id === selectedIp) || allocations.find(a => a.ip === selectedIp) || null;
   }, [selectedIp, allocations]);
 
   const activeGroup = useMemo(() => {
@@ -114,12 +117,19 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
   // Filtered Services List
   const filteredServices = useMemo(() => {
     return services.filter(svc => {
-      // Filter by IP
-      if (selectedIp !== 'all' && svc.ip !== selectedIp) return false;
+      // Filter by IP or allocationId
+      if (selectedIp !== 'all') {
+        const selectedAlloc = allocations.find(a => a.id === selectedIp || a.ip === selectedIp);
+        if (selectedAlloc) {
+          if (svc.allocationId !== selectedAlloc.id && svc.ip !== selectedAlloc.ip) return false;
+        } else if (svc.ip !== selectedIp) {
+          return false;
+        }
+      }
 
       // Filter by Subnet if set
       if (selectedSubnetId !== 'all') {
-        const alloc = allocations.find(a => a.ip === svc.ip);
+        const alloc = allocations.find(a => a.id === svc.allocationId) || allocations.find(a => a.ip === svc.ip);
         if (!alloc || alloc.groupId !== selectedSubnetId) return false;
       }
 
@@ -354,41 +364,6 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
             )}
           </div>
 
-          {/* Quick IP Switcher Dropdown */}
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap hidden sm:block">
-              Pilih Host:
-            </label>
-            <select
-              value={selectedIp}
-              onChange={(e) => {
-                const val = e.target.value;
-                setSelectedIp(val);
-                if (onSelectIp) onSelectIp(val === 'all' ? null : val);
-              }}
-              className="w-full sm:w-auto bg-slate-50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer min-w-[200px]"
-            >
-              <option value="all">🌐 Tampilkan Semua Host IP</option>
-              <optgroup label="Daftar Host IP Terdaftar">
-                {allocations.map(a => {
-                  const raw = (a.deviceType || '').toLowerCase();
-                  const cleanRaw = raw.replace(/_/g, ' ');
-                  const cat = categories.find(c => 
-                    c.id.toLowerCase() === raw || 
-                    c.name.toLowerCase() === raw ||
-                    c.id.toLowerCase().replace(/_/g, ' ') === cleanRaw ||
-                    c.name.toLowerCase().replace(/_/g, ' ') === cleanRaw
-                  );
-                  return (
-                    <option key={a.id} value={a.ip}>
-                      {a.ip} — {a.hostname} ({cat ? cat.name : (a.deviceType ? a.deviceType.replace(/_/g, ' ') : '-')})
-                    </option>
-                  );
-                })}
-              </optgroup>
-            </select>
-          </div>
-
         </div>
       </div>
 
@@ -559,7 +534,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                 ) : (
                   filteredServices.map(svc => {
                     const meta = getCategoryMeta(svc.category);
-                    const alloc = allocations.find(a => a.ip === svc.ip);
+                    const alloc = allocations.find(a => a.id === svc.allocationId) || allocations.find(a => a.ip === svc.ip);
                     const isTesting = testingServiceId === svc.id || isTestingAll;
 
                     return (
@@ -883,14 +858,16 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
           onClose={() => {
             setIsModalOpen(false);
             setEditingService(null);
-                      }}
+          }}
           onSave={onSaveService}
           editService={editingService}
-          presetIp={selectedIp !== 'all' ? selectedIp : allocations[0]?.ip}
+          presetAllocationId={activeAllocation?.id}
+          presetIp={activeAllocation?.ip || (selectedIp !== 'all' ? selectedIp : allocations[0]?.ip)}
           allocations={allocations}
           groups={groups}
           existingServices={services}
           categories={categories}
+          serviceCategories={serviceCategories}
         />
       )}
 

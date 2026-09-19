@@ -262,7 +262,7 @@ export const IPTable: React.FC<IPTableProps> = ({
             ) : (
               filteredAllocations.map(item => {
                 const isGateway = item.ip === group.gateway;
-                const itemServices = services.filter(s => s.allocationId === item.id || s.ip === item.ip);
+                const itemServices = services.filter(s => (s.allocationId ? s.allocationId === item.id : s.ip === item.ip));
 
                 return (
                   <tr 

@@ -10,7 +10,7 @@ import {
   Shield,
   Layers
 } from 'lucide-react';
-import { IPService, IPAllocation, IPGroup, ServiceCategory, ServiceProtocol, ServiceStatus, DeviceCategory } from '../types/ipam';
+import { IPService, IPAllocation, IPGroup, ServiceCategory, ServiceProtocol, ServiceStatus, DeviceCategory, ServiceCategoryItem } from '../types/ipam';
 import { 
   SERVICE_CATEGORIES, 
   buildDefaultServiceUrl,
@@ -24,10 +24,12 @@ interface ServiceModalProps {
   onSave: (serviceData: Partial<IPService>) => void;
   editService: IPService | null;
   presetIp?: string;
+  presetAllocationId?: string;
   allocations: IPAllocation[];
   groups: IPGroup[];
   existingServices: IPService[];
   categories?: DeviceCategory[];
+  serviceCategories?: ServiceCategoryItem[];
 }
 
 export const ServiceModal: React.FC<ServiceModalProps> = ({
@@ -36,27 +38,39 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
   onSave,
   editService,
   presetIp,
+  presetAllocationId,
   allocations,
   groups,
   existingServices,
-  categories = []
+  categories = [],
+  serviceCategories = []
 }) => {
-  // Determine initial IP
-  const defaultIp = editService?.ip || presetIp || allocations[0]?.ip || '';
-  const [ip, setIp] = useState(defaultIp);
+  // Determine initial allocation and IP
+  const defaultAlloc = editService
+    ? allocations.find(a => a.id === editService.allocationId || a.ip === editService.ip)
+    : presetAllocationId
+    ? allocations.find(a => a.id === presetAllocationId)
+    : presetIp
+    ? allocations.find(a => a.ip === presetIp)
+    : allocations[0];
+
+  const [allocationId, setAllocationId] = useState(defaultAlloc?.id || editService?.allocationId || '');
+  const [ip, setIp] = useState(defaultAlloc?.ip || editService?.ip || presetIp || allocations[0]?.ip || '');
   const [name, setName] = useState(editService?.name || '');
   const [port, setPort] = useState<number | ''>(editService?.port ?? 80);
   const [protocol, setProtocol] = useState<ServiceProtocol>(editService?.protocol || 'TCP');
-  const [category, setCategory] = useState<ServiceCategory>(editService?.category || 'web');
+  const [category, setCategory] = useState<string>(editService?.category || 'web');
   const [status, setStatus] = useState<ServiceStatus>(editService?.status || 'active');
   const [version, setVersion] = useState(editService?.version || '');
   const [url, setUrl] = useState(editService?.url || '');
   const [description, setDescription] = useState(editService?.description || '');
   const [isCustomUrl, setIsCustomUrl] = useState(Boolean(editService?.url));
 
-  // Reset when editService or presetIp changes
+  // Reset when editService, presetAllocationId, or presetIp changes
   useEffect(() => {
     if (editService) {
+      const matchAlloc = allocations.find(a => a.id === editService.allocationId || a.ip === editService.ip);
+      setAllocationId(matchAlloc?.id || editService.allocationId);
       setIp(editService.ip);
       setName(editService.name);
       setPort(editService.port);
@@ -68,37 +82,44 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
       setDescription(editService.description || '');
       setIsCustomUrl(Boolean(editService.url));
     } else {
-      const target = presetIp || allocations[0]?.ip || '';
-      setIp(target);
+      const matchAlloc = presetAllocationId
+        ? allocations.find(a => a.id === presetAllocationId)
+        : presetIp
+        ? allocations.find(a => a.ip === presetIp)
+        : allocations[0];
+
+      const targetIp = matchAlloc?.ip || presetIp || allocations[0]?.ip || '';
+      setAllocationId(matchAlloc?.id || '');
+      setIp(targetIp);
       setName('');
       setPort(80);
       setProtocol('TCP');
       setCategory('web');
       setStatus('active');
       setVersion('');
-      setUrl(target ? `http://${target}` : '');
+      setUrl(targetIp ? `http://${targetIp}` : '');
       setDescription('');
       setIsCustomUrl(false);
     }
-  }, [editService, presetIp, allocations]);
+  }, [editService, presetAllocationId, presetIp, allocations]);
 
   if (!isOpen) return null;
 
-  // Selected IP allocation object
-  const currentAlloc = allocations.find(a => a.ip === ip);
+  // Selected IP allocation object (strictly matching allocationId if present, fallback to ip)
+  const currentAlloc = allocations.find(a => (allocationId ? a.id === allocationId : a.ip === ip));
   const currentGroup = currentAlloc ? groups.find(g => g.id === currentAlloc.groupId) : null;
 
   // Conflict detection
   const conflictService = existingServices.find(s => {
     if (editService && s.id === editService.id) return false;
-    return s.ip === ip && s.port === Number(port) && (s.protocol === protocol || protocol === 'TCP/UDP' || s.protocol === 'TCP/UDP');
+    const sameHost = currentAlloc ? (s.allocationId === currentAlloc.id || s.ip === currentAlloc.ip) : (s.ip === ip);
+    return sameHost && s.port === Number(port) && (s.protocol === protocol || protocol === 'TCP/UDP' || s.protocol === 'TCP/UDP');
   });
-
 
   const handlePortChange = (val: number | '') => {
     setPort(val);
     if (!isCustomUrl && ip && typeof val === 'number') {
-      const autoUrl = buildDefaultServiceUrl(ip, val, protocol, category);
+      const autoUrl = buildDefaultServiceUrl(ip, val, protocol, category as ServiceCategory);
       if (autoUrl) setUrl(autoUrl);
     }
   };
@@ -119,16 +140,16 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
       return;
     }
 
-    const alloc = allocations.find(a => a.ip === ip);
+    const alloc = currentAlloc || allocations.find(a => a.ip === ip);
 
     onSave({
       id: editService?.id,
       allocationId: alloc?.id || `alloc-${ip}`,
-      ip,
+      ip: alloc?.ip || ip,
       name: name.trim(),
       port: portNum,
       protocol,
-      category,
+      category: category as ServiceCategory,
       status,
       version: version.trim() || undefined,
       url: url.trim() || undefined,
@@ -180,32 +201,27 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <select
-                  value={ip}
-                  onChange={(e) => {
-                    const newIp = e.target.value;
-                    setIp(newIp);
-                    if (!isCustomUrl && port) {
-                      const autoUrl = buildDefaultServiceUrl(newIp, Number(port), protocol, category);
-                      if (autoUrl) setUrl(autoUrl);
-                    }
-                  }}
-                  className="w-full bg-white dark:bg-slate-900 border border-blue-300 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  disabled
+                  value={currentAlloc?.id || allocationId || ''}
+                  className="w-full bg-slate-100 dark:bg-slate-800 border border-blue-300 dark:border-blue-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-700 dark:text-slate-300 cursor-not-allowed opacity-90"
                 >
-                  {allocations.map(a => {
-                    const raw = (a.deviceType || '').toLowerCase();
-                    const cleanRaw = raw.replace(/_/g, ' ');
-                    const cat = categories.find(c => 
-                      c.id.toLowerCase() === raw || 
-                      c.name.toLowerCase() === raw ||
-                      c.id.toLowerCase().replace(/_/g, ' ') === cleanRaw ||
-                      c.name.toLowerCase().replace(/_/g, ' ') === cleanRaw
-                    );
-                    return (
-                      <option key={a.id} value={a.ip}>
-                        {a.ip} — {a.hostname} ({cat ? cat.name : (a.deviceType ? a.deviceType.replace(/_/g, ' ') : '-')})
-                      </option>
-                    );
-                  })}
+                  {currentAlloc ? (
+                    <option value={currentAlloc.id}>
+                      {currentAlloc.ip} — {currentAlloc.hostname} ({(() => {
+                        const raw = (currentAlloc.deviceType || '').toLowerCase();
+                        const cleanRaw = raw.replace(/_/g, ' ');
+                        const cat = categories.find(c => 
+                          c.id.toLowerCase() === raw || 
+                          c.name.toLowerCase() === raw ||
+                          c.id.toLowerCase().replace(/_/g, ' ') === cleanRaw ||
+                          c.name.toLowerCase().replace(/_/g, ' ') === cleanRaw
+                        );
+                        return cat ? cat.name : (currentAlloc.deviceType ? currentAlloc.deviceType.replace(/_/g, ' ') : '-');
+                      })()})
+                    </option>
+                  ) : (
+                    <option value="">{ip || 'Pilih Host IP'}</option>
+                  )}
                 </select>
               </div>
 
@@ -289,14 +305,23 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
               </label>
               <select
                 value={category}
-                onChange={(e) => setCategory(e.target.value as ServiceCategory)}
+                onChange={(e) => setCategory(e.target.value)}
                 className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
-                {SERVICE_CATEGORIES.map(cat => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.label}
-                  </option>
-                ))}
+                {/* Master Custom Service Categories if available */}
+                {serviceCategories.length > 0 ? (
+                  serviceCategories.map(cat => (
+                    <option key={cat.id} value={cat.code}>
+                      {cat.name} ({cat.code})
+                    </option>
+                  ))
+                ) : (
+                  SERVICE_CATEGORIES.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.label}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
 

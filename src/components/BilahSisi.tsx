@@ -37,6 +37,7 @@ export type NavTab =
   | 'dns_record_types'
   | 'services' 
   | 'categories' 
+  | 'service_categories'
   | 'lan_device_types'
   | 'lan_cable_types'
   | 'lan_room_types'
@@ -261,7 +262,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  // 6. Alamat IP & Hardware (Alamat IP, Kategori Hardware)
+  // 6. Alamat IP & Hardware (Alamat IP, Kategori Hardware, Kategori Layanan)
   const ipItems: NavItem[] = [
     {
       id: 'groups',
@@ -275,6 +276,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Kategori Hardware',
       icon: Cpu,
       description: 'Kelola Tipe Hardware',
+      activeColor: 'bg-indigo-600'
+    },
+    {
+      id: 'service_categories',
+      label: 'Kategori Layanan',
+      icon: Server,
+      description: 'Master Jenis Kategori Port & Layanan',
       activeColor: 'bg-indigo-600'
     }
   ];
